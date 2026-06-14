@@ -1,0 +1,2883 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>CV SANSAM GROUP - Fleet App</title>
+  
+  <!-- PWA Setup untuk Android & iOS -->
+  <meta name="theme-color" content="#07080B">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sansam Fleet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts & FontAwesome Premium Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- ChartJS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- jsPDF & jsPDF AutoTable untuk Download PDF via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- PWA Manifest dinamis agar bisa di-install langsung di HP Android -->
+  <link id="manifest-placeholder" rel="manifest">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              black: '#07080B',
+              card: '#10121A',
+              border: '#1D2230',
+              blue: '#005CFF',
+              green: '#00CC44',
+              accent: '#3B82F6'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body {
+      background-color: #07080B;
+      color: #F3F4F6;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #10121A;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1D2230;
+      border-radius: 4px;
+    }
+    .pulsing-dot {
+      animation: pulse 2s infinite;
+    }
+    .pulsing-green-dot {
+      animation: pulseGreen 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 92, 255, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(0, 92, 255, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 92, 255, 0); }
+    }
+    @keyframes pulseGreen {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 204, 68, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(0, 204, 68, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 204, 68, 0); }
+    }
+    /* Animasi transisi antar tab agar terasa native */
+    .tab-pane {
+      transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
+    .active-scale:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-24 md:pb-6 overflow-x-hidden">
+
+  <!-- NATIVE-LIKE SPLASH SCREEN -->
+  <div id="splash-screen" class="fixed inset-0 bg-brand-black z-[9999] flex flex-col items-center justify-center transition-all duration-700">
+    <div class="text-center space-y-4 animate-bounce">
+      <div class="w-20 h-20 bg-gradient-to-tr from-brand-blue to-brand-green rounded-3xl mx-auto flex items-center justify-center shadow-xl shadow-brand-blue/20">
+        <i class="fa-solid fa-truck-fast text-white text-3xl"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl font-black tracking-wider text-white">SANSAM FLEET</h2>
+        <p class="text-xs text-brand-green font-bold tracking-[0.2em] uppercase mt-1">CV SANSAM GROUP</p>
+      </div>
+    </div>
+    <div class="absolute bottom-12 flex flex-col items-center gap-2">
+      <div class="w-12 h-1 bg-brand-border rounded-full overflow-hidden">
+        <div class="h-full w-1/2 bg-brand-blue rounded-full animate-[loading_1.5s_infinite_ease-in-out]"></div>
+      </div>
+      <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Memuat Database Internal</span>
+    </div>
+  </div>
+
+  <style>
+    @keyframes loading {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+  </style>
+
+  <!-- TOP HEADER (Clean Layout) -->
+  <header class="border-b border-brand-border bg-brand-black/95 sticky top-0 z-50 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+      
+      <!-- Brand Header -->
+      <div class="text-left">
+        <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          CV SANSAM GROUP
+          <span class="inline-flex items-center gap-1 text-[9px] bg-brand-green/10 text-brand-green border border-brand-green/20 px-2 py-0.5 rounded-full font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-green pulsing-green-dot"></span>
+            AKTIF
+          </span>
+        </h1>
+        <span class="text-[9px] text-gray-400 font-bold tracking-[0.25em] uppercase block mt-0.5">
+          Aplikasi Manajemen Internal
+        </span>
+      </div>
+      
+      <!-- PWA Install Button & Live Date -->
+      <div class="flex items-center gap-2">
+        <button id="pwa-install-btn" class="hidden active-scale bg-brand-blue hover:bg-brand-blue/90 text-white text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition shadow-lg shadow-brand-blue/25">
+          <i class="fa-solid fa-download"></i> PASANG APLIKASI
+        </button>
+        
+        <div class="hidden sm:flex items-center gap-2 bg-brand-card px-3.5 py-2 rounded-xl border border-brand-border">
+          <i class="fa-regular fa-calendar-days text-brand-green"></i>
+          <span class="text-xs font-semibold text-gray-300" id="current-date-el">13 Juni 2026</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- METRICS GRID -->
+    <section class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <!-- Metric 1: Total Omzet -->
+      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Pendapatan</p>
+        <h3 class="text-base sm:text-2xl font-black mt-1 text-white leading-tight" id="metric-total-omzet">Rp 0</h3>
+        <span class="text-[9px] text-brand-green flex items-center gap-1 mt-2 font-semibold">
+          <i class="fa-solid fa-circle text-[5px] pulsing-green-dot"></i> Total Ritase Aktif
+        </span>
+      </div>
+
+      <!-- Metric 2: Cash Di Driver -->
+      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cash Sisa (Di Driver)</p>
+        <h3 class="text-base sm:text-2xl font-black mt-1 text-amber-500 leading-tight" id="metric-cash-driver">Rp 0</h3>
+        <span class="text-[9px] text-gray-400 flex items-center gap-1 mt-2 font-semibold">
+          <i class="fa-solid fa-handshake"></i> Terpotong Solar/Panjar
+        </span>
+      </div>
+
+      <!-- Metric 3: Total Panjar Driver -->
+      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Panjar Driver</p>
+        <h3 class="text-base sm:text-2xl font-black mt-1 text-sky-400 leading-tight" id="metric-total-panjar">Rp 0</h3>
+        <span class="text-[9px] text-sky-300 flex items-center gap-1 mt-2 font-semibold">
+          <i class="fa-solid fa-hand-holding-dollar"></i> Kas Pinjaman Aktif
+        </span>
+      </div>
+
+      <!-- Metric 4: Transfer Masuk -->
+      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Lunas / TF Kasir</p>
+        <h3 class="text-base sm:text-2xl font-black mt-1 text-brand-green leading-tight" id="metric-tf-masuk">Rp 0</h3>
+        <span class="text-[9px] text-gray-400 flex items-center gap-1 mt-2 font-semibold">
+          <i class="fa-solid fa-building-columns"></i> Masuk Rekening
+        </span>
+      </div>
+
+      <!-- Metric 5: Bon / Piutang -->
+      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Bon (Tempo)</p>
+        <h3 class="text-base sm:text-2xl font-black mt-1 text-rose-500 leading-tight" id="metric-bon-total">Rp 0</h3>
+        <span class="text-[9px] text-rose-400 flex items-center gap-1 mt-2 font-semibold">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Tunggu Pelunasan
+        </span>
+      </div>
+    </section>
+
+    <!-- DESKTOP TOP NAVIGATION TAB BAR -->
+    <div class="hidden md:flex border-b border-brand-border mb-6 gap-2 py-1">
+      <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-brand-blue text-brand-blue bg-brand-card/50">
+        <i class="fa-solid fa-chart-pie"></i> Dashboard Utama
+      </button>
+      <button onclick="switchTab('input')" id="tab-btn-input" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-truck-pickup text-brand-blue"></i> Input Data & Kas
+      </button>
+      <button onclick="switchTab('rekap')" id="tab-btn-rekap" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-list-check"></i> Rekap Penjualan
+      </button>
+      <button onclick="switchTab('absensi')" id="tab-btn-absensi" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-clipboard-user"></i> Absensi Driver
+      </button>
+      <button onclick="switchTab('tracking')" id="tab-btn-tracking" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-map-location-dot text-rose-500"></i> Peta GPS Live
+      </button>
+    </div>
+
+    <!-- TAB 1: DASHBOARD -->
+    <div id="tab-content-dashboard" class="tab-pane block space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Live Driver Status list -->
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-users text-brand-blue"></i> Radar Keaktifan & Kondisi Driver
+          </h4>
+          <div class="space-y-3" id="driver-status-list">
+            <!-- Dinamis -->
+          </div>
+        </div>
+
+        <!-- Chart Penjualan -->
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center justify-between">
+            <span><i class="fa-solid fa-chart-bar text-brand-green"></i> Distribusi Ritase Driver</span>
+            <span class="text-[10px] text-gray-500 font-normal">Real-Time</span>
+          </h4>
+          <div class="h-60 relative">
+            <canvas id="driverChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed Aktivitas -->
+      <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-bell text-brand-blue"></i> Laporan Operasional Masuk
+        </h4>
+        <div class="space-y-3 max-h-64 overflow-y-auto custom-scrollbar pr-2" id="dashboard-recent-activities">
+          <!-- Dinamis -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: INPUT DIRECT FORM (RITASE & PENGELUARAN) -->
+    <div id="tab-content-input" class="tab-pane hidden">
+      <!-- Sub-Tab Switcher -->
+      <div class="flex bg-brand-black p-1.5 rounded-2xl border border-brand-border mb-6 max-w-md mx-auto">
+        <button type="button" onclick="switchInputSubTab('ritase')" id="sub-input-btn-ritase" class="flex-1 text-center py-2.5 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale">
+          <i class="fa-solid fa-truck-pickup mr-1.5"></i> Laporan Ritase
+        </button>
+        <button type="button" onclick="switchInputSubTab('pengeluaran')" id="sub-input-btn-pengeluaran" class="flex-1 text-center py-2.5 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale">
+          <i class="fa-solid fa-gas-pump mr-1.5"></i> Solar & Panjar Driver
+        </button>
+      </div>
+
+      <!-- Sub-Tab 1: FORM INPUT RITASE -->
+      <div id="sub-tab-ritase" class="block max-w-2xl mx-auto bg-brand-card border border-brand-border p-5 rounded-2xl">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-brand-blue/10 border border-brand-blue/30 flex items-center justify-center text-brand-blue">
+            <i class="fa-solid fa-truck-ramp-box text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Input Laporan Ritase Baru</h3>
+            <p class="text-xs text-gray-400">Pilih data armada di bawah untuk merekam perjalanan</p>
+          </div>
+        </div>
+
+        <form id="direct-ritase-form" onsubmit="handleDirectSubmit(event)" class="space-y-5">
+          <!-- Driver & Armada -->
+          <div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Pilih Driver & Unit</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <label class="active-scale relative flex items-center gap-3 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition duration-150">
+                <input type="radio" name="direct_driver" value="IKKI|DW 8549 BN" required class="accent-brand-blue w-4 h-4">
+                <div>
+                  <h5 class="text-xs font-bold text-white leading-none">IKKI</h5>
+                  <p class="text-[9px] text-gray-400 mt-1">DW 8549 BN</p>
+                </div>
+              </label>
+              <label class="active-scale relative flex items-center gap-3 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition duration-150">
+                <input type="radio" name="direct_driver" value="FAUZI|DD 8554 HD" class="accent-brand-blue w-4 h-4">
+                <div>
+                  <h5 class="text-xs font-bold text-white leading-none">FAUZI</h5>
+                  <p class="text-[9px] text-gray-400 mt-1">DD 8554 HD</p>
+                </div>
+              </label>
+              <label class="active-scale relative flex items-center gap-3 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition duration-150">
+                <input type="radio" name="direct_driver" value="ASO|DD 8601 RN" class="accent-brand-blue w-4 h-4">
+                <div>
+                  <h5 class="text-xs font-bold text-white leading-none">ASO</h5>
+                  <p class="text-[9px] text-gray-400 mt-1">DD 8601 RN</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Jenis Muatan -->
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label for="direct-muatan" class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Jenis Muatan</label>
+              <span class="text-[9px] text-brand-green italic font-bold">Tombol Ketuk Cepat</span>
+            </div>
+            <div class="flex flex-wrap gap-1.5 mb-2">
+              <button type="button" onclick="quickFillMuatan('Pasir Halus')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Pasir Halus</button>
+              <button type="button" onclick="quickFillMuatan('Pasir Kasar')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Pasir Kasar</button>
+              <button type="button" onclick="quickFillMuatan('Kerikil')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Kerikil</button>
+              <button type="button" onclick="quickFillMuatan('Sirtu')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Sirtu</button>
+              <button type="button" onclick="quickFillMuatan('Batu Belopa')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Batu Belopa</button>
+              <button type="button" onclick="quickFillMuatan('Batu Sidrap')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Batu Sidrap</button>
+            </div>
+            <input type="text" id="direct-muatan" required placeholder="Pilih muatan atau tulis manual..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue transition">
+          </div>
+
+          <!-- Rute / Tujuan -->
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label for="direct-rute" class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Tujuan / Rute</label>
+              <span class="text-[9px] text-brand-green italic font-bold">Tombol Rute</span>
+            </div>
+            <div class="flex flex-wrap gap-1.5 mb-2">
+              <button type="button" onclick="quickFillRute('Bolabakka')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Bolabakka</button>
+              <button type="button" onclick="quickFillRute('Doping')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Doping</button>
+              <button type="button" onclick="quickFillRute('Tarumpakkae')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Tarumpakkae</button>
+              <button type="button" onclick="quickFillRute('Siwa')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Siwa</button>
+              <button type="button" onclick="quickFillRute('Belopa')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Belopa</button>
+            </div>
+            <input type="text" id="direct-rute" required placeholder="Pilih rute di atas atau tulis manual..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue transition">
+          </div>
+
+          <!-- Metode Pembayaran -->
+          <div class="border-t border-brand-border pt-4">
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Pilih Metode Pembayaran</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" onclick="setDirectPayment('Cash')" id="pay-btn-Cash" class="active-scale pay-option-btn py-3 px-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue flex flex-col items-center gap-1.5 transition duration-150">
+                <i class="fa-solid fa-wallet text-amber-500 text-lg"></i>
+                Cash / Tunai
+              </button>
+              <button type="button" onclick="setDirectPayment('Transfer')" id="pay-btn-Transfer" class="active-scale pay-option-btn py-3 px-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue flex flex-col items-center gap-1.5 transition duration-150">
+                <i class="fa-solid fa-building-columns text-brand-blue text-lg"></i>
+                Transfer (TF)
+              </button>
+              <button type="button" onclick="setDirectPayment('Bon')" id="pay-btn-Bon" class="active-scale pay-option-btn py-3 px-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue flex flex-col items-center gap-1.5 transition duration-150">
+                <i class="fa-solid fa-file-invoice text-rose-500 text-lg"></i>
+                Bon (Tempo)
+              </button>
+            </div>
+            <input type="hidden" id="direct-selected-payment" required value="">
+          </div>
+
+          <!-- Nominal Ongkos -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label for="direct-nominal" class="block text-xs font-bold text-gray-300 uppercase tracking-wider">
+                Nominal Pembayaran (Rp) 
+                <span id="optional-label" class="text-gray-500 font-normal lowercase">(Wajib untuk Cash)</span>
+              </label>
+            </div>
+            
+            <div id="price-history-container" class="mb-2.5 hidden">
+              <p class="text-[9px] text-gray-500 font-bold uppercase tracking-wider mb-1">Riwayat Harga Terakhir:</p>
+              <div id="price-history-buttons" class="flex flex-wrap gap-1.5"></div>
+            </div>
+
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-brand-green font-bold text-xs">Rp</span>
+              <input type="number" id="direct-nominal" placeholder="Contoh: 550000" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-10 pr-4 text-xs font-bold text-white focus:outline-none focus:border-brand-blue transition">
+            </div>
+          </div>
+
+          <!-- Upload Foto Timemark -->
+          <div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Laporan Bongkar (Bukti Timemark)</label>
+            <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-5 bg-brand-black hover:border-brand-green/40 transition">
+              <input type="file" id="direct-photo-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="processDirectPhoto(event)">
+              
+              <div id="direct-upload-placeholder" class="text-center space-y-1.5 pointer-events-none">
+                <div class="w-9 h-9 bg-brand-green/10 border border-brand-green/30 text-brand-green rounded-full flex items-center justify-center mx-auto">
+                  <i class="fa-solid fa-camera text-sm"></i>
+                </div>
+                <p class="text-xs font-bold text-gray-300">Ambil / Pilih Foto Geotag HP</p>
+                <p class="text-[9px] text-gray-500">Kamera HP langsung atau galeri</p>
+              </div>
+
+              <div id="direct-photo-preview-container" class="hidden w-full space-y-2 pointer-events-none">
+                <div class="relative rounded-lg overflow-hidden border border-brand-border">
+                  <img id="direct-processed-photo-preview" class="w-full max-h-48 object-cover" src="" alt="Bukti Timemark">
+                  <div class="absolute top-2 left-2 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[8px] text-brand-green font-bold flex items-center gap-1 border border-brand-green/30">
+                    <i class="fa-solid fa-location-crosshairs"></i> GEOTAG OK
+                  </div>
+                </div>
+                <p class="text-[9px] text-brand-green text-center font-bold">✓ Bukti Foto berhasil dilampirkan.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simpan Button -->
+          <button type="submit" class="active-scale w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow-lg shadow-brand-blue/20 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-circle-check"></i> Simpan Laporan Ritase
+          </button>
+        </form>
+      </div>
+
+      <!-- Sub-Tab 2: FORM PENGELUARAN DRIVER (Solar, Panjar Driver, Dll) -->
+      <div id="sub-tab-pengeluaran" class="hidden max-w-2xl mx-auto bg-brand-card border border-brand-border p-5 rounded-2xl">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
+            <i class="fa-solid fa-gas-pump text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Catat Alokasi Pengeluaran / Panjar</h3>
+            <p class="text-xs text-gray-400">Pencatatan kas keluar oleh driver untuk solar, panjar, atau keperluan operasional</p>
+          </div>
+        </div>
+
+        <form id="driver-expense-form" onsubmit="handleExpenseSubmit(event)" class="space-y-5">
+          <!-- Pemberi Cash -->
+          <div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Pemberi Cash (Uang Kas Siapa?)</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <label class="active-scale relative flex items-center gap-2 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
+                <input type="radio" name="exp_source" value="IKKI" required class="accent-brand-blue w-3.5 h-3.5" onchange="showSourceCashInHand('IKKI')">
+                <div class="text-left">
+                  <h5 class="text-xs font-bold text-white leading-none">IKKI</h5>
+                  <span id="cash-hand-IKKI" class="text-[9px] text-amber-500 font-bold block mt-1">Rp 0</span>
+                </div>
+              </label>
+              <label class="active-scale relative flex items-center gap-2 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
+                <input type="radio" name="exp_source" value="FAUZI" class="accent-brand-blue w-3.5 h-3.5" onchange="showSourceCashInHand('FAUZI')">
+                <div class="text-left">
+                  <h5 class="text-xs font-bold text-white leading-none">FAUZI</h5>
+                  <span id="cash-hand-FAUZI" class="text-[9px] text-amber-500 font-bold block mt-1">Rp 0</span>
+                </div>
+              </label>
+              <label class="active-scale relative flex items-center gap-2 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
+                <input type="radio" name="exp_source" value="ASO" class="accent-brand-blue w-3.5 h-3.5" onchange="showSourceCashInHand('ASO')">
+                <div class="text-left">
+                  <h5 class="text-xs font-bold text-white leading-none">ASO</h5>
+                  <span id="cash-hand-ASO" class="text-[9px] text-amber-500 font-bold block mt-1">Rp 0</span>
+                </div>
+              </label>
+              <label class="active-scale relative flex items-center gap-2 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
+                <input type="radio" name="exp_source" value="KASIR" class="accent-brand-blue w-3.5 h-3.5" onchange="showSourceCashInHand('KASIR')">
+                <div class="text-left">
+                  <h5 class="text-xs font-bold text-white leading-none">KASIR</h5>
+                  <span class="text-[9px] text-emerald-500 font-bold block mt-1">Kas Kantor</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Kategori Pengeluaran (Wajib) -->
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Kategori Pengeluaran (Wajib)</label>
+            </div>
+            <div class="flex flex-wrap gap-1.5 mb-2">
+              <button type="button" onclick="setExpCategory('Solar')" id="exp-cat-btn-Solar" class="active-scale exp-category-btn bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Beli Solar</button>
+              <button type="button" onclick="setExpCategory('Panjar Driver')" id="exp-cat-btn-PanjarDriver" class="active-scale exp-category-btn bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Panjar Driver</button>
+              <button type="button" onclick="setExpCategory('Transfer Kas')" id="exp-cat-btn-TransferKas" class="active-scale exp-category-btn bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-bold"><i class="fa-solid fa-right-left text-brand-blue mr-1"></i> Transfer Kas</button>
+              <button type="button" onclick="setExpCategory('Ban & Sparepart')" id="exp-cat-btn-BanSparepart" class="active-scale exp-category-btn bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Ban & Sparepart</button>
+              <button type="button" onclick="setExpCategory('Makan & Operasional')" id="exp-cat-btn-MakanOperasional" class="active-scale exp-category-btn bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Makan / Parkir</button>
+              <button type="button" onclick="setExpCategory('Lain-lain')" id="exp-cat-btn-Lain-lain" class="active-scale exp-category-btn bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Lain-lain</button>
+            </div>
+            <input type="hidden" id="exp-category" required value="">
+          </div>
+
+          <!-- Penerima atau Tujuan Alokasi -->
+          <div>
+            <div id="recipient-text-wrapper">
+              <label for="exp-recipient" class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Penerima Alokasi Dana (Toko / Nama Tempat)</label>
+              <input type="text" id="exp-recipient" placeholder="Contoh: SPBU Bolabakka, Toko Ban..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue transition">
+            </div>
+            <div id="recipient-driver-wrapper" class="hidden">
+              <label for="exp-recipient-driver" class="block text-xs font-bold text-brand-green uppercase tracking-wider mb-1.5">Driver Penerima Kas (Kas Masuk Ke Siapa?)</label>
+              <select id="exp-recipient-driver" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue transition">
+                <option value="">-- Pilih Driver Penerima --</option>
+                <option value="IKKI">DW 8549 BN (IKKI)</option>
+                <option value="FAUZI">DD 8554 HD (FAUZI)</option>
+                <option value="ASO">DD 8601 RN (ASO)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Nominal -->
+          <div>
+            <label for="exp-nominal" class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal Uang Pengeluaran / Transfer (Rp)</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-brand-green font-bold text-xs">Rp</span>
+              <input type="number" id="exp-nominal" required placeholder="Masukkan jumlah pengeluaran..." class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-10 pr-4 text-xs font-bold text-white focus:outline-none focus:border-brand-blue transition">
+            </div>
+          </div>
+
+          <!-- Keterangan / Catatan -->
+          <div>
+            <label for="exp-note" class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Keterangan Catatan Tambahan</label>
+            <textarea id="exp-note" rows="2" placeholder="Contoh: Pinjam saldo beli solar rute Bolabakka atau panjar darurat..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue transition"></textarea>
+          </div>
+
+          <!-- Upload Bukti Pengeluaran -->
+          <div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Unggah Bukti Nota / Foto Serah Terima</label>
+            <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-4 bg-brand-black hover:border-brand-green/40 transition">
+              <input type="file" id="exp-photo-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="processExpensePhoto(event)">
+              
+              <div id="exp-upload-placeholder" class="text-center space-y-1.5 pointer-events-none">
+                <div class="w-9 h-9 bg-brand-blue/10 border border-brand-blue/30 text-brand-blue rounded-full flex items-center justify-center mx-auto">
+                  <i class="fa-solid fa-file-invoice-dollar text-sm"></i>
+                </div>
+                <p class="text-xs font-bold text-gray-300">Ambil Foto Bukti</p>
+                <p class="text-[9px] text-gray-500 font-medium">Kamera HP langsung atau galeri</p>
+              </div>
+
+              <div id="exp-photo-preview-container" class="hidden w-full space-y-2 pointer-events-none">
+                <div class="relative rounded-lg overflow-hidden border border-brand-border">
+                  <img id="exp-processed-photo-preview" class="w-full max-h-40 object-cover" src="" alt="Bukti Pengeluaran">
+                </div>
+                <p class="text-[9px] text-brand-green text-center font-bold">✓ Bukti lampiran dilampirkan.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="active-scale w-full bg-amber-500 hover:bg-amber-600 text-brand-black font-extrabold py-3 px-6 rounded-xl text-xs transition shadow-lg shadow-amber-500/10 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-circle-check"></i> Simpan Catatan / Transfer Kas
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB 3: REKAP PENJUALAN TABLE, PENGELUARAN, & PANJAR -->
+    <div id="tab-content-rekap" class="tab-pane hidden space-y-4">
+      <!-- Sub-Tab Switcher (3 Tabs) -->
+      <div class="flex bg-brand-black p-1.5 rounded-2xl border border-brand-border mb-4 max-w-lg overflow-x-auto custom-scrollbar">
+        <button type="button" onclick="switchRekapSubTab('ritase')" id="sub-rekap-btn-ritase" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale">
+          <i class="fa-solid fa-file-invoice mr-1.5"></i> Log Ritase Penjualan
+        </button>
+        <button type="button" onclick="switchRekapSubTab('pengeluaran')" id="sub-rekap-btn-pengeluaran" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale">
+          <i class="fa-solid fa-file-invoice-dollar mr-1.5"></i> Log Pengeluaran Kas
+        </button>
+        <button type="button" onclick="switchRekapSubTab('panjar')" id="sub-rekap-btn-panjar" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale">
+          <i class="fa-solid fa-hand-holding-dollar mr-1.5 text-sky-400"></i> Rekap Panjar Driver
+        </button>
+      </div>
+
+      <!-- SUB TAB REKAP RITASE -->
+      <div id="sub-tab-rekap-ritase" class="block bg-brand-card border border-brand-border p-5 rounded-2xl space-y-4">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 class="text-base font-bold text-white">Daftar Transaksi Ritase</h3>
+            <p class="text-xs text-gray-400">Total riwayat pengiriman armada dump truck CV Sansam Group</p>
+          </div>
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <button onclick="exportToCSV()" class="active-scale bg-brand-border border border-zinc-800 hover:bg-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition ml-auto md:ml-0">
+              <i class="fa-solid fa-file-excel text-brand-green"></i> Excel (CSV)
+            </button>
+            <button onclick="exportToPDF()" class="active-scale bg-brand-border border border-zinc-800 hover:bg-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition">
+              <i class="fa-solid fa-file-pdf text-rose-500"></i> Unduh PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-3.5 bg-brand-black border border-brand-border rounded-xl">
+          <div>
+            <label for="filter-driver" class="block text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Filter Driver</label>
+            <select id="filter-driver" onchange="applyFilters()" class="w-full bg-brand-card border border-brand-border rounded-lg p-2 text-xs text-white focus:outline-none">
+              <option value="All">Semua Driver</option>
+              <option value="IKKI">IKKI (DW 8549 BN)</option>
+              <option value="FAUZI">FAUZI (DD 8554 HD)</option>
+              <option value="ASO">ASO (DD 8601 RN)</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-payment" class="block text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Filter Pembayaran</label>
+            <select id="filter-payment" onchange="applyFilters()" class="w-full bg-brand-card border border-brand-border rounded-lg p-2 text-xs text-white focus:outline-none">
+              <option value="All">Semua Pembayaran</option>
+              <option value="Cash">Cash / Tunai</option>
+              <option value="Transfer">Transfer (TF)</option>
+              <option value="Bon">Bon (Tempo)</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-status" class="block text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Filter Status Setoran</label>
+            <select id="filter-status" onchange="applyFilters()" class="w-full bg-brand-card border border-brand-border rounded-lg p-2 text-xs text-white focus:outline-none">
+              <option value="All">Semua Status</option>
+              <option value="Belum Disetor">Belum Disetor</option>
+              <option value="Sudah Disetor">Sudah Disetor</option>
+              <option value="Piutang">Piutang / Tempo</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Responsive Table -->
+        <div class="overflow-x-auto custom-scrollbar rounded-xl border border-brand-border">
+          <table class="w-full text-left text-xs min-w-[900px]">
+            <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
+              <tr>
+                <th class="p-3.5">Tanggal / Waktu</th>
+                <th class="p-3.5">Armada (Driver)</th>
+                <th class="p-3.5">Rute / Tujuan</th>
+                <th class="p-3.5">Muatan</th>
+                <th class="p-3.5 text-right">Nominal</th>
+                <th class="p-3.5 text-center">Metode</th>
+                <th class="p-3.5 text-center">Setoran / Status</th>
+                <th class="p-3.5 text-center">Bukti</th>
+                <th class="p-3.5 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="rekap-table-body" class="divide-y divide-brand-border"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUB TAB REKAP PENGELUARAN KAS -->
+      <div id="sub-tab-rekap-pengeluaran" class="hidden bg-brand-card border border-brand-border p-5 rounded-2xl space-y-4">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 class="text-base font-bold text-white">Log Alokasi, Pengeluaran & Transfer Kas</h3>
+            <p class="text-xs text-gray-400">Pencatatan real-time pengeluaran solar, sparepart, dan transfer saldo antar driver</p>
+          </div>
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <button onclick="exportExpensesToCSV()" class="active-scale bg-brand-border border border-zinc-800 hover:bg-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition ml-auto md:ml-0">
+              <i class="fa-solid fa-file-excel text-amber-500"></i> Excel (CSV)
+            </button>
+            <button onclick="exportExpensesToPDF()" class="active-scale bg-brand-border border border-zinc-800 hover:bg-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition">
+              <i class="fa-solid fa-file-pdf text-rose-500"></i> Unduh PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Expense Table -->
+        <div class="overflow-x-auto custom-scrollbar rounded-xl border border-brand-border">
+          <table class="w-full text-left text-xs min-w-[800px]">
+            <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
+              <tr>
+                <th class="p-3.5">Tanggal / Waktu</th>
+                <th class="p-3.5">Sumber Dana</th>
+                <th class="p-3.5">Kategori</th>
+                <th class="p-3.5">Penerima / Alokasi</th>
+                <th class="p-3.5 text-right">Nominal Keluar</th>
+                <th class="p-3.5">Catatan/Keterangan</th>
+                <th class="p-3.5 text-center">Bukti</th>
+                <th class="p-3.5 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="expense-table-body" class="divide-y divide-brand-border"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUB TAB REKAP PANJAR DRIVER -->
+      <div id="sub-tab-rekap-panjar" class="hidden bg-brand-card border border-brand-border p-5 rounded-2xl space-y-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 class="text-base font-bold text-white">Monitoring & Rekapitulasi Panjar Driver</h3>
+            <p class="text-xs text-gray-400 font-medium">Melacak total pengajuan panjar aktif, historis pengambilan, serta sinkronisasi potong kas harian.</p>
+          </div>
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <button onclick="exportPanjarToPDF()" class="active-scale bg-brand-border border border-zinc-800 hover:bg-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition ml-auto md:ml-0">
+              <i class="fa-solid fa-file-pdf text-sky-400"></i> Unduh PDF Panjar
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Summary Cards for Panjar -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="panjar-driver-summary-cards">
+          <!-- Dinamis -->
+        </div>
+
+        <!-- History of Panjar Requests Table -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-history text-sky-400"></i> Log Pengambilan Panjar Harian
+          </h4>
+          <div class="overflow-x-auto custom-scrollbar rounded-xl border border-brand-border">
+            <table class="w-full text-left text-xs min-w-[750px]">
+              <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
+                <tr>
+                  <th class="p-3.5">Tanggal / Waktu</th>
+                  <th class="p-3.5">Nama Driver</th>
+                  <th class="p-3.5">Jumlah Panjar</th>
+                  <th class="p-3.5">Keterangan / Catatan</th>
+                  <th class="p-3.5 text-center">Bukti Foto</th>
+                  <th class="p-3.5 text-center">Status Settle</th>
+                  <th class="p-3.5 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="panjar-table-body" class="divide-y divide-brand-border">
+                <!-- Dinamis -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ABSENSI DRIVER -->
+    <div id="tab-content-absensi" class="tab-pane hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Form Absen -->
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-brand-green/10 border border-brand-green/30 flex items-center justify-center text-brand-green">
+              <i class="fa-solid fa-id-card text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">Mesin Absensi Driver</h3>
+              <p class="text-xs text-gray-400">Pencatatan kehadiran harian driver</p>
+            </div>
+          </div>
+
+          <form id="attendance-form" onsubmit="handleAttendanceSubmit(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Pilih Driver</label>
+              <select id="absensi-driver-select" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue">
+                <option value="">-- Pilih Driver --</option>
+                <option value="IKKI">DW 8549 BN (IKKI)</option>
+                <option value="FAUZI">DD 8554 HD (FAUZI)</option>
+                <option value="ASO">DD 8601 RN (ASO)</option>
+              </select>
+            </div>
+
+            <!-- Kondisi Driver -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Status / Kondisi Driver Saat Ini</label>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <label class="active-scale flex items-center justify-center gap-1.5 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-green transition">
+                  <input type="radio" name="absensi_tipe" value="Jalan" required class="accent-brand-green">
+                  <span class="text-[11px] font-bold text-white">Jalan (Aktif)</span>
+                </label>
+                <label class="active-scale flex items-center justify-center gap-1.5 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-amber-500 transition">
+                  <input type="radio" name="absensi_tipe" value="Istirahat" class="accent-amber-500">
+                  <span class="text-[11px] font-bold text-white">Istirahat</span>
+                </label>
+                <label class="active-scale flex items-center justify-center gap-1.5 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-rose-500 transition">
+                  <input type="radio" name="absensi_tipe" value="Sakit" class="accent-rose-500">
+                  <span class="text-[11px] font-bold text-white">Sakit</span>
+                </label>
+                <label class="active-scale flex items-center justify-center gap-1.5 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-orange-500 transition">
+                  <input type="radio" name="absensi_tipe" value="Izin" class="accent-orange-500">
+                  <span class="text-[11px] font-bold text-white">Izin / Off</span>
+                </label>
+                <label class="active-scale flex items-center justify-center gap-1.5 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-zinc-500 transition col-span-2 sm:col-span-1">
+                  <input type="radio" name="absensi_tipe" value="Selesai Dinas" class="accent-zinc-500">
+                  <span class="text-[11px] font-bold text-white">Selesai Tugas</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Uang Jalan / Operasional (Rp)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-brand-green font-bold text-xs">Rp</span>
+                <input type="number" id="absensi-uang-jalan" placeholder="Contoh: 150000" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-10 pr-4 text-xs text-white focus:outline-none focus:border-brand-blue">
+              </div>
+            </div>
+
+            <button type="submit" class="active-scale w-full bg-brand-green hover:bg-brand-green/90 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow-lg shadow-brand-green/20 flex items-center justify-center gap-2">
+              <i class="fa-solid fa-fingerprint"></i> Kirim Kehadiran
+            </button>
+          </form>
+        </div>
+
+        <!-- Log Absensi -->
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
+          <h3 class="text-base font-bold mb-4 flex items-center gap-2 text-white">
+            <i class="fa-solid fa-calendar-check text-brand-blue"></i> Riwayat Kehadiran Driver Hari Ini
+          </h3>
+          <div class="overflow-x-auto custom-scrollbar rounded-xl border border-brand-border">
+            <table class="w-full text-left text-xs min-w-[500px]">
+              <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
+                <tr>
+                  <th class="p-3.5">Jam Log</th>
+                  <th class="p-3.5">Nama Driver</th>
+                  <th class="p-3.5">Status Kondisi</th>
+                  <th class="p-3.5 text-right">Uang Jalan</th>
+                  <th class="p-3.5 text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody id="absensi-table-body" class="divide-y divide-brand-border"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 5: GPS TRACKING MAP -->
+    <div id="tab-content-tracking" class="tab-pane hidden space-y-6">
+      <div class="bg-brand-card border border-brand-border p-5 rounded-2xl space-y-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="text-base font-bold text-white">Pelacakan Geofence GPS</h3>
+            <p class="text-xs text-gray-400 font-medium">Monitoring armada dump truck CV Sansam Group di Kabupaten Wajo & Sekitarnya</p>
+          </div>
+          <span class="bg-brand-blue/10 border border-brand-blue/30 text-brand-blue text-[9px] px-3 py-1 rounded-full font-bold pulsing-dot flex items-center gap-1.5">
+            <i class="fa-solid fa-radio animate-pulse"></i> RADAR AKTIF
+          </span>
+        </div>
+
+        <!-- SVG Map simulation -->
+        <div class="relative bg-[#07080b] border border-brand-border rounded-xl h-80 overflow-hidden flex items-center justify-center">
+          <svg viewBox="0 0 800 400" class="w-full h-full opacity-80" id="simulated-map-svg">
+            <rect width="100%" height="100%" fill="#07080b" />
+            <path d="M 150 200 L 400 120 L 680 220 L 450 310 Z" fill="none" stroke="#252d40" stroke-width="3.5" stroke-dasharray="6 4" />
+            <path d="M 400 120 L 450 310" fill="none" stroke="#252d40" stroke-width="3.5" stroke-dasharray="6 4" />
+
+            <!-- Major Waypoints -->
+            <g transform="translate(150, 200)">
+              <circle r="14" fill="#005CFF" fill-opacity="0.1"/>
+              <circle r="5" fill="#005CFF" />
+              <text y="-14" fill="#E5E7EB" font-size="10" font-weight="bold" text-anchor="middle">Tarumpakkae (Quarry)</text>
+            </g>
+
+            <g transform="translate(400, 120)">
+              <circle r="14" fill="#00CC44" fill-opacity="0.1"/>
+              <circle r="5" fill="#00CC44" />
+              <text y="-14" fill="#E5E7EB" font-size="10" font-weight="bold" text-anchor="middle">Bolabakka</text>
+            </g>
+
+            <g transform="translate(680, 220)">
+              <circle r="14" fill="#F59E0B" fill-opacity="0.1"/>
+              <circle r="5" fill="#F59E0B" />
+              <text y="-14" fill="#E5E7EB" font-size="10" font-weight="bold" text-anchor="middle">Doping</text>
+            </g>
+
+            <g transform="translate(450, 310)">
+              <circle r="14" fill="#EF4444" fill-opacity="0.1"/>
+              <circle r="5" fill="#EF4444" />
+              <text y="22" fill="#E5E7EB" font-size="10" font-weight="bold" text-anchor="middle">Siwa - Belopa</text>
+            </g>
+
+            <!-- Truck Markers -->
+            <g id="truck-ikki-marker" transform="translate(150, 200)">
+              <circle r="12" fill="#005CFF" fill-opacity="0.35" class="pulsing-dot" />
+              <polygon points="0,-8 6,6 -6,6" fill="#005CFF" transform="rotate(45)"/>
+              <text x="12" y="3" fill="#3B82F6" font-size="9" font-weight="bold">IKKI (8549)</text>
+            </g>
+
+            <g id="truck-fauzi-marker" transform="translate(400, 120)">
+              <circle r="12" fill="#00CC44" fill-opacity="0.35" class="pulsing-green-dot" />
+              <polygon points="0,-8 6,6 -6,6" fill="#00CC44" transform="rotate(130)"/>
+              <text x="12" y="3" fill="#10B981" font-size="9" font-weight="bold">FAUZI (8554)</text>
+            </g>
+
+            <g id="truck-aso-marker" transform="translate(450, 310)">
+              <circle r="12" fill="#EF4444" fill-opacity="0.3" />
+              <polygon points="0,-8 6,6 -6,6" fill="#EF4444" transform="rotate(220)"/>
+              <text x="12" y="3" fill="#EF4444" font-size="9" font-weight="bold">ASO (8601)</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-brand-card/95 border-t border-brand-border backdrop-blur-md py-3 px-3 flex justify-around items-center z-50">
+    <button onclick="switchTab('dashboard')" class="active-scale mobile-nav-btn text-brand-blue flex flex-col items-center gap-1.5 transition-all">
+      <i class="fa-solid fa-chart-pie text-lg"></i>
+      <span class="text-[9px] font-bold">Dashboard</span>
+    </button>
+    <button onclick="switchTab('input')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all">
+      <i class="fa-solid fa-file-invoice text-lg"></i>
+      <span class="text-[9px] font-bold">Input Data</span>
+    </button>
+    <button onclick="switchTab('rekap')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all">
+      <i class="fa-solid fa-list-check text-lg"></i>
+      <span class="text-[9px] font-bold">Rekapan</span>
+    </button>
+    <button onclick="switchTab('absensi')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all">
+      <i class="fa-solid fa-clipboard-user text-lg"></i>
+      <span class="text-[9px] font-bold">Absensi</span>
+    </button>
+    <button onclick="switchTab('tracking')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all">
+      <i class="fa-solid fa-location-crosshairs text-lg"></i>
+      <span class="text-[9px] font-bold">GPS Map</span>
+    </button>
+  </nav>
+
+  <!-- POPUP EDIT MODAL -->
+  <div id="edit-record-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[999] flex items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border w-full max-w-lg rounded-2xl overflow-hidden relative shadow-2xl">
+      <button onclick="closeEditModal()" class="absolute top-4 right-4 bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black transition">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      
+      <div class="p-5 border-b border-brand-border bg-brand-black">
+        <h3 class="font-bold text-sm flex items-center gap-2 text-white"><i class="fa-solid fa-pen-to-square text-brand-blue"></i> Sunting Data Ritase</h3>
+        <p class="text-[11px] text-gray-400">Silakan koreksi detail transaksi harian di bawah</p>
+      </div>
+
+      <form id="edit-record-form" onsubmit="saveEditRecord(event)" class="p-5 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        <input type="hidden" id="edit-record-id">
+        
+        <div>
+          <label for="edit-driver" class="block text-xs font-bold text-gray-300 uppercase mb-1.5">Driver & Armada</label>
+          <select id="edit-driver" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue">
+            <option value="IKKI|DW 8549 BN">IKKI (DW 8549 BN)</option>
+            <option value="FAUZI|DD 8554 HD">FAUZI (DD 8554 HD)</option>
+            <option value="ASO|DD 8601 RN">ASO (DD 8601 RN)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="edit-muatan" class="block text-xs font-bold text-gray-300 uppercase mb-1.5">Jenis Muatan</label>
+            <input type="text" id="edit-muatan" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue">
+          </div>
+          <div>
+            <label for="edit-rute" class="block text-xs font-bold text-gray-300 uppercase mb-1.5">Tujuan / Rute</label>
+            <input type="text" id="edit-rute" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="edit-payment" class="block text-xs font-bold text-gray-300 uppercase mb-1.5">Metode Bayar</label>
+            <select id="edit-payment" onchange="toggleEditNominalRequired()" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue">
+              <option value="Cash">Cash / Tunai</option>
+              <option value="Transfer">Transfer (TF)</option>
+              <option value="Bon">Bon (Tempo)</option>
+            </select>
+          </div>
+          <div>
+            <label for="edit-status" class="block text-xs font-bold text-gray-300 uppercase mb-1.5">Status Setoran</label>
+            <select id="edit-status" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue">
+              <option value="Belum Disetor">Belum Disetor</option>
+              <option value="Sudah Disetor">Sudah Disetor</option>
+              <option value="Piutang">Piutang / Tempo</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="edit-nominal" class="block text-xs font-bold text-gray-300 uppercase mb-1.5">Nominal Jual (Rp) <span id="edit-optional-label" class="text-gray-500 font-normal"></span></label>
+          <input type="number" id="edit-nominal" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs font-bold text-white focus:outline-none focus:border-brand-blue">
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-xl text-xs font-semibold transition">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl text-xs font-bold transition">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DETAIL LIGHTBOX -->
+  <div id="photo-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border w-full max-w-lg rounded-2xl overflow-hidden relative shadow-2xl">
+      <button onclick="closePhotoModal()" class="absolute top-3 right-3 bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black transition">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="p-4 border-b border-brand-border bg-brand-black">
+        <h3 class="font-bold text-sm" id="modal-title">Detail Bukti Foto</h3>
+        <p class="text-[10px] text-gray-400" id="modal-subtitle">Detail pengiriman / pengeluaran</p>
+      </div>
+      <div class="p-4 flex justify-center bg-black">
+        <img id="modal-image" class="w-full max-h-[350px] object-contain rounded-lg" src="" alt="Bukti Foto">
+      </div>
+      <div class="p-4 bg-brand-black text-xs space-y-2 border-t border-brand-border">
+        <div class="flex justify-between">
+          <span class="text-gray-400">Penerima/Alokasi/Rute:</span>
+          <span class="font-bold text-white" id="modal-rute">Bolabakka</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-400">Muatan/Keterangan:</span>
+          <span class="font-bold text-white" id="modal-volume">Pasir Halus</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-400">Total Nominal:</span>
+          <span class="font-bold" id="modal-metode">Cash</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM DIALOG MODAL -->
+  <div id="custom-dialog-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl">
+      <div class="p-6 text-center space-y-4">
+        <div id="dialog-icon-container" class="w-14 h-14 rounded-full mx-auto flex items-center justify-center">
+          <i id="dialog-icon" class="text-xl"></i>
+        </div>
+        <div class="space-y-1">
+          <h3 id="dialog-title" class="text-base font-bold text-white">Judul Dialog</h3>
+          <p id="dialog-message" class="text-xs text-gray-400 leading-relaxed whitespace-pre-line">Isi keterangan detail disini.</p>
+        </div>
+        <div id="dialog-input-container" class="hidden text-left mt-3">
+          <label id="dialog-input-label" class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5">Harga Jual</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-brand-green font-bold text-xs">Rp</span>
+            <input type="number" id="dialog-input-field" class="w-full bg-brand-black border border-brand-border rounded-xl py-2.5 pl-9 pr-4 text-xs font-bold text-white focus:outline-none focus:border-brand-blue transition">
+          </div>
+          <p id="dialog-input-error" class="text-[9px] text-rose-500 font-bold mt-1 hidden">✓ Harap masukkan nilai angka yang valid!</p>
+        </div>
+        <div class="flex items-center justify-center gap-2 pt-2">
+          <button id="dialog-cancel-btn" class="active-scale px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-xl text-xs font-semibold transition">Batal</button>
+          <button id="dialog-confirm-btn" class="active-scale px-4 py-2 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl text-xs font-bold transition">Konfirmasi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM TOAST NOTIFICATION -->
+  <div id="custom-toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-brand-card border border-brand-border px-4 py-3 rounded-xl shadow-2xl z-[10000] flex items-center gap-3 transition-all duration-300 translate-y-[-100px] opacity-0 pointer-events-none max-w-sm w-[90%]">
+    <div id="toast-icon-bg" class="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0">
+      <i id="toast-icon"></i>
+    </div>
+    <div class="flex-grow">
+      <p id="toast-title" class="text-xs font-bold text-white">Judul Notif</p>
+      <p id="toast-desc" class="text-[10px] text-gray-400 mt-0.5">Keterangan singkat notif.</p>
+    </div>
+    <button onclick="hideToast()" class="text-gray-500 hover:text-white transition">
+      <i class="fa-solid fa-xmark text-xs"></i>
+    </button>
+  </div>
+
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script>
+    // PWA Manifest & SW setup
+    const manifest = {
+      "name": "CV SANSAM GROUP",
+      "short_name": "Sansam",
+      "description": "Sistem PWA Manajemen Logistik CV Sansam",
+      "start_url": window.location.href,
+      "display": "standalone",
+      "background_color": "#07080B",
+      "theme_color": "#07080B",
+      "orientation": "portrait-primary",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2307080B'/><path d='M25 35 C25 18, 48 12, 60 22 C72 32, 58 42, 48 52 C38 62, 32 78, 55 78 C72 78, 78 68, 78 58' fill='none' stroke='%23005CFF' stroke-width='12' stroke-linecap='round'/><path d='M75 65 C75 82, 52 88, 40 78 C28 68, 42 58, 52 48 C62 38, 68 22, 45 22 C28 22, 22 32, 22 42' fill='none' stroke='%2300CC44' stroke-width='12' stroke-linecap='round'/></svg>",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    };
+    const stringManifest = JSON.stringify(manifest);
+    const blobManifest = new Blob([stringManifest], {type: 'application/json'});
+    document.getElementById('manifest-placeholder').setAttribute('href', URL.createObjectURL(blobManifest));
+
+    // Bypass pendaftaran Service Worker pada domain sandbox usercontent
+    if ('serviceWorker' in navigator && window.location.protocol === 'https:' && !window.location.hostname.includes('usercontent.goog')) {
+      try {
+        const swCode = `
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
+          self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => new Response("Koneksi Lokal."))));
+        `;
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        const blobURL = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(blobURL)
+          .catch(err => console.log('Pendaftaran Service Worker dilewati di lingkungan ini.'));
+      } catch (e) {
+        console.log('Service Worker tidak dapat diinisialisasi:', e);
+      }
+    }
+
+    // Capture PWA installation
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('pwa-install-btn').classList.remove('hidden');
+    });
+
+    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          document.getElementById('pwa-install-btn').classList.add('hidden');
+        }
+        deferredPrompt = null;
+      }
+    });
+
+    // TOAST & CUSTOM DIALOGS UTILITIES
+    function showToast(title, desc, type = 'success') {
+      const toast = document.getElementById('custom-toast');
+      const toastIconBg = document.getElementById('toast-icon-bg');
+      const toastIcon = document.getElementById('toast-icon');
+      const toastTitle = document.getElementById('toast-title');
+      const toastDesc = document.getElementById('toast-desc');
+
+      toastTitle.innerText = title;
+      toastDesc.innerText = desc;
+
+      if (type === 'success') {
+        toastIconBg.className = "w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-brand-green text-sm flex-shrink-0";
+        toastIcon.className = "fa-solid fa-circle-check";
+      } else if (type === 'error') {
+        toastIconBg.className = "w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 text-sm flex-shrink-0";
+        toastIcon.className = "fa-solid fa-circle-xmark";
+      } else {
+        toastIconBg.className = "w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 text-sm flex-shrink-0";
+        toastIcon.className = "fa-solid fa-triangle-exclamation";
+      }
+
+      toast.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      if (window.toastTimeout) clearTimeout(window.toastTimeout);
+      window.toastTimeout = setTimeout(hideToast, 3000);
+    }
+
+    function hideToast() {
+      const toast = document.getElementById('custom-toast');
+      toast.classList.add('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+    }
+
+    function showCustomDialog({ title, message, showInput = false, inputLabel = '', inputVal = '', confirmText = 'Konfirmasi', cancelText = 'Batal', type = 'info', onConfirm }) {
+      const modal = document.getElementById('custom-dialog-modal');
+      const titleEl = document.getElementById('dialog-title');
+      const msgEl = document.getElementById('dialog-message');
+      const inputContainer = document.getElementById('dialog-input-container');
+      const inputLabelEl = document.getElementById('dialog-input-label');
+      const inputField = document.getElementById('dialog-input-field');
+      const inputError = document.getElementById('dialog-input-error');
+      const iconContainer = document.getElementById('dialog-icon-container');
+      const iconEl = document.getElementById('dialog-icon');
+      const confirmBtn = document.getElementById('dialog-confirm-btn');
+      const cancelBtn = document.getElementById('dialog-cancel-btn');
+
+      titleEl.innerText = title;
+      msgEl.innerText = message;
+      confirmBtn.innerText = confirmText;
+      cancelBtn.innerText = cancelText;
+
+      if (type === 'success') {
+        iconContainer.className = "w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-brand-green/10 border border-brand-green/30 text-brand-green";
+        iconEl.className = "fa-solid fa-circle-check text-2xl";
+      } else if (type === 'error') {
+        iconContainer.className = "w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-rose-500/10 border border-rose-500/30 text-rose-500";
+        iconEl.className = "fa-solid fa-circle-xmark text-2xl";
+      } else if (type === 'warning') {
+        iconContainer.className = "w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-amber-500/10 border border-amber-500/30 text-amber-500";
+        iconEl.className = "fa-solid fa-triangle-exclamation text-2xl";
+      } else {
+        iconContainer.className = "w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-brand-blue/10 border border-brand-blue/30 text-brand-blue";
+        iconEl.className = "fa-solid fa-circle-info text-2xl";
+      }
+
+      if (showInput) {
+        inputContainer.classList.remove('hidden');
+        inputLabelEl.innerText = inputLabel;
+        inputField.value = inputVal || '';
+        inputError.classList.add('hidden');
+      } else {
+        inputContainer.classList.add('hidden');
+      }
+
+      modal.classList.remove('hidden');
+
+      confirmBtn.onclick = () => {
+        if (showInput) {
+          const val = inputField.value;
+          if (!val || isNaN(parseFloat(val)) || parseFloat(val) <= 0) {
+            inputError.classList.remove('hidden');
+            return;
+          }
+          onConfirm(parseFloat(val));
+        } else {
+          onConfirm();
+        }
+        closeCustomDialog();
+      };
+      cancelBtn.onclick = closeCustomDialog;
+    }
+
+    function closeCustomDialog() {
+      document.getElementById('custom-dialog-modal').classList.add('hidden');
+    }
+
+    // STATE STORE ENGINE (v5)
+    const STORAGE_KEY = "sansam_pwa_system_records_v5";
+    let appState = {
+      ritase: [],
+      absensi: [],
+      pengeluaran: [],
+      drivers: {
+        "IKKI": { plate: "DW 8549 BN", status: "Jalan" },
+        "FAUZI": { plate: "DD 8554 HD", status: "Jalan" },
+        "ASO": { plate: "DD 8601 RN", status: "Jalan" }
+      }
+    };
+
+    const defaultData = {
+      ritase: [
+        { id: "r-1", timestamp: "12/06/2026 15:54", driver: "ASO", plate: "DD 8601 RN", rute: "Bolabakka", muatan: "Pasir Kasar", nominal: 550000, payment: "Cash", status: "Sudah Disetor", photo: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&auto=format&fit=crop&q=60" },
+        { id: "r-2", timestamp: "12/06/2026 18:10", driver: "IKKI", plate: "DW 8549 BN", rute: "Doping", muatan: "Kerikil", nominal: 1000000, payment: "Cash", status: "Belum Disetor", photo: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=600&auto=format&fit=crop&q=60" },
+        { id: "r-3", timestamp: "13/06/2026 09:30", driver: "FAUZI", plate: "DD 8554 HD", rute: "Belopa", muatan: "Batu Belopa", nominal: 0, payment: "Bon", status: "Piutang", photo: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=600&auto=format&fit=crop&q=60" }
+      ],
+      absensi: [
+        { timestamp: "13/06/2026 07:10", name: "ASO", tipe: "Jalan", uangJalan: 150000, status: "Aktif" },
+        { timestamp: "13/06/2026 07:15", name: "IKKI", tipe: "Istirahat", uangJalan: 150000, status: "Aktif" },
+        { timestamp: "13/06/2026 07:45", name: "FAUZI", tipe: "Jalan", uangJalan: 150000, status: "Aktif" }
+      ],
+      pengeluaran: [
+        { id: "exp-1", timestamp: "12/06/2026 16:30", source: "ASO", category: "Solar", recipient: "SPBU Wajo 74.912", nominal: 250000, note: "Solar untuk jalan rute Bolabakka", photo: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&auto=format&fit=crop&q=60", status: "Active" },
+        { id: "exp-2", timestamp: "13/06/2026 10:15", source: "IKKI", category: "Transfer Kas", recipient: "FAUZI", nominal: 150000, note: "Bagi saldo cash untuk panjar darurat", photo: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=600&auto=format&fit=crop&q=60", status: "Active" }
+      ]
+    };
+
+    let directSelectedPayment = "";
+    let base64Photo = "";
+    let base64ExpensePhoto = "";
+    let driverDistributionChart = null;
+
+    // INITIAL LOAD
+    window.onload = function() {
+      setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        if (splash) splash.classList.add('opacity-0', 'pointer-events-none');
+      }, 1500);
+
+      const d = new Date();
+      const options = { day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('current-date-el').innerText = d.toLocaleDateString('id-ID', options);
+
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        appState = JSON.parse(raw);
+        if (!appState.pengeluaran) appState.pengeluaran = defaultData.pengeluaran;
+      } else {
+        appState.ritase = defaultData.ritase;
+        appState.absensi = defaultData.absensi;
+        appState.pengeluaran = defaultData.pengeluaran;
+        saveState();
+      }
+
+      updateMetrics();
+      renderDashboardActivities();
+      renderRekapTable();
+      renderExpenseTable();
+      renderAbsensi();
+      renderDriverStatusList();
+      initChart();
+      startGpsSimulation();
+      buildPriceHistory();
+      showSourceCashInHand('IKKI');
+    };
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    }
+
+    // MULTI-TABS SWAP
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => {
+        el.classList.add('hidden');
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(10px)';
+      });
+      
+      const targetedPane = document.getElementById(`tab-content-${tabId}`);
+      if (targetedPane) {
+        targetedPane.classList.remove('hidden');
+        setTimeout(() => {
+          targetedPane.style.opacity = '1';
+          targetedPane.style.transform = 'translateY(0)';
+        }, 50);
+      }
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'text-brand-blue', 'border-b-2', 'border-brand-blue', 'bg-brand-card/50');
+        btn.classList.add('text-gray-400');
+      });
+
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active', 'text-brand-blue', 'border-b-2', 'border-brand-blue', 'bg-brand-card/50');
+        activeBtn.classList.remove('text-gray-400');
+      }
+
+      document.querySelectorAll('.mobile-nav-btn').forEach((btn) => {
+        btn.classList.remove('text-brand-blue');
+        btn.classList.add('text-gray-500');
+      });
+      
+      const mobButtons = document.querySelectorAll('.mobile-nav-btn');
+      if (tabId === 'dashboard' && mobButtons[0]) mobButtons[0].classList.add('text-brand-blue');
+      if (tabId === 'input' && mobButtons[1]) mobButtons[1].classList.add('text-brand-blue');
+      if (tabId === 'rekap' && mobButtons[2]) mobButtons[2].classList.add('text-brand-blue');
+      if (tabId === 'absensi' && mobButtons[3]) mobButtons[3].classList.add('text-brand-blue');
+      if (tabId === 'tracking' && mobButtons[4]) mobButtons[4].classList.add('text-brand-blue');
+
+      if (tabId === 'dashboard' && driverDistributionChart) {
+        setTimeout(() => { 
+          driverDistributionChart.resize(); 
+          driverDistributionChart.update(); 
+        }, 50);
+      }
+    }
+
+    // TOGGLE SUB-TABS (INPUT)
+    function switchInputSubTab(subTab) {
+      if (subTab === 'ritase') {
+        document.getElementById('sub-tab-ritase').classList.remove('hidden');
+        document.getElementById('sub-tab-pengeluaran').classList.add('hidden');
+        document.getElementById('sub-input-btn-ritase').className = "flex-1 text-center py-2.5 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale";
+        document.getElementById('sub-input-btn-pengeluaran').className = "flex-1 text-center py-2.5 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
+      } else {
+        document.getElementById('sub-tab-ritase').classList.add('hidden');
+        document.getElementById('sub-tab-pengeluaran').classList.remove('hidden');
+        document.getElementById('sub-input-btn-ritase').className = "flex-1 text-center py-2.5 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
+        document.getElementById('sub-input-btn-pengeluaran').className = "flex-1 text-center py-2.5 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale";
+        updateAllSourcesCashLabels();
+      }
+    }
+
+    // TOGGLE SUB-TABS REKAPAN (RITASE vs EXPENSE vs PANJAR)
+    function switchRekapSubTab(subTab) {
+      if (subTab === 'ritase') {
+        document.getElementById('sub-tab-rekap-ritase').classList.remove('hidden');
+        document.getElementById('sub-tab-rekap-pengeluaran').classList.add('hidden');
+        document.getElementById('sub-tab-rekap-panjar').classList.add('hidden');
+        document.getElementById('sub-rekap-btn-ritase').className = "flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale";
+        document.getElementById('sub-rekap-btn-pengeluaran').className = "flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
+        document.getElementById('sub-rekap-btn-panjar').className = "flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
+      } else if (subTab === 'pengeluaran') {
+        document.getElementById('sub-tab-rekap-ritase').classList.add('hidden');
+        document.getElementById('sub-tab-rekap-pengeluaran').classList.remove('hidden');
+        document.getElementById('sub-tab-rekap-panjar').classList.add('hidden');
+        document.getElementById('sub-rekap-btn-ritase').className = "flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
+        document.getElementById('sub-rekap-btn-pengeluaran').className = "flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale";
+        document.getElementById('sub-rekap-btn-panjar').className = "flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
+        renderExpenseTable();
+      } else if (subTab === 'panjar') {
+        document.getElementById('sub-tab-rekap-ritase').classList.add('hidden');
+        document.getElementById('sub-tab-rekap-pengeluaran').classList.add('hidden');
+        document.getElementById('sub-tab-rekap-panjar').classList.remove('hidden');
+        document.getElementById('sub-rekap-btn-ritase').className = "flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
+        document.getElementById('sub-rekap-btn-pengeluaran').className = "flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
+        document.getElementById('sub-rekap-btn-panjar').className = "flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale";
+        renderPanjarRecap();
+      }
+    }
+
+    // DRIVER CASH BALANCING ENGINE
+    function getDriverCashInHand(driverName) {
+      let cashCollected = 0;
+      appState.ritase.forEach(item => {
+        if (item.driver === driverName && item.payment === "Cash" && item.status === "Belum Disetor") {
+          cashCollected += item.nominal;
+        }
+      });
+
+      let cashSpent = 0;
+      let cashReceived = 0;
+
+      appState.pengeluaran.forEach(exp => {
+        const isActive = (exp.status === undefined || exp.status === "Active");
+        if (exp.source === driverName && isActive) {
+          cashSpent += exp.nominal;
+        }
+        if (exp.category === "Transfer Kas" && exp.recipient === driverName && isActive) {
+          cashReceived += exp.nominal;
+        }
+      });
+
+      return (cashCollected + cashReceived) - cashSpent;
+    }
+
+    // GET DRIVER PANJAR TOTALS
+    function getDriverPanjarTotal(driverName) {
+      let total = 0;
+      appState.pengeluaran.forEach(exp => {
+        const isActive = (exp.status === undefined || exp.status === "Active");
+        if (exp.source === driverName && exp.category === "Panjar Driver" && isActive) {
+          total += exp.nominal;
+        }
+      });
+      return total;
+    }
+
+    function updateAllSourcesCashLabels() {
+      const list = ["IKKI", "FAUZI", "ASO"];
+      list.forEach(name => {
+        const cash = getDriverCashInHand(name);
+        const el = document.getElementById(`cash-hand-${name}`);
+        if (el) el.innerText = "Sisa: Rp " + cash.toLocaleString('id-ID');
+      });
+    }
+
+    function showSourceCashInHand(name) {
+      updateAllSourcesCashLabels();
+    }
+
+    // SUGGESTED CHIPS FOR PRICE
+    function buildPriceHistory() {
+      const container = document.getElementById('price-history-container');
+      const buttonsDiv = document.getElementById('price-history-buttons');
+      buttonsDiv.innerHTML = "";
+
+      let prices = [];
+      appState.ritase.forEach(item => {
+        if (item.nominal && item.nominal > 0 && !prices.includes(item.nominal)) {
+          prices.push(item.nominal);
+        }
+      });
+
+      if (prices.length === 0) prices = [550000, 1000000, 1200000];
+      const recentPrices = prices.slice(0, 4);
+
+      if (recentPrices.length > 0) {
+        container.classList.remove('hidden');
+        recentPrices.forEach(price => {
+          buttonsDiv.innerHTML += `
+            <button type="button" onclick="quickFillNominal(${price})" class="active-scale bg-brand-black hover:border-brand-green border border-brand-border text-[11px] text-brand-green py-1.5 px-3 rounded-xl transition font-bold shadow">
+              Rp ${price.toLocaleString('id-ID')}
+            </button>
+          `;
+        });
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    function quickFillMuatan(value) { document.getElementById('direct-muatan').value = value; }
+    function quickFillRute(value) { document.getElementById('direct-rute').value = value; }
+    function quickFillNominal(value) { document.getElementById('direct-nominal').value = value; }
+
+    function setDirectPayment(method) {
+      directSelectedPayment = method;
+      document.getElementById('direct-selected-payment').value = method;
+      
+      document.querySelectorAll('.pay-option-btn').forEach(btn => {
+        btn.classList.remove('border-brand-blue', 'bg-brand-blue/10');
+        btn.classList.add('border-brand-border', 'bg-brand-black');
+      });
+
+      const activeBtn = document.getElementById(`pay-btn-${method}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-brand-border', 'bg-brand-black');
+        activeBtn.classList.add('border-brand-blue', 'bg-brand-blue/10');
+      }
+
+      const nominalInput = document.getElementById('direct-nominal');
+      const optLabel = document.getElementById('optional-label');
+      
+      if (method === "Cash") {
+        nominalInput.setAttribute('required', 'true');
+        optLabel.innerText = "(Wajib diisi)";
+        optLabel.className = "text-rose-500 font-bold";
+      } else {
+        nominalInput.removeAttribute('required');
+        optLabel.innerText = "(Opsional / tidak wajib)";
+        optLabel.className = "text-gray-500 font-normal";
+      }
+    }
+
+    function setExpCategory(category) {
+      document.getElementById('exp-category').value = category;
+      document.querySelectorAll('.exp-category-btn').forEach(btn => {
+        btn.classList.remove('border-brand-blue', 'bg-brand-blue/10');
+      });
+      const normId = category.replace(/\s+/g, '').replace('&', '');
+      const activeBtn = document.getElementById(`exp-cat-btn-${normId}`);
+      if (activeBtn) activeBtn.classList.add('border-brand-blue', 'bg-brand-blue/10');
+
+      const textWrapper = document.getElementById('recipient-text-wrapper');
+      const driverWrapper = document.getElementById('recipient-driver-wrapper');
+
+      if (category === "Transfer Kas") {
+        textWrapper.classList.add('hidden');
+        driverWrapper.classList.remove('hidden');
+      } else {
+        textWrapper.classList.remove('hidden');
+        driverWrapper.classList.add('hidden');
+      }
+    }
+
+    function processDirectPhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        base64Photo = e.target.result;
+        document.getElementById('direct-upload-placeholder').classList.add('hidden');
+        document.getElementById('direct-photo-preview-container').classList.remove('hidden');
+        document.getElementById('direct-processed-photo-preview').src = base64Photo;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // DIRECT RITASE SAVE
+    function handleDirectSubmit(e) {
+      e.preventDefault();
+      const selectedRadio = document.querySelector('input[name="direct_driver"]:checked');
+      if (!selectedRadio) {
+        showToast('Driver Belum Dipilih', 'Silakan pilih driver & unit terlebih dahulu.', 'warning');
+        return;
+      }
+      const rawDriver = selectedRadio.value.split('|');
+      const name = rawDriver[0];
+      const plate = rawDriver[1];
+
+      const rute = document.getElementById('direct-rute').value;
+      const muatan = document.getElementById('direct-muatan').value;
+      let nominal = parseFloat(document.getElementById('direct-nominal').value) || 0;
+
+      if (!directSelectedPayment) {
+        showToast('Metode Bayar', 'Silakan pilih metode bayar terlebih dahulu.', 'warning');
+        return;
+      }
+
+      if (directSelectedPayment === "Cash" && nominal <= 0) {
+        showToast('Nominal Wajib', 'Nominal wajib diisi untuk transaksi Cash.', 'warning');
+        return;
+      }
+
+      let defaultStatus = "Belum Disetor";
+      if (directSelectedPayment === "Transfer") defaultStatus = "Sudah Disetor";
+      if (directSelectedPayment === "Bon") defaultStatus = "Piutang";
+
+      const newRecord = {
+        id: "r-" + Date.now(),
+        timestamp: new Date().toLocaleString('id-ID', { hour12: false }).replace(',', ''),
+        driver: name,
+        plate: plate,
+        rute: rute,
+        muatan: muatan,
+        nominal: nominal,
+        payment: directSelectedPayment,
+        status: defaultStatus,
+        photo: base64Photo || "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&auto=format&fit=crop&q=60"
+      };
+
+      appState.ritase.unshift(newRecord);
+      saveState();
+
+      document.getElementById('direct-ritase-form').reset();
+      directSelectedPayment = "";
+      base64Photo = "";
+      document.getElementById('direct-photo-preview-container').classList.add('hidden');
+      document.getElementById('direct-upload-placeholder').classList.remove('hidden');
+      document.querySelectorAll('.pay-option-btn').forEach(btn => {
+        btn.classList.remove('border-brand-blue', 'bg-brand-blue/10');
+        btn.classList.add('border-brand-border', 'bg-brand-black');
+      });
+
+      updateMetrics();
+      renderDashboardActivities();
+      renderRekapTable();
+      updateCharts();
+      buildPriceHistory();
+
+      showToast('Laporan Disimpan', `Data ritase driver ${name} berhasil disimpan.`, 'success');
+      switchTab('dashboard');
+    }
+
+    function processExpensePhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        base64ExpensePhoto = e.target.result;
+        document.getElementById('exp-upload-placeholder').classList.add('hidden');
+        document.getElementById('exp-photo-preview-container').classList.remove('hidden');
+        document.getElementById('exp-processed-photo-preview').src = base64ExpensePhoto;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // DIRECT EXPENSE & TRANSFER SAVE
+    function handleExpenseSubmit(e) {
+      e.preventDefault();
+      const sourceRadio = document.querySelector('input[name="exp_source"]:checked');
+      if (!sourceRadio) {
+        showToast('Pemberi Cash', 'Silakan tentukan siapa yang memberikan uang kas.', 'warning');
+        return;
+      }
+      const source = sourceRadio.value;
+      const category = document.getElementById('exp-category').value;
+      if (!category) {
+        showToast('Kategori Wajib', 'Harap pilih salah satu kategori pengeluaran.', 'warning');
+        return;
+      }
+
+      let recipient = "";
+      if (category === "Transfer Kas") {
+        recipient = document.getElementById('exp-recipient-driver').value;
+        if (!recipient) {
+          showToast('Penerima Wajib', 'Pilih driver yang menerima uang kas.', 'warning');
+          return;
+        }
+        if (source === recipient) {
+          showToast('Gagal Transfer', 'Pemberi dan penerima kas tidak boleh driver yang sama!', 'error');
+          return;
+        }
+      } else {
+        recipient = document.getElementById('exp-recipient').value;
+        if (!recipient) {
+          showToast('Penerima Wajib', 'Harap isi nama penerima atau toko alokasi dana.', 'warning');
+          return;
+        }
+      }
+
+      const nominal = parseFloat(document.getElementById('exp-nominal').value) || 0;
+      const note = document.getElementById('exp-note').value;
+
+      if (nominal <= 0) {
+        showToast('Nominal Valid', 'Harap isi nominal belanja / transfer yang sesuai.', 'warning');
+        return;
+      }
+
+      // Cash-in-hand checking
+      if (source !== "KASIR") {
+        const cashAvailable = getDriverCashInHand(source);
+        if (nominal > cashAvailable) {
+          showCustomDialog({
+            title: 'Sisa Kas Kurang',
+            message: `Kas di tangan ${source} saat ini Rp ${cashAvailable.toLocaleString('id-ID')}, sedangkan transfer/pengeluaran adalah Rp ${nominal.toLocaleString('id-ID')}. Tetap lanjutkan pencatatan?`,
+            confirmText: 'Lanjutkan',
+            cancelText: 'Batal',
+            type: 'warning',
+            onConfirm: () => {
+              saveExpense(source, category, recipient, nominal, note);
+            }
+          });
+          return;
+        }
+      }
+
+      saveExpense(source, category, recipient, nominal, note);
+    }
+
+    function saveExpense(source, category, recipient, nominal, note) {
+      const newExp = {
+        id: "exp-" + Date.now(),
+        timestamp: new Date().toLocaleString('id-ID', { hour12: false }).replace(',', ''),
+        source: source,
+        category: category,
+        recipient: recipient,
+        nominal: nominal,
+        note: note,
+        photo: base64ExpensePhoto || "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=600&auto=format&fit=crop&q=60",
+        status: "Active"
+      };
+
+      appState.pengeluaran.unshift(newExp);
+      saveState();
+
+      document.getElementById('driver-expense-form').reset();
+      document.getElementById('exp-recipient').value = "";
+      document.getElementById('exp-recipient-driver').value = "";
+      base64ExpensePhoto = "";
+      document.getElementById('exp-photo-preview-container').classList.add('hidden');
+      document.getElementById('exp-upload-placeholder').classList.remove('hidden');
+      document.querySelectorAll('.exp-category-btn').forEach(btn => btn.classList.remove('border-brand-blue', 'bg-brand-blue/10'));
+      document.getElementById('exp-category').value = "";
+      
+      document.getElementById('recipient-text-wrapper').classList.remove('hidden');
+      document.getElementById('recipient-driver-wrapper').classList.add('hidden');
+
+      updateMetrics();
+      renderDashboardActivities();
+      renderExpenseTable();
+      updateAllSourcesCashLabels();
+
+      const notifMsg = category === "Transfer Kas" 
+        ? `Sukses mentransfer Rp ${nominal.toLocaleString('id-ID')} dari ${source} ke ${recipient}.`
+        : `Pengeluaran ${category} sebesar Rp ${nominal.toLocaleString('id-ID')} telah berhasil dicatat.`;
+
+      showToast('Transaksi Tercatat', notifMsg, 'success');
+      switchTab('dashboard');
+    }
+
+    // ATTENDANCE SUBMIT
+    function handleAttendanceSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('absensi-driver-select').value;
+      const conditionRadio = document.querySelector('input[name="absensi_tipe"]:checked');
+      const uangJalan = parseFloat(document.getElementById('absensi-uang-jalan').value) || 0;
+
+      if (!name || !conditionRadio) {
+        showToast('Input Absensi', 'Lengkapi pilihan driver & kondisi jalan.', 'warning');
+        return;
+      }
+
+      const condition = conditionRadio.value;
+
+      const newAbsen = {
+        timestamp: new Date().toLocaleString('id-ID', { hour12: false }).replace(',', ''),
+        name: name,
+        tipe: condition,
+        uangJalan: uangJalan,
+        status: "Active"
+      };
+
+      appState.absensi.unshift(newAbsen);
+      saveState();
+
+      document.getElementById('attendance-form').reset();
+      renderAbsensi();
+      renderDriverStatusList();
+      updateMetrics();
+
+      showToast('Absensi Tersimpan', `Status ${name} sekarang diperbarui menjadi: ${condition}`, 'success');
+    }
+
+    // UPDATE METRIC TOTALS
+    function updateMetrics() {
+      let totalOmzet = 0;
+      let tfMasuk = 0;
+      let bonTotal = 0;
+
+      appState.ritase.forEach(item => {
+        totalOmzet += item.nominal;
+        
+        if (item.payment === "Transfer" || (item.payment === "Cash" && item.status === "Sudah Disetor")) {
+          tfMasuk += item.nominal;
+        } else if (item.payment === "Bon") {
+          bonTotal += item.nominal;
+        }
+      });
+
+      let totalPanjar = 0;
+      appState.pengeluaran.forEach(exp => {
+        const isActive = (exp.status === undefined || exp.status === "Active");
+        if (exp.category === "Panjar Driver" && isActive && exp.source !== "KASIR") {
+          totalPanjar += exp.nominal;
+        }
+      });
+
+      let netCashInHand = getDriverCashInHand("IKKI") + getDriverCashInHand("FAUZI") + getDriverCashInHand("ASO");
+      if (netCashInHand < 0) netCashInHand = 0;
+
+      const rp = val => "Rp " + val.toLocaleString('id-ID');
+      
+      document.getElementById('metric-total-omzet').innerText = rp(totalOmzet);
+      document.getElementById('metric-cash-driver').innerText = rp(netCashInHand);
+      document.getElementById('metric-total-panjar').innerText = rp(totalPanjar);
+      document.getElementById('metric-tf-masuk').innerText = rp(tfMasuk);
+      document.getElementById('metric-bon-total').innerText = rp(bonTotal);
+    }
+
+    // RENDER RECENT OPERATIONS LIST
+    function renderDashboardActivities() {
+      const container = document.getElementById('dashboard-recent-activities');
+      container.innerHTML = "";
+
+      if (appState.ritase.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Belum ada aktivitas ritase hari ini.</p>`;
+        return;
+      }
+
+      const itemsToView = appState.ritase.slice(0, 4);
+
+      itemsToView.forEach(item => {
+        let badgeColor = "bg-amber-500/10 text-amber-500 border border-amber-500/30";
+        if (item.status === "Sudah Disetor") badgeColor = "bg-emerald-500/10 text-brand-green border border-brand-green/30";
+        if (item.status === "Piutang") badgeColor = "bg-rose-500/10 text-rose-500 border border-rose-500/30";
+
+        let nominalDisplay = item.nominal > 0 ? `Rp ${item.nominal.toLocaleString('id-ID')}` : `<span class="text-gray-500 italic text-[11px]">Belum Diisi</span>`;
+
+        container.innerHTML += `
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 bg-brand-black border border-brand-border rounded-xl gap-2 transition hover:border-brand-blue/30">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-zinc-900 border border-brand-border flex items-center justify-center text-gray-300">
+                <i class="fa-solid fa-truck-pickup text-sm text-brand-green"></i>
+              </div>
+              <div>
+                <h5 class="text-xs font-bold text-white">${item.driver} (${item.plate}) - <span class="text-gray-400 font-medium">${item.rute}</span></h5>
+                <p class="text-[10px] text-gray-500 mt-0.5">${item.timestamp} | Muatan: ${item.muatan}</p>
+              </div>
+            </div>
+            <div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">
+              <span class="text-xs font-bold text-white">${nominalDisplay}</span>
+              <span class="text-[9px] font-extrabold tracking-wide uppercase px-2 py-0.5 rounded ${badgeColor}">${item.status}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // MAIN REKAP TABLE
+    function renderRekapTable(filteredData = null) {
+      const tbody = document.getElementById('rekap-table-body');
+      tbody.innerHTML = "";
+
+      const dataToRender = filteredData || appState.ritase;
+
+      if (dataToRender.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="p-8 text-center text-gray-500">
+              <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i> Tidak ada rekapan penjualan.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      dataToRender.forEach(item => {
+        let badgeColor = "bg-amber-500/10 text-amber-500 border border-amber-500/30";
+        if (item.status === "Sudah Disetor") badgeColor = "bg-emerald-500/10 text-brand-green border border-brand-green/30";
+        if (item.status === "Piutang") badgeColor = "bg-rose-500/10 text-rose-500 border border-rose-500/30";
+
+        let actionBtn = "";
+        if (item.status === "Belum Disetor" && item.payment === "Cash") {
+          actionBtn = `
+            <button onclick="approveDeposit('${item.id}')" title="Terima Setoran" class="active-scale bg-brand-green/10 hover:bg-brand-green text-brand-green hover:text-white px-2.5 py-1.5 rounded text-[10px] font-bold border border-brand-green/30 transition">
+              <i class="fa-solid fa-check"></i> Setor
+            </button>
+          `;
+        } else if (item.status === "Piutang" || item.nominal === 0) {
+          actionBtn = `
+            <button onclick="settlePriceAndPay('${item.id}')" title="Atur Harga & Lunas" class="active-scale bg-brand-blue/10 hover:bg-brand-blue text-brand-blue hover:text-white px-2.5 py-1.5 rounded text-[10px] font-bold border border-brand-blue/30 transition">
+              <i class="fa-solid fa-pen-to-square"></i> Atur Harga
+            </button>
+          `;
+        } else {
+          actionBtn = `<span class="text-[11px] text-gray-500 italic mr-2">Selesai ✓</span>`;
+        }
+
+        let priceDisplay = item.nominal > 0 ? `Rp ${item.nominal.toLocaleString('id-ID')}` : `<span class="text-gray-500 italic text-[11px]">Belum Diisi</span>`;
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-brand-card/30 transition border-b border-brand-border/40">
+            <td class="p-4 text-[11px] text-gray-300 whitespace-nowrap">${item.timestamp}</td>
+            <td class="p-4">
+              <div class="font-bold text-white">${item.driver}</div>
+              <div class="text-[10px] text-gray-500">${item.plate}</div>
+            </td>
+            <td class="p-4 font-medium text-gray-300">${item.rute}</td>
+            <td class="p-4 text-gray-400 font-mono">${item.muatan}</td>
+            <td class="p-4 text-right font-bold text-white">${priceDisplay}</td>
+            <td class="p-4 text-center">
+              <span class="px-2 py-0.5 bg-zinc-900 border border-brand-border text-[10px] font-medium text-gray-300 rounded">${item.payment}</span>
+            </td>
+            <td class="p-4 text-center">
+              <span class="text-[9px] px-2 py-0.5 rounded font-extrabold uppercase tracking-wide ${badgeColor}">${item.status}</span>
+            </td>
+            <td class="p-4 text-center">
+              <button onclick="viewPhoto('${item.id}')" class="text-brand-blue hover:text-blue-400 text-base transition">
+                <i class="fa-solid fa-image-portrait"></i>
+              </button>
+            </td>
+            <td class="p-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                ${actionBtn}
+                <!-- Edit -->
+                <button onclick="openEditModal('${item.id}')" title="Sunting Data" class="active-scale text-blue-500 hover:text-blue-400 p-1.5 rounded border border-blue-500/20 hover:border-blue-500/50 bg-blue-500/5 transition">
+                  <i class="fa-solid fa-pen-to-square text-xs"></i>
+                </button>
+                <!-- Delete -->
+                <button onclick="deleteRecord('${item.id}')" title="Hapus Data" class="active-scale text-rose-500 hover:text-rose-400 p-1.5 rounded border border-rose-500/20 hover:border-rose-500/50 bg-rose-500/5 transition">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // RENDER LOG PENGELUARAN TABLE
+    function renderExpenseTable() {
+      const tbody = document.getElementById('expense-table-body');
+      tbody.innerHTML = "";
+
+      if (appState.pengeluaran.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-8 text-center text-gray-500">
+              <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i> Belum ada catatan pengeluaran kas.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      appState.pengeluaran.forEach(item => {
+        const isTransfer = item.category === "Transfer Kas";
+        
+        const categoryBadge = isTransfer 
+          ? `<span class="px-2 py-0.5 bg-brand-blue/10 border border-brand-blue/30 text-[10px] font-extrabold text-brand-blue rounded"><i class="fa-solid fa-right-left mr-1"></i>Transfer Kas</span>`
+          : `<span class="px-2 py-0.5 bg-zinc-900 border border-brand-border text-[10px] font-medium text-amber-500 rounded">${item.category}</span>`;
+        
+        const recipientDisplay = isTransfer
+          ? `<span class="inline-flex items-center gap-1 bg-brand-green/10 border border-brand-green/20 px-2 py-0.5 rounded text-brand-green font-extrabold text-[11px]">
+               <i class="fa-solid fa-user-check text-[9px]"></i> ${item.recipient} (Driver)
+             </span>`
+          : `<span class="text-gray-300 font-bold">${item.recipient}</span>`;
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-brand-card/30 transition border-b border-brand-border/40">
+            <td class="p-4 text-[11px] text-gray-300 whitespace-nowrap">${item.timestamp}</td>
+            <td class="p-4 font-bold text-white flex items-center gap-1.5 mt-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> ${item.source}
+            </td>
+            <td class="p-4">${categoryBadge}</td>
+            <td class="p-4">${recipientDisplay}</td>
+            <td class="p-4 text-right font-bold text-rose-500">Rp ${item.nominal.toLocaleString('id-ID')}</td>
+            <td class="p-4 text-gray-400 max-w-xs truncate">${item.note || '-'}</td>
+            <td class="p-4 text-center">
+              <button onclick="viewExpensePhoto('${item.id}')" class="text-brand-blue hover:text-blue-400 text-base transition">
+                <i class="fa-solid fa-receipt"></i>
+              </button>
+            </td>
+            <td class="p-4 text-right">
+              <button onclick="deleteExpense('${item.id}')" title="Hapus Pengeluaran" class="active-scale text-rose-500 hover:text-rose-400 p-1.5 rounded border border-rose-500/20 hover:border-rose-500/50 bg-rose-500/5 transition">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // RENDER REKAP PANJAR DRIVER
+    function renderPanjarRecap() {
+      const cardsContainer = document.getElementById('panjar-driver-summary-cards');
+      const tbody = document.getElementById('panjar-table-body');
+      
+      if (!cardsContainer || !tbody) return;
+
+      cardsContainer.innerHTML = "";
+      const drivers = ["IKKI", "FAUZI", "ASO"];
+      
+      drivers.forEach(name => {
+        const plate = appState.drivers[name].plate;
+        const totalPanjar = getDriverPanjarTotal(name);
+        const cashHand = getDriverCashInHand(name);
+
+        const activePanjarCount = appState.pengeluaran.filter(exp => 
+          exp.source === name && 
+          exp.category === "Panjar Driver" && 
+          (exp.status === undefined || exp.status === "Active")
+        ).length;
+
+        cardsContainer.innerHTML += `
+          <div class="bg-brand-black border border-brand-border p-4 rounded-xl flex flex-col justify-between space-y-3 transition hover:border-sky-500/30">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">${name.substring(0,2)}</div>
+                <div>
+                  <h4 class="text-xs font-bold text-white">${name}</h4>
+                  <p class="text-[9px] text-gray-500">${plate}</p>
+                </div>
+              </div>
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${totalPanjar > 0 ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20' : 'bg-zinc-850 text-gray-500'}">
+                ${activePanjarCount} Panjar Aktif
+              </span>
+            </div>
+            <div>
+              <span class="text-[9px] text-gray-500 uppercase font-bold block">Total Panjar Aktif</span>
+              <span class="text-sm font-black text-sky-400">Rp ${totalPanjar.toLocaleString('id-ID')}</span>
+            </div>
+            <div class="pt-2 border-t border-brand-border/40 flex items-center justify-between text-[10px]">
+              <span class="text-gray-400">Sisa Kas Setoran Driver:</span>
+              <span class="font-bold text-white">Rp ${cashHand.toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      tbody.innerHTML = "";
+      const activePanjars = appState.pengeluaran.filter(exp => exp.category === "Panjar Driver");
+
+      if (activePanjars.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="p-8 text-center text-gray-500">
+              <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i> Tidak ada riwayat pengambilan panjar driver.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      activePanjars.forEach(item => {
+        const isActive = (item.status === undefined || item.status === "Active");
+        const statusBadge = isActive 
+          ? `<span class="px-2 py-0.5 bg-sky-500/10 border border-sky-500/30 text-[9px] font-bold text-sky-400 rounded-full">Belum Dipotong (Aktif)</span>`
+          : `<span class="px-2 py-0.5 bg-zinc-800 text-gray-500 text-[9px] font-medium rounded-full">Selesai (Settled)</span>`;
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-brand-card/30 transition border-b border-brand-border/40">
+            <td class="p-4 text-[11px] text-gray-300 whitespace-nowrap">${item.timestamp}</td>
+            <td class="p-4">
+              <div class="font-bold text-white">${item.source}</div>
+              <div class="text-[10px] text-gray-500">${appState.drivers[item.source]?.plate || ""}</div>
+            </td>
+            <td class="p-4 font-bold text-sky-400">Rp ${item.nominal.toLocaleString('id-ID')}</td>
+            <td class="p-4 text-gray-300 max-w-xs truncate">${item.note || '-'}</td>
+            <td class="p-4 text-center">
+              <button onclick="viewExpensePhoto('${item.id}')" class="text-brand-blue hover:text-blue-400 text-base transition">
+                <i class="fa-solid fa-image-portrait"></i>
+              </button>
+            </td>
+            <td class="p-4 text-center">${statusBadge}</td>
+            <td class="p-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                ${isActive ? `
+                  <button onclick="settleSinglePanjar('${item.id}')" title="Settle Panjar Ini" class="active-scale bg-sky-500/10 hover:bg-sky-500 text-sky-400 hover:text-white px-2.5 py-1 rounded text-[10px] font-bold border border-sky-500/20 transition">
+                    Potong
+                  </button>
+                ` : `<span class="text-[10px] text-zinc-600 font-semibold uppercase italic mr-1">Settled ✓</span>`}
+                <button onclick="deleteExpense('${item.id}')" title="Hapus Panjar" class="active-scale text-rose-500 hover:text-rose-400 p-1 rounded border border-rose-500/20 bg-rose-500/5 transition">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // SETTLE A SINGLE PANJAR OPERATIONAL
+    function settleSinglePanjar(id) {
+      const item = appState.pengeluaran.find(x => x.id === id);
+      if (!item) return;
+
+      showCustomDialog({
+        title: 'Settle Panjar Driver',
+        message: `Apakah Anda yakin ingin memotong/menyelesaikan transaksi panjar ${item.source} senilai Rp ${item.nominal.toLocaleString('id-ID')}?`,
+        confirmText: 'Ya, Selesaikan',
+        cancelText: 'Batal',
+        type: 'success',
+        onConfirm: () => {
+          item.status = "Settled";
+          saveState();
+          updateMetrics();
+          renderDashboardActivities();
+          renderExpenseTable();
+          renderDriverStatusList();
+          renderPanjarRecap();
+          updateAllSourcesCashLabels();
+          showToast('Panjar Selesai', `Transaksi panjar driver ${item.source} telah berhasil diselesaikan/dipotong.`, 'success');
+        }
+      });
+    }
+
+    // RENDER LIVE STATUS MONITOR + KAS WALLET DRIVER
+    function renderDriverStatusList() {
+      const container = document.getElementById('driver-status-list');
+      container.innerHTML = "";
+
+      const names = ["IKKI", "FAUZI", "ASO"];
+      names.forEach(name => {
+        const lastAbsen = appState.absensi.find(x => x.name === name);
+        const status = lastAbsen ? lastAbsen.tipe : "Jalan"; 
+        const driverPlate = appState.drivers[name].plate;
+        const timeStr = lastAbsen ? lastAbsen.timestamp.split(' ')[1] : "07:15";
+        const cashHand = getDriverCashInHand(name);
+
+        let badgeClass = "bg-emerald-500/10 text-brand-green border border-brand-green/20";
+        let dotClass = "bg-brand-green pulsing-green-dot";
+        let statusText = "Aktif Jalan";
+
+        if (status === "Istirahat") {
+          badgeClass = "bg-amber-500/10 text-amber-500 border border-amber-500/20";
+          dotClass = "bg-amber-500 pulsing-dot";
+          statusText = "Istirahat";
+        } else if (status === "Sakit") {
+          badgeClass = "bg-rose-500/10 text-rose-500 border border-rose-500/20";
+          dotClass = "bg-rose-500";
+          statusText = "Sakit / Off";
+        } else if (status === "Izin") {
+          badgeClass = "bg-orange-500/10 text-orange-500 border border-orange-500/20";
+          dotClass = "bg-orange-500";
+          statusText = "Izin / Off";
+        } else if (status === "Selesai Dinas") {
+          badgeClass = "bg-zinc-800 text-gray-400 border border-zinc-700";
+          dotClass = "bg-gray-500";
+          statusText = "Selesai Tugas";
+        }
+
+        container.innerHTML += `
+          <div class="flex flex-col p-4 rounded-xl bg-brand-black border border-brand-border space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-brand-blue/10 border border-brand-blue/30 flex items-center justify-center font-bold text-brand-blue">${name.substring(0, 2)}</div>
+                <div>
+                  <h5 class="text-sm font-bold text-white leading-none">${name}</h5>
+                  <span class="text-xs text-gray-400">${driverPlate}</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${badgeClass}">
+                  <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span> ${statusText}
+                </span>
+                <p class="text-[10px] text-gray-500 mt-1">Sejak Jam: ${timeStr} WITA</p>
+              </div>
+            </div>
+            
+            <!-- Kas Wallet Section -->
+            <div class="flex items-center justify-between pt-2.5 border-t border-brand-border/40">
+              <div>
+                <span class="text-[9px] text-gray-500 uppercase font-bold block">Cash Di Tangan</span>
+                <span class="text-xs font-extrabold ${cashHand > 0 ? 'text-amber-500 animate-pulse' : 'text-gray-400'}">Rp ${cashHand.toLocaleString('id-ID')}</span>
+              </div>
+              ${cashHand > 0 ? `
+                <button onclick="settleDriverWallet('${name}')" class="active-scale bg-brand-green/10 hover:bg-brand-green text-brand-green hover:text-white border border-brand-green/30 hover:border-brand-green px-2.5 py-1 rounded-[10px] text-[10px] font-extrabold transition flex items-center gap-1">
+                  <i class="fa-solid fa-hand-holding-dollar"></i> Setor Kasir
+                </button>
+              ` : `
+                <span class="text-[9px] text-zinc-600 font-semibold uppercase italic">Kas Bersih (Rp 0)</span>
+              `}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // SETOR KAS AKHIR / SETTLE WALLET ENGINE
+    function settleDriverWallet(driverName) {
+      const cashInHand = getDriverCashInHand(driverName);
+      if (cashInHand <= 0) return;
+      
+      let ritaseCash = 0;
+      appState.ritase.forEach(item => {
+        if (item.driver === driverName && item.payment === "Cash" && item.status === "Belum Disetor") {
+          ritaseCash += item.nominal;
+        }
+      });
+
+      let expenseCash = 0;
+      let transferInCash = 0;
+      appState.pengeluaran.forEach(exp => {
+        const isActive = (exp.status === undefined || exp.status === "Active");
+        if (exp.source === driverName && isActive) {
+          expenseCash += exp.nominal;
+        }
+        if (exp.category === "Transfer Kas" && exp.recipient === driverName && isActive) {
+          transferInCash += exp.nominal;
+        }
+      });
+
+      showCustomDialog({
+        title: `Konfirmasi Setor Kas - ${driverName}`,
+        message: `Rincian Kas Aktif Hari Ini:\n` +
+                 `• Total Uang Ritase Diterima: Rp ${ritaseCash.toLocaleString('id-ID')}\n` +
+                 `• Total Kas Masuk (TF Teman): Rp ${transferInCash.toLocaleString('id-ID')}\n` +
+                 `• Total Belanja (Solar/Sparepart): Rp ${expenseCash.toLocaleString('id-ID')}\n` +
+                 `--------------------------------------------------\n` +
+                 `UANG FISIK WAJIB DISERAHKAN: Rp ${cashInHand.toLocaleString('id-ID')}\n\n` +
+                 `Apakah Anda mengonfirmasi serah terima uang fisik tersebut secara lengkap?`,
+        confirmText: 'Ya, Terima & Selesaikan',
+        cancelText: 'Batal',
+        type: 'success',
+        onConfirm: () => {
+          // 1. Ubah status semua ritase cash yang menggantung menjadi "Sudah Disetor"
+          appState.ritase.forEach(item => {
+            if (item.driver === driverName && item.payment === "Cash" && item.status === "Belum Disetor") {
+              item.status = "Sudah Disetor";
+            }
+          });
+
+          // 2. Tandai semua log belanja driver di jalan menjadi "Settled"
+          appState.pengeluaran.forEach(exp => {
+            const isActive = (exp.status === undefined || exp.status === "Active");
+            if (exp.source === driverName && isActive) {
+              exp.status = "Settled";
+            }
+            if (exp.category === "Transfer Kas" && exp.recipient === driverName && isActive) {
+              exp.status = "Settled";
+            }
+          });
+
+          saveState();
+          updateMetrics();
+          renderDashboardActivities();
+          renderRekapTable();
+          renderExpenseTable();
+          renderDriverStatusList();
+          renderPanjarRecap();
+          updateCharts();
+
+          showToast('Kas Driver Selesai', `Serah terima kas driver ${driverName} sebesar Rp ${cashInHand.toLocaleString('id-ID')} berhasil. Saldo driver di-reset ke Rp 0.`, 'success');
+        }
+      });
+    }
+
+    // POPULATE ABSENSI
+    function renderAbsensi() {
+      const tbody = document.getElementById('absensi-table-body');
+      tbody.innerHTML = "";
+
+      if (appState.absensi.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Belum ada absensi hari ini.</td></tr>`;
+        return;
+      }
+
+      appState.absensi.forEach(item => {
+        let conditionColor = "text-brand-green bg-emerald-500/10 border border-emerald-500/20";
+        if (item.tipe === "Istirahat") conditionColor = "text-amber-500 bg-amber-500/10 border border-amber-500/20";
+        if (item.tipe === "Sakit") conditionColor = "text-rose-500 bg-rose-500/10 border border-rose-500/20";
+        if (item.tipe === "Izin") conditionColor = "text-orange-500 bg-orange-500/10 border border-orange-500/20";
+        if (item.tipe === "Selesai Dinas") conditionColor = "text-gray-400 bg-zinc-800 border border-zinc-700";
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-brand-card/30 transition border-b border-brand-border/40">
+            <td class="p-4 text-gray-400 font-mono">${item.timestamp}</td>
+            <td class="p-4 font-bold text-white">${item.name}</td>
+            <td class="p-4">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${conditionColor}">
+                ${item.tipe}
+              </span>
+            </td>
+            <td class="p-4 text-right font-semibold text-brand-green">Rp ${item.uangJalan.toLocaleString('id-ID')}</td>
+            <td class="p-4 text-right text-gray-500 text-[10px]">Sukses Terkirim</td>
+          </tr>
+        `;
+      });
+    }
+
+    // TERIMA SETORAN CASH SATUAN
+    function approveDeposit(id) {
+      const idx = appState.ritase.findIndex(item => item.id === id);
+      if (idx !== -1) {
+        const driverName = appState.ritase[idx].driver;
+        
+        showCustomDialog({
+          title: 'Terima Setoran Kas?',
+          message: `Konfirmasi penerimaan kas dari pengiriman driver ${driverName} ke ${appState.ritase[idx].rute}.`,
+          confirmText: 'Ya, Terima Setoran',
+          cancelText: 'Batal',
+          type: 'info',
+          onConfirm: () => {
+            appState.ritase[idx].status = "Sudah Disetor";
+            saveState();
+            
+            updateMetrics();
+            renderDashboardActivities();
+            renderRekapTable();
+            renderDriverStatusList();
+            renderPanjarRecap();
+            updateCharts();
+
+            showToast('Setoran Diterima', `Kas dari pengiriman ${driverName} sukses disetor ke kasir CV SANSAM GROUP.`, 'success');
+          }
+        });
+      }
+    }
+
+    // PENAGIHAN HARGA BON
+    function settlePriceAndPay(id) {
+      const item = appState.ritase.find(x => x.id === id);
+      if (!item) return;
+
+      showCustomDialog({
+        title: 'Tentukan Harga & Lunasi',
+        message: `Atur harga pengiriman ${item.muatan} rute ${item.rute} (${item.driver})`,
+        showInput: true,
+        inputLabel: 'Masukkan nominal harga jual (Rp)',
+        inputVal: item.nominal || '',
+        confirmText: 'Simpan & Lunasi',
+        cancelText: 'Batal',
+        type: 'info',
+        onConfirm: (finalPrice) => {
+          item.nominal = finalPrice;
+          item.status = "Sudah Disetor"; 
+          saveState();
+
+          updateMetrics();
+          renderDashboardActivities();
+          renderRekapTable();
+          renderDriverStatusList();
+          renderPanjarRecap();
+          updateCharts();
+          buildPriceHistory();
+
+          showToast('Transaksi Diperbarui', `Uang masuk sebesar Rp ${finalPrice.toLocaleString('id-ID')} dicatat lunas.`, 'success');
+        }
+      });
+    }
+
+    // OPEN POPUP EDIT MODAL
+    function openEditModal(id) {
+      const item = appState.ritase.find(x => x.id === id);
+      if (!item) return;
+
+      document.getElementById('edit-record-id').value = item.id;
+      document.getElementById('edit-driver').value = `${item.driver}|${item.plate}`;
+      document.getElementById('edit-muatan').value = item.muatan;
+      document.getElementById('edit-rute').value = item.rute;
+      document.getElementById('edit-payment').value = item.payment;
+      document.getElementById('edit-status').value = item.status;
+      document.getElementById('edit-nominal').value = item.nominal || '';
+
+      toggleEditNominalRequired();
+      document.getElementById('edit-record-modal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-record-modal').classList.add('hidden');
+    }
+
+    function toggleEditNominalRequired() {
+      const paymentMethod = document.getElementById('edit-payment').value;
+      const nominalInput = document.getElementById('edit-nominal');
+      const optLabel = document.getElementById('edit-optional-label');
+
+      if (paymentMethod === "Cash") {
+        nominalInput.setAttribute('required', 'true');
+        optLabel.innerText = "(Wajib untuk Cash)";
+        optLabel.className = "text-rose-500 font-bold";
+      } else {
+        nominalInput.removeAttribute('required');
+        optLabel.innerText = "(Opsional / tidak wajib)";
+        optLabel.className = "text-gray-500 font-normal text-[11px]";
+      }
+    }
+
+    function saveEditRecord(e) {
+      e.preventDefault();
+
+      const id = document.getElementById('edit-record-id').value;
+      const rawDriver = document.getElementById('edit-driver').value;
+      const muatan = document.getElementById('edit-muatan').value;
+      const rute = document.getElementById('edit-rute').value;
+      const payment = document.getElementById('edit-payment').value;
+      const status = document.getElementById('edit-status').value;
+      const nominal = parseFloat(document.getElementById('edit-nominal').value) || 0;
+
+      const parts = rawDriver.split('|');
+      const name = parts[0];
+      const plate = parts[1];
+
+      if (payment === "Cash" && nominal <= 0) {
+        showToast('Input Gagal', 'Nominal wajib diisi untuk transaksi Cash.', 'error');
+        return;
+      }
+
+      const idx = appState.ritase.findIndex(x => x.id === id);
+      if (idx !== -1) {
+        appState.ritase[idx].driver = name;
+        appState.ritase[idx].plate = plate;
+        appState.ritase[idx].muatan = muatan;
+        appState.ritase[idx].rute = rute;
+        appState.ritase[idx].payment = payment;
+        appState.ritase[idx].status = status;
+        appState.ritase[idx].nominal = nominal;
+
+        saveState();
+
+        updateMetrics();
+        renderDashboardActivities();
+        renderRekapTable();
+        renderDriverStatusList();
+        renderPanjarRecap();
+        updateCharts();
+        buildPriceHistory();
+
+        closeEditModal();
+        showToast('Perubahan Disimpan', 'Data laporan ritase berhasil diperbarui.', 'success');
+      }
+    }
+
+    // DELETE RECORDS
+    function deleteRecord(id) {
+      const item = appState.ritase.find(x => x.id === id);
+      if (!item) return;
+
+      showCustomDialog({
+        title: 'Hapus Data Ritase?',
+        message: `Apakah Anda yakin ingin menghapus catatan perjalanan ${item.driver} ke ${item.rute}? Tindakan ini tidak dapat dikembalikan.`,
+        confirmText: 'Ya, Hapus!',
+        cancelText: 'Batal',
+        type: 'warning',
+        onConfirm: () => {
+          appState.ritase = appState.ritase.filter(x => x.id !== id);
+          saveState();
+
+          updateMetrics();
+          renderDashboardActivities();
+          renderRekapTable();
+          renderDriverStatusList();
+          renderPanjarRecap();
+          updateCharts();
+          buildPriceHistory();
+
+          showToast('Berhasil Dihapus', 'Data ritase telah dihapus dari sistem CV Sansam Group.', 'success');
+        }
+      });
+    }
+
+    function deleteExpense(id) {
+      const item = appState.pengeluaran.find(x => x.id === id);
+      if (!item) return;
+
+      showCustomDialog({
+        title: 'Hapus Transaksi Kas?',
+        message: `Hapus alokasi belanja/panjar ${item.category} senilai Rp ${item.nominal.toLocaleString('id-ID')}?`,
+        confirmText: 'Ya, Hapus',
+        cancelText: 'Batal',
+        type: 'warning',
+        onConfirm: () => {
+          appState.pengeluaran = appState.pengeluaran.filter(x => x.id !== id);
+          saveState();
+
+          updateMetrics();
+          renderDashboardActivities();
+          renderExpenseTable();
+          renderDriverStatusList();
+          renderPanjarRecap();
+          updateAllSourcesCashLabels();
+
+          showToast('Berhasil Dihapus', 'Catatan pengeluaran kas telah berhasil dihapus.', 'success');
+        }
+      });
+    }
+
+    // MULTI-FILTER SEARCH
+    function applyFilters() {
+      const driver = document.getElementById('filter-driver').value;
+      const payment = document.getElementById('filter-payment').value;
+      const status = document.getElementById('filter-status').value;
+
+      let temp = [...appState.ritase];
+
+      if (driver !== "All") temp = temp.filter(item => item.driver === driver);
+      if (payment !== "All") temp = temp.filter(item => item.payment === payment);
+      if (status !== "All") temp = temp.filter(item => item.status === status);
+
+      renderRekapTable(temp);
+    }
+
+    // VIEW PHOTOS
+    function viewPhoto(id) {
+      const item = appState.ritase.find(x => x.id === id);
+      if (!item) return;
+
+      document.getElementById('modal-title').innerText = `Laporan Foto Timemark - ${item.driver}`;
+      document.getElementById('modal-subtitle').innerText = `${item.plate} | Tanggal: ${item.timestamp}`;
+      document.getElementById('modal-image').src = item.photo;
+      document.getElementById('modal-rute').innerText = item.rute;
+      document.getElementById('modal-volume').innerText = item.muatan;
+      
+      let pBadge = document.getElementById('modal-metode');
+      let priceText = item.nominal > 0 ? `Rp ${item.nominal.toLocaleString('id-ID')}` : "Belum Ditentukan";
+      pBadge.innerText = `${item.payment} (${priceText} - ${item.status})`;
+      pBadge.className = "font-bold text-amber-500";
+      if (item.status === "Sudah Disetor") pBadge.className = "font-bold text-brand-green";
+      if (item.status === "Piutang") pBadge.className = "font-bold text-rose-500";
+
+      document.getElementById('photo-modal').classList.remove('hidden');
+    }
+
+    function viewExpensePhoto(id) {
+      const item = appState.pengeluaran.find(x => x.id === id);
+      if (!item) return;
+
+      document.getElementById('modal-title').innerText = `Kwitansi Belanja / Bukti Serah Terima - ${item.source}`;
+      document.getElementById('modal-subtitle').innerText = `Kategori: ${item.category} | Waktu: ${item.timestamp}`;
+      document.getElementById('modal-image').src = item.photo;
+      document.getElementById('modal-rute').innerText = item.recipient;
+      document.getElementById('modal-volume').innerText = item.note || '-';
+      
+      let pBadge = document.getElementById('modal-metode');
+      pBadge.innerText = `Rp ${item.nominal.toLocaleString('id-ID')}`;
+      pBadge.className = "font-bold text-rose-500";
+
+      document.getElementById('photo-modal').classList.remove('hidden');
+    }
+
+    function closePhotoModal() {
+      document.getElementById('photo-modal').classList.add('hidden');
+    }
+
+    // EXPORTS CSV
+    function exportToCSV() {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "ID,Tanggal,Nama Driver,Plat Kendaraan,Rute Tujuan,Volume Muatan,Nominal Jual,Pembayaran,Status Setoran\r\n";
+
+      appState.ritase.forEach(item => {
+        let row = `"${item.id}","${item.timestamp}","${item.driver}","${item.plate}","${item.rute}","${item.muatan}",${item.nominal},"${item.payment}","${item.status}"`;
+        csvContent += row + "\r\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Rekap_SANSAM_Logistik_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function exportExpensesToCSV() {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "ID,Tanggal,Sumber Dana,Kategori,Penerima/Alokasi,Nominal,Keterangan\r\n";
+
+      appState.pengeluaran.forEach(item => {
+        let row = `"${item.id}","${item.timestamp}","${item.source}","${item.category}","${item.recipient}",${item.nominal},"${item.note || ''}"`;
+        csvContent += row + "\r\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Rekap_Pengeluaran_SANSAM_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // PREMIUM EXPORTS TO PDF (DENGAN KOP CV SANSAM GROUP)
+    function exportToPDF() {
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('l', 'mm', 'a4');
+
+        doc.setFillColor(16, 18, 26);
+        doc.rect(0, 0, 297, 45, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.text("CV SANSAM GROUP", 15, 18);
+        
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(156, 163, 175);
+        doc.text("KABUPATEN WAJO, SULAWESI SELATAN - INDONESIA", 15, 24);
+        doc.text("SISTEM MANAJEMEN ARMADA & RITASE DUMP TRUCK", 15, 29);
+
+        doc.setDrawColor(0, 92, 255);
+        doc.setLineWidth(1.5);
+        doc.line(15, 33, 282, 33);
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("LAPORAN OPERASIONAL RITASE DRIVER", 15, 40);
+        doc.text("Tanggal Cetak: " + new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}), 210, 40);
+
+        const headers = [["Tanggal/Waktu", "Driver", "Plat Nomor", "Rute Tujuan", "Muatan", "Ongkos Jual", "Metode", "Status Setoran"]];
+        const rows = appState.ritase.map(item => [
+          item.timestamp,
+          item.driver,
+          item.plate,
+          item.rute,
+          item.muatan,
+          item.nominal > 0 ? "Rp " + item.nominal.toLocaleString('id-ID') : "Belum Diisi",
+          item.payment,
+          item.status
+        ]);
+
+        doc.autoTable({
+          head: headers,
+          body: rows,
+          startY: 50,
+          theme: 'grid',
+          headStyles: { 
+            fillColor: [0, 92, 255], 
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            halign: 'center'
+          },
+          bodyStyles: { 
+            textColor: [50, 50, 50],
+            fontSize: 9
+          },
+          alternateRowStyles: {
+            fillColor: [245, 247, 250]
+          },
+          columnStyles: {
+            5: { halign: 'right', fontStyle: 'bold' },
+            6: { halign: 'center' },
+            7: { halign: 'center' }
+          }
+        });
+
+        const finalY = doc.previousAutoTable.finalY + 15;
+        doc.setFontSize(10);
+        doc.setTextColor(40, 40, 40);
+        doc.text("Disetujui Oleh,", 20, finalY);
+        doc.text("Dibuat Oleh,", 220, finalY);
+        
+        doc.setLineWidth(0.3);
+        doc.setDrawColor(150, 150, 150);
+        doc.line(20, finalY + 22, 65, finalY + 22);
+        doc.line(220, finalY + 22, 265, finalY + 22);
+
+        doc.text("Kasir CV SANSAM", 20, finalY + 26);
+        doc.text("Driver Bersangkutan", 220, finalY + 26);
+
+        doc.save(`Laporan_Ritase_CV_SANSAM_${Date.now()}.pdf`);
+        showToast("PDF Diunduh", "Berkas laporan Ritase PDF berhasil diekspor.", "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Ekspor PDF Gagal", "Gagal memproses dokumen PDF.", "error");
+      }
+    }
+
+    function exportExpensesToPDF() {
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+
+        doc.setFillColor(16, 18, 26);
+        doc.rect(0, 0, 210, 42, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(20);
+        doc.text("CV SANSAM GROUP", 15, 18);
+        
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(156, 163, 175);
+        doc.text("SISTEM MANAJEMEN INTERNAL LOGISTIK", 15, 24);
+        doc.text("LAPORAN ALOKASI KAS, PENGELUARAN & TRANSFER SOLAR", 15, 29);
+
+        doc.setDrawColor(245, 158, 11);
+        doc.setLineWidth(1.5);
+        doc.line(15, 33, 195, 33);
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("LOG ARUS KELUAR & TRANSFER DRIVER", 15, 38);
+        doc.text("Tanggal Cetak: " + new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long'}), 145, 38);
+
+        const headers = [["Tanggal", "Sumber Dana", "Kategori", "Penerima/Alokasi", "Nominal", "Catatan"]];
+        const rows = appState.pengeluaran.map(item => [
+          item.timestamp,
+          item.source,
+          item.category,
+          item.recipient,
+          "Rp " + item.nominal.toLocaleString('id-ID'),
+          item.note || "-"
+        ]);
+
+        doc.autoTable({
+          head: headers,
+          body: rows,
+          startY: 48,
+          theme: 'grid',
+          headStyles: { 
+            fillColor: [245, 158, 11],
+            textColor: [16, 18, 26],
+            fontStyle: 'bold',
+            halign: 'center'
+          },
+          bodyStyles: { 
+            textColor: [50, 50, 50],
+            fontSize: 9
+          },
+          alternateRowStyles: {
+            fillColor: [254, 252, 243]
+          },
+          columnStyles: {
+            4: { halign: 'right', fontStyle: 'bold' }
+          }
+        });
+
+        const finalY = doc.previousAutoTable.finalY + 15;
+        doc.setFontSize(10);
+        doc.setTextColor(40, 40, 40);
+        doc.text("Saksi Kantor,", 20, finalY);
+        doc.text("Penyetor Kas,", 140, finalY);
+        
+        doc.setLineWidth(0.3);
+        doc.setDrawColor(150, 150, 150);
+        doc.line(20, finalY + 22, 65, finalY + 22);
+        doc.line(140, finalY + 22, 185, finalY + 22);
+
+        doc.text("Kasir Sansam", 20, finalY + 26);
+        doc.text("Driver Pengirim", 140, finalY + 26);
+
+        doc.save(`Laporan_Kas_Pengeluaran_CV_SANSAM_${Date.now()}.pdf`);
+        showToast("PDF Diunduh", "Berkas Laporan Kas PDF berhasil diunduh.", "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Ekspor PDF Gagal", "Gagal memproses dokumen PDF.", "error");
+      }
+    }
+
+    function exportPanjarToPDF() {
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+
+        doc.setFillColor(16, 18, 26);
+        doc.rect(0, 0, 210, 42, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(20);
+        doc.text("CV SANSAM GROUP", 15, 18);
+        
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(156, 163, 175);
+        doc.text("SISTEM MONITORING KAS PANJAR INTERNAL", 15, 24);
+        doc.text("LAPORAN DETEKSI KAS DRIVER & OUTSTANDING PANJAR", 15, 29);
+
+        doc.setDrawColor(14, 165, 233); 
+        doc.setLineWidth(1.5);
+        doc.line(15, 33, 195, 33);
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("REKAPITULASI PANJAR AKTIF DRIVER", 15, 38);
+        doc.text("Tanggal Cetak: " + new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long'}), 145, 38);
+
+        let startTextY = 52;
+        doc.setFontSize(10);
+        doc.setTextColor(50, 50, 50);
+        doc.text("KONDISI PANJAR AKTIF SAAT INI:", 15, startTextY);
+        
+        const driversList = ["IKKI", "FAUZI", "ASO"];
+        driversList.forEach((name, i) => {
+          const totalPanjar = getDriverPanjarTotal(name);
+          const cashHand = getDriverCashInHand(name);
+          doc.text(`• Driver ${name} : Total Panjar Aktif = Rp ${totalPanjar.toLocaleString('id-ID')} | Sisa Dompet Kas = Rp ${cashHand.toLocaleString('id-ID')}`, 20, startTextY + 6 + (i * 6));
+        });
+
+        const headers = [["Tanggal/Waktu", "Driver", "Kategori", "Jumlah Panjar", "Catatan", "Status"]];
+        const rows = appState.pengeluaran
+          .filter(item => item.category === "Panjar Driver")
+          .map(item => [
+            item.timestamp,
+            item.source,
+            item.category,
+            "Rp " + item.nominal.toLocaleString('id-ID'),
+            item.note || "-",
+            (item.status === undefined || item.status === "Active") ? "Belum Settle" : "Selesai (Settled)"
+          ]);
+
+        doc.autoTable({
+          head: headers,
+          body: rows,
+          startY: startTextY + 28,
+          theme: 'grid',
+          headStyles: { 
+            fillColor: [14, 165, 233], 
+            textColor: [16, 18, 26],
+            fontStyle: 'bold',
+            halign: 'center'
+          },
+          bodyStyles: { 
+            textColor: [50, 50, 50],
+            fontSize: 9
+          },
+          alternateRowStyles: {
+            fillColor: [240, 249, 255]
+          },
+          columnStyles: {
+            3: { halign: 'right', fontStyle: 'bold' }
+          }
+        });
+
+        const finalY = doc.previousAutoTable.finalY + 15;
+        doc.setFontSize(10);
+        doc.text("Disetujui Kasir,", 20, finalY);
+        doc.text("Pimpinan CV Sansam Group,", 140, finalY);
+        
+        doc.setLineWidth(0.3);
+        doc.setDrawColor(150, 150, 150);
+        doc.line(20, finalY + 22, 65, finalY + 22);
+        doc.line(140, finalY + 22, 185, finalY + 22);
+
+        doc.text("Kasir Operasional", 20, finalY + 26);
+        doc.text("Manajer Logistik", 140, finalY + 26);
+
+        doc.save(`Laporan_Panjar_SANSAM_${Date.now()}.pdf`);
+        showToast("PDF Diunduh", "Berkas laporan panjar driver PDF berhasil diunduh.", "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Ekspor PDF Gagal", "Gagal memproses dokumen PDF.", "error");
+      }
+    }
+
+    // CHART VISUALIZATIONS
+    function initChart() {
+      const ctx = document.getElementById('driverChart').getContext('2d');
+      const counts = getDriverChartData();
+
+      driverDistributionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['IKKI', 'FAUZI', 'ASO'],
+          labels: ['IKKI', 'FAUZI', 'ASO'],
+          datasets: [{
+            label: 'Jumlah Ritase Berjalan',
+            data: [counts.IKKI, counts.FAUZI, counts.ASO],
+            backgroundColor: [
+              'rgba(0, 92, 255, 0.7)',
+              'rgba(0, 204, 68, 0.7)',
+              'rgba(239, 68, 68, 0.7)'
+            ],
+            borderColor: [
+              '#005CFF',
+              '#00CC44',
+              '#EF4444'
+            ],
+            borderWidth: 2,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              grid: { color: '#1D2230' },
+              ticks: { color: '#9CA3AF', stepSize: 1 },
+              beginAtZero: true
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#9CA3AF' }
+            }
+          }
+        }
+      });
+    }
+
+    function updateCharts() {
+      if (driverDistributionChart) {
+        const counts = getDriverChartData();
+        driverDistributionChart.data.datasets[0].data = [counts.IKKI, counts.FAUZI, counts.ASO];
+        driverDistributionChart.update();
+      }
+    }
+
+    function getDriverChartData() {
+      let counts = { IKKI: 0, FAUZI: 0, ASO: 0 };
+      appState.ritase.forEach(item => {
+        if (counts.hasOwnProperty(item.driver)) {
+          counts[item.driver]++;
+        }
+      });
+      return counts;
+    }
+
+    // GPS RADAR SIMULATION
+    function startGpsSimulation() {
+      let step = 0;
+      setInterval(() => {
+        step++;
+        const ikkiMarker = document.getElementById('truck-ikki-marker');
+        const fauziMarker = document.getElementById('truck-fauzi-marker');
+        const asoMarker = document.getElementById('truck-aso-marker');
+
+        let ikkiX = 150 + (Math.sin(step * 0.04) + 1) * 265;
+        let ikkiY = 200 + (Math.sin(step * 0.04) + 1) * 10;
+        if (ikkiMarker) ikkiMarker.setAttribute('transform', `translate(${ikkiX}, ${ikkiY})`);
+
+        let fauziX = 400 + Math.cos(step * 0.08) * 40;
+        let fauziY = 120 + Math.sin(step * 0.08) * 40;
+        if (fauziMarker) fauziMarker.setAttribute('transform', `translate(${fauziX}, ${fauziY})`);
+
+        if (asoMarker) asoMarker.setAttribute('transform', `translate(400, 120)`);
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
