@@ -29,6 +29,9 @@
   <!-- PWA Manifest dinamis agar bisa di-install langsung di HP Android -->
   <link id="manifest-placeholder" rel="manifest">
 
+  <!-- Setup Supabase JS (Disiapkan untuk Integrasi Nanti) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -85,19 +88,22 @@
       70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(0, 204, 68, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 204, 68, 0); }
     }
-    /* Animasi transisi antar tab agar terasa native */
     .tab-pane {
       transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
     }
     .active-scale:active {
       transform: scale(0.96);
     }
+    @keyframes loading {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
   </style>
 </head>
 <body class="min-h-screen pb-24 md:pb-6 overflow-x-hidden">
 
   <!-- NATIVE-LIKE SPLASH SCREEN -->
-  <div id="splash-screen" class="fixed inset-0 bg-brand-black z-[9999] flex flex-col items-center justify-center transition-all duration-700">
+  <div id="splash-screen" class="fixed inset-0 bg-brand-black z-[999999] flex flex-col items-center justify-center transition-all duration-700">
     <div class="text-center space-y-4 animate-bounce">
       <div class="w-20 h-20 bg-gradient-to-tr from-brand-blue to-brand-green rounded-3xl mx-auto flex items-center justify-center shadow-xl shadow-brand-blue/20">
         <i class="fa-solid fa-truck-fast text-white text-3xl"></i>
@@ -111,16 +117,41 @@
       <div class="w-12 h-1 bg-brand-border rounded-full overflow-hidden">
         <div class="h-full w-1/2 bg-brand-blue rounded-full animate-[loading_1.5s_infinite_ease-in-out]"></div>
       </div>
-      <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Memuat Database Internal</span>
+      <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Memuat Database</span>
     </div>
   </div>
 
-  <style>
-    @keyframes loading {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(200%); }
-    }
-  </style>
+  <!-- ROLE GATEWAY / PINTU MASUK -->
+  <div id="login-modal" class="fixed inset-0 bg-brand-black/95 backdrop-blur-md z-[99999] flex flex-col items-center justify-center p-4 transition-all duration-500 hidden">
+    <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-6">
+      <div class="w-16 h-16 bg-brand-blue/10 rounded-2xl mx-auto flex items-center justify-center border border-brand-blue/30 shadow-lg shadow-brand-blue/20">
+        <i class="fa-solid fa-users-gear text-brand-blue text-2xl"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-black text-white">SANSAM FLEET</h2>
+        <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Pilih Akses Masuk</p>
+      </div>
+
+      <div class="space-y-3 pt-2">
+        <!-- Tombol Driver -->
+        <button onclick="loginAsDriver()" class="active-scale w-full bg-brand-black border border-brand-border hover:border-brand-green text-white font-bold py-3.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-steering-wheel text-brand-green"></i> Masuk Sebagai Driver Armada
+        </button>
+        
+        <!-- Tombol Admin -->
+        <div class="bg-brand-black border border-brand-border rounded-xl p-3 space-y-3">
+          <button onclick="togglePinInput()" class="w-full text-gray-300 hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition">
+            <i class="fa-solid fa-user-tie text-brand-blue"></i> Masuk Sebagai Admin / Pemilik
+          </button>
+          <div id="pin-container" class="hidden flex gap-2">
+            <input type="password" id="admin-pin" placeholder="Masukkan PIN..." class="w-full bg-brand-card border border-brand-border rounded-lg p-2 text-center text-xs text-white focus:outline-none focus:border-brand-blue tracking-widest">
+            <button onclick="loginAsAdmin()" class="bg-brand-blue text-white px-4 rounded-lg text-xs font-bold hover:bg-brand-blue/90 transition">OK</button>
+          </div>
+          <p id="pin-error" class="hidden text-[9px] text-rose-500 font-bold">PIN Salah! Hubungi Direktur.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- TOP HEADER (Clean Layout) -->
   <header class="border-b border-brand-border bg-brand-black/95 sticky top-0 z-50 backdrop-blur-md">
@@ -135,15 +166,20 @@
             AKTIF
           </span>
         </h1>
-        <span class="text-[9px] text-gray-400 font-bold tracking-[0.25em] uppercase block mt-0.5">
+        <span class="text-[9px] text-gray-400 font-bold tracking-[0.25em] uppercase block mt-0.5" id="header-role-badge">
           Aplikasi Manajemen Internal
         </span>
       </div>
       
-      <!-- PWA Install Button & Live Date -->
+      <!-- PWA Install Button, Keluar & Live Date -->
       <div class="flex items-center gap-2">
+        <!-- Tombol Keluar (Logout) -->
+        <button onclick="logoutAccount()" class="active-scale bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">KELUAR</span>
+        </button>
+        
         <button id="pwa-install-btn" class="hidden active-scale bg-brand-blue hover:bg-brand-blue/90 text-white text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition shadow-lg shadow-brand-blue/25">
-          <i class="fa-solid fa-download"></i> PASANG APLIKASI
+          <i class="fa-solid fa-download"></i> PASANG
         </button>
         
         <div class="hidden sm:flex items-center gap-2 bg-brand-card px-3.5 py-2 rounded-xl border border-brand-border">
@@ -158,9 +194,9 @@
   <main class="max-w-7xl mx-auto px-4 py-6">
 
     <!-- METRICS GRID -->
-    <section class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-      <!-- Metric 1: Total Omzet -->
-      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
+    <section class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6" id="metrics-container">
+      <!-- Metric 1: Total Omzet (Hanya Admin) -->
+      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Pendapatan</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-white leading-tight" id="metric-total-omzet">Rp 0</h3>
         <span class="text-[9px] text-brand-green flex items-center gap-1 mt-2 font-semibold">
@@ -168,7 +204,7 @@
         </span>
       </div>
 
-      <!-- Metric 2: Cash Di Driver -->
+      <!-- Metric 2: Cash Di Driver (Bisa Dilihat Semua) -->
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cash Sisa (Di Driver)</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-amber-500 leading-tight" id="metric-cash-driver">Rp 0</h3>
@@ -177,7 +213,7 @@
         </span>
       </div>
 
-      <!-- Metric 3: Total Panjar Driver -->
+      <!-- Metric 3: Total Panjar Driver (Bisa Dilihat Semua) -->
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Panjar Driver</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-sky-400 leading-tight" id="metric-total-panjar">Rp 0</h3>
@@ -186,8 +222,8 @@
         </span>
       </div>
 
-      <!-- Metric 4: Transfer Masuk -->
-      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
+      <!-- Metric 4: Transfer Masuk (Hanya Admin) -->
+      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Lunas / TF Kasir</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-brand-green leading-tight" id="metric-tf-masuk">Rp 0</h3>
         <span class="text-[9px] text-gray-400 flex items-center gap-1 mt-2 font-semibold">
@@ -195,8 +231,8 @@
         </span>
       </div>
 
-      <!-- Metric 5: Bon / Piutang -->
-      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
+      <!-- Metric 5: Bon / Piutang (Hanya Admin) -->
+      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Bon (Tempo)</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-rose-500 leading-tight" id="metric-bon-total">Rp 0</h3>
         <span class="text-[9px] text-rose-400 flex items-center gap-1 mt-2 font-semibold">
@@ -213,7 +249,7 @@
       <button onclick="switchTab('input')" id="tab-btn-input" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white">
         <i class="fa-solid fa-truck-pickup text-brand-blue"></i> Input Data & Kas
       </button>
-      <button onclick="switchTab('rekap')" id="tab-btn-rekap" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white">
+      <button onclick="switchTab('rekap')" id="tab-btn-rekap" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white admin-only-tab">
         <i class="fa-solid fa-list-check"></i> Rekap Penjualan
       </button>
       <button onclick="switchTab('absensi')" id="tab-btn-absensi" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white">
@@ -372,7 +408,7 @@
             <div class="flex justify-between items-center mb-1">
               <label for="direct-nominal" class="block text-xs font-bold text-gray-300 uppercase tracking-wider">
                 Nominal Pembayaran (Rp) 
-                <span id="optional-label" class="text-gray-500 font-normal lowercase">(Wajib untuk Cash)</span>
+                <span id="optional-label" class="text-gray-500 font-normal lowercase">(Wajib diisi)</span>
               </label>
             </div>
             
@@ -383,7 +419,7 @@
 
             <div class="relative">
               <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-brand-green font-bold text-xs">Rp</span>
-              <input type="number" id="direct-nominal" placeholder="Contoh: 550000" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-10 pr-4 text-xs font-bold text-white focus:outline-none focus:border-brand-blue transition">
+              <input type="number" id="direct-nominal" required placeholder="Contoh: 550000" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-10 pr-4 text-xs font-bold text-white focus:outline-none focus:border-brand-blue transition">
             </div>
           </div>
 
@@ -548,7 +584,7 @@
     </div>
 
     <!-- TAB 3: REKAP PENJUALAN TABLE, PENGELUARAN, & PANJAR -->
-    <div id="tab-content-rekap" class="tab-pane hidden space-y-4">
+    <div id="tab-content-rekap" class="tab-pane hidden space-y-4 admin-only-tab">
       <!-- Sub-Tab Switcher (3 Tabs) -->
       <div class="flex bg-brand-black p-1.5 rounded-2xl border border-brand-border mb-4 max-w-lg overflow-x-auto custom-scrollbar">
         <button type="button" onclick="switchRekapSubTab('ritase')" id="sub-rekap-btn-ritase" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale">
@@ -886,7 +922,7 @@
       <i class="fa-solid fa-file-invoice text-lg"></i>
       <span class="text-[9px] font-bold">Input Data</span>
     </button>
-    <button onclick="switchTab('rekap')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all">
+    <button onclick="switchTab('rekap')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all admin-only-tab">
       <i class="fa-solid fa-list-check text-lg"></i>
       <span class="text-[9px] font-bold">Rekapan</span>
     </button>
@@ -1038,8 +1074,87 @@
     </button>
   </div>
 
-  <!-- JAVASCRIPT APP LOGIC -->
   <script>
+    // -------------------------------------------------------------
+    // PERSIAPAN SUPABASE (DATABASE ONLINE)
+    // -------------------------------------------------------------
+    // Nanti setelah Anda membuat akun Supabase, copas URL & KEY Anda di bawah ini:
+    // const SUPABASE_URL = 'https://xyzabcdefgh.supabase.co';
+    // const SUPABASE_KEY = 'eyJhbGciOiJIUz...';
+    // const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    //
+    // Fungsi `saveState()` di bawah nantinya akan kita ganti dari:
+    // localStorage.setItem(...) menjadi supabase.from('data_ritase').insert(...)
+    // -------------------------------------------------------------
+
+    // --- SISTEM AUTENTIKASI & HAK AKSES ---
+    let currentRole = localStorage.getItem('sansam_role') || null;
+
+    function togglePinInput() {
+      document.getElementById('pin-container').classList.toggle('hidden');
+    }
+
+    function loginAsDriver() {
+      currentRole = 'DRIVER';
+      localStorage.setItem('sansam_role', 'DRIVER');
+      applyRoleUI();
+      showToast('Akses Driver', 'Berhasil masuk sebagai Driver Armada.', 'success');
+    }
+
+    function loginAsAdmin() {
+      const pin = document.getElementById('admin-pin').value;
+      if (pin === "123456") { // PIN ADMIN SEMENTARA
+        currentRole = 'ADMIN';
+        localStorage.setItem('sansam_role', 'ADMIN');
+        applyRoleUI();
+        showToast('Akses Admin', 'Selamat datang di Dasbor Manajemen.', 'success');
+      } else {
+        document.getElementById('pin-error').classList.remove('hidden');
+      }
+    }
+
+    function logoutAccount() {
+      localStorage.removeItem('sansam_role');
+      location.reload();
+    }
+
+    function applyRoleUI() {
+      if (!currentRole) return;
+      document.getElementById('login-modal').classList.add('hidden');
+
+      const rekapTabBtn = document.getElementById('tab-btn-rekap');
+      const mobileNavBtns = document.querySelectorAll('.mobile-nav-btn');
+      const omzetCard = document.getElementById('metric-total-omzet').parentElement;
+      const tfCard = document.getElementById('metric-tf-masuk').parentElement;
+      const bonCard = document.getElementById('metric-bon-total').parentElement;
+      const badgeHeader = document.getElementById('header-role-badge');
+
+      if (currentRole === 'DRIVER') {
+        badgeHeader.innerText = "Mode Terbatas (Akses Driver)";
+        badgeHeader.className = "text-[9px] text-amber-500 font-bold tracking-[0.2em] uppercase block mt-0.5";
+        
+        // Sembunyikan Elemen Admin
+        if(rekapTabBtn) rekapTabBtn.classList.add('hidden');
+        if(mobileNavBtns[2]) mobileNavBtns[2].classList.add('hidden'); 
+        if(omzetCard) omzetCard.classList.add('hidden');
+        if(tfCard) tfCard.classList.add('hidden');
+        if(bonCard) bonCard.classList.add('hidden');
+      } else {
+        badgeHeader.innerText = "Akses Penuh (Admin/Pemilik)";
+        badgeHeader.className = "text-[9px] text-brand-blue font-bold tracking-[0.2em] uppercase block mt-0.5";
+
+        // Tampilkan Elemen Admin
+        if(rekapTabBtn) rekapTabBtn.classList.remove('hidden');
+        if(mobileNavBtns[2]) mobileNavBtns[2].classList.remove('hidden');
+        if(omzetCard) omzetCard.classList.remove('hidden');
+        if(tfCard) tfCard.classList.remove('hidden');
+        if(bonCard) bonCard.classList.remove('hidden');
+      }
+      
+      // Reset ulang form input agar menyesuaikan hak akses
+      setDirectPayment('Cash'); 
+    }
+
     // PWA Manifest & SW setup
     const manifest = {
       "name": "CV SANSAM GROUP",
@@ -1062,7 +1177,6 @@
     const blobManifest = new Blob([stringManifest], {type: 'application/json'});
     document.getElementById('manifest-placeholder').setAttribute('href', URL.createObjectURL(blobManifest));
 
-    // Bypass pendaftaran Service Worker pada domain sandbox usercontent
     if ('serviceWorker' in navigator && window.location.protocol === 'https:' && !window.location.hostname.includes('usercontent.goog')) {
       try {
         const swCode = `
@@ -1079,7 +1193,6 @@
       }
     }
 
-    // Capture PWA installation
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -1195,7 +1308,7 @@
       document.getElementById('custom-dialog-modal').classList.add('hidden');
     }
 
-    // STATE STORE ENGINE (v5)
+    // STATE STORE ENGINE (v5) - SEMENTARA MENGGUNAKAN LOCAL STORAGE
     const STORAGE_KEY = "sansam_pwa_system_records_v5";
     let appState = {
       ritase: [],
@@ -1236,6 +1349,13 @@
         const splash = document.getElementById('splash-screen');
         if (splash) splash.classList.add('opacity-0', 'pointer-events-none');
       }, 1500);
+
+      // CEK LOGIN
+      if (!currentRole) {
+        document.getElementById('login-modal').classList.remove('hidden');
+      } else {
+        applyRoleUI();
+      }
 
       const d = new Date();
       const options = { day: 'numeric', month: 'long', year: 'numeric' };
@@ -1442,8 +1562,13 @@
 
     function quickFillMuatan(value) { document.getElementById('direct-muatan').value = value; }
     function quickFillRute(value) { document.getElementById('direct-rute').value = value; }
-    function quickFillNominal(value) { document.getElementById('direct-nominal').value = value; }
+    function quickFillNominal(value) { 
+      if(!document.getElementById('direct-nominal').disabled) {
+        document.getElementById('direct-nominal').value = value; 
+      }
+    }
 
+    // MODIFIKASI: PENGUNCIAN HARGA OTOMATIS BERDASARKAN ROLE
     function setDirectPayment(method) {
       directSelectedPayment = method;
       document.getElementById('direct-selected-payment').value = method;
@@ -1462,14 +1587,37 @@
       const nominalInput = document.getElementById('direct-nominal');
       const optLabel = document.getElementById('optional-label');
       
-      if (method === "Cash") {
-        nominalInput.setAttribute('required', 'true');
-        optLabel.innerText = "(Wajib diisi)";
-        optLabel.className = "text-rose-500 font-bold";
-      } else {
-        nominalInput.removeAttribute('required');
-        optLabel.innerText = "(Opsional / tidak wajib)";
-        optLabel.className = "text-gray-500 font-normal";
+      // LOGIKA DRIVER (Kunci kolom jika bukan Cash)
+      if (currentRole === 'DRIVER') {
+        if (method === "Cash") {
+          nominalInput.disabled = false;
+          nominalInput.value = '';
+          nominalInput.setAttribute('required', 'true');
+          nominalInput.classList.remove('opacity-50', 'bg-zinc-900', 'cursor-not-allowed');
+          optLabel.innerText = "(Wajib diisi nominal fisik uang)";
+          optLabel.className = "text-rose-500 font-bold";
+        } else {
+          nominalInput.disabled = true;
+          nominalInput.value = '0';
+          nominalInput.removeAttribute('required');
+          nominalInput.classList.add('opacity-50', 'bg-zinc-900', 'cursor-not-allowed');
+          optLabel.innerText = "(Dikunci - Harga diatur Admin)";
+          optLabel.className = "text-amber-500 font-bold";
+        }
+      } 
+      // LOGIKA ADMIN (Bisa isi nominal apa saja)
+      else {
+        nominalInput.disabled = false;
+        nominalInput.classList.remove('opacity-50', 'bg-zinc-900', 'cursor-not-allowed');
+        if (method === "Cash") {
+          nominalInput.setAttribute('required', 'true');
+          optLabel.innerText = "(Wajib diisi)";
+          optLabel.className = "text-rose-500 font-bold";
+        } else {
+          nominalInput.removeAttribute('required');
+          optLabel.innerText = "(Opsional untuk Admin)";
+          optLabel.className = "text-gray-500 font-normal";
+        }
       }
     }
 
@@ -1521,6 +1669,8 @@
 
       const rute = document.getElementById('direct-rute').value;
       const muatan = document.getElementById('direct-muatan').value;
+      
+      // Ambil nominal (jika dikunci karena TF/Bon, nilainya akan 0)
       let nominal = parseFloat(document.getElementById('direct-nominal').value) || 0;
 
       if (!directSelectedPayment) {
@@ -1568,6 +1718,7 @@
       renderRekapTable();
       updateCharts();
       buildPriceHistory();
+      setDirectPayment('Cash'); // Reset to Cash
 
       showToast('Laporan Disimpan', `Data ritase driver ${name} berhasil disimpan.`, 'success');
       switchTab('dashboard');
@@ -1776,7 +1927,13 @@
         if (item.status === "Sudah Disetor") badgeColor = "bg-emerald-500/10 text-brand-green border border-brand-green/30";
         if (item.status === "Piutang") badgeColor = "bg-rose-500/10 text-rose-500 border border-rose-500/30";
 
-        let nominalDisplay = item.nominal > 0 ? `Rp ${item.nominal.toLocaleString('id-ID')}` : `<span class="text-gray-500 italic text-[11px]">Belum Diisi</span>`;
+        // Tampilan nominal khusus di Feed (agar TF/Bon yang 0 tidak kelihatan jelek)
+        let nominalDisplay = `Rp ${item.nominal.toLocaleString('id-ID')}`;
+        if (item.nominal === 0 && (item.payment === "Transfer" || item.payment === "Bon")) {
+          nominalDisplay = `<span class="text-amber-500 italic text-[11px]"><i class="fa-solid fa-clock-rotate-left"></i> Dicek Admin</span>`;
+        } else if (item.nominal === 0) {
+          nominalDisplay = `<span class="text-gray-500 italic text-[11px]">Belum Diisi</span>`;
+        }
 
         container.innerHTML += `
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 bg-brand-black border border-brand-border rounded-xl gap-2 transition hover:border-brand-blue/30">
@@ -1791,14 +1948,14 @@
             </div>
             <div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">
               <span class="text-xs font-bold text-white">${nominalDisplay}</span>
-              <span class="text-[9px] font-extrabold tracking-wide uppercase px-2 py-0.5 rounded ${badgeColor}">${item.status}</span>
+              <span class="text-[9px] font-extrabold tracking-wide uppercase px-2 py-0.5 rounded ${badgeColor}">${item.payment} - ${item.status}</span>
             </div>
           </div>
         `;
       });
     }
 
-    // MAIN REKAP TABLE
+    // MAIN REKAP TABLE (Khusus Admin)
     function renderRekapTable(filteredData = null) {
       const tbody = document.getElementById('rekap-table-body');
       tbody.innerHTML = "";
@@ -2131,6 +2288,12 @@
 
     // SETOR KAS AKHIR / SETTLE WALLET ENGINE
     function settleDriverWallet(driverName) {
+      // Driver tidak boleh menekan tombol Setor Kasir (Hanya Admin)
+      if (currentRole === 'DRIVER') {
+        showToast('Akses Ditolak', 'Hanya Admin/Kasir yang berhak memverifikasi serah terima kas.', 'error');
+        return;
+      }
+
       const cashInHand = getDriverCashInHand(driverName);
       if (cashInHand <= 0) return;
       
@@ -2800,7 +2963,6 @@
       driverDistributionChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['IKKI', 'FAUZI', 'ASO'],
           labels: ['IKKI', 'FAUZI', 'ASO'],
           datasets: [{
             label: 'Jumlah Ritase Berjalan',
