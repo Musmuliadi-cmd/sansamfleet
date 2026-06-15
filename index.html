@@ -1024,20 +1024,21 @@
   <!-- JAVASCRIPT APP LOGIC -->
   <script>
     // -------------------------------------------------------------
-    // PERSIAPAN SUPABASE (DATABASE ONLINE)
+    // KONFIGURASI SUPABASE (Hanya satu kali deklarasi)
     // -------------------------------------------------------------
-    // GANTI 2 BARIS DI BAWAH INI DENGAN URL & KEY DARI SUPABASE ANDA
-    const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
-   // Mencegah deklarasi ganda yang menyebabkan error
-let supabase;
-if (!window.supabaseClient) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    window.supabaseClient = supabase;
-} else {
-    supabase = window.supabaseClient;
-}
-// -------------------------------------------------------------
+    (function() {
+      const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
+      const SUPABASE_KEY = 'YOUR_ANON_KEY_HERE'; // GANTI INI DENGAN KUNCI ANON ANDA YANG SEBENARNYA
+
+      // Cek apakah sudah diinisialisasi untuk mencegah error "Already declared"
+      if (!window.supabaseClient) {
+          window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          console.log("Supabase Client berhasil diinisialisasi.");
+      }
+    })();
+
+    // Referensi global agar mudah digunakan di seluruh fungsi lain
+    const supabaseClient = window.supabaseClient;
     // -------------------------------------------------------------
 
     let appState = {
@@ -1142,20 +1143,14 @@ if (!window.supabaseClient) {
     };
 
     async function loadSupabaseData() {
-      if(SUPABASE_URL.includes('ISI_URL')) {
-        console.log("Supabase belum disetting. Menjalankan memori lokal fallback.");
-        refreshAllUI();
-        return;
-      }
-
       try {
-        const { data: ritaseData } = await supabase.from('ritase').select('*').order('timestamp', { ascending: false });
+        const { data: ritaseData } = await supabaseClient.from('ritase').select('*').order('timestamp', { ascending: false });
         if(ritaseData) appState.ritase = ritaseData;
 
-        const { data: expData } = await supabase.from('pengeluaran').select('*').order('timestamp', { ascending: false });
+        const { data: expData } = await supabaseClient.from('pengeluaran').select('*').order('timestamp', { ascending: false });
         if(expData) appState.pengeluaran = expData;
 
-        const { data: absData } = await supabase.from('absensi').select('*').order('timestamp', { ascending: false });
+        const { data: absData } = await supabaseClient.from('absensi').select('*').order('timestamp', { ascending: false });
         if(absData) appState.absensi = absData;
 
         refreshAllUI();
@@ -1165,9 +1160,7 @@ if (!window.supabaseClient) {
     }
 
     function setupRealtimeSync() {
-      if(SUPABASE_URL.includes('ISI_URL')) return;
-
-      supabase.channel('public-changes')
+      supabaseClient.channel('public-changes')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'ritase' }, () => { loadSupabaseData(); })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'pengeluaran' }, () => { loadSupabaseData(); })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'absensi' }, () => { loadSupabaseData(); })
@@ -1189,20 +1182,17 @@ if (!window.supabaseClient) {
 
     // CRUD HELPER UNTUK SUPABASE
     async function insertToDB(table, record) {
-      if(SUPABASE_URL.includes('ISI_URL')) return;
-      const { error } = await supabase.from(table).insert([record]);
+      const { error } = await supabaseClient.from(table).insert([record]);
       if(error) console.error("Error Insert:", error);
     }
 
     async function updateDB(table, id, updates) {
-      if(SUPABASE_URL.includes('ISI_URL')) return;
-      const { error } = await supabase.from(table).update(updates).eq('id', id);
+      const { error } = await supabaseClient.from(table).update(updates).eq('id', id);
       if(error) console.error("Error Update:", error);
     }
 
     async function deleteFromDB(table, id) {
-      if(SUPABASE_URL.includes('ISI_URL')) return;
-      const { error } = await supabase.from(table).delete().eq('id', id);
+      const { error } = await supabaseClient.from(table).delete().eq('id', id);
       if(error) console.error("Error Delete:", error);
     }
 
@@ -2792,7 +2782,7 @@ if (!window.supabaseClient) {
         let fauziX = 400 + Math.cos(step * 0.08) * 40;
         let fauziY = 120 + Math.sin(step * 0.08) * 40;
         if (fauziMarker) fauziMarker.setAttribute('transform', `translate(${fauziX}, ${fauziY})`);
-        if (asoMarker) asoMarker.setAttribute('transform', `translate(400, 120)`);
+        if (asoMarker) asoMarker.setAttribute('transform', `translate(450, 310)`);
       }, 1000);
     }
   </script>
