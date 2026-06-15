@@ -1029,7 +1029,15 @@
     // GANTI 2 BARIS DI BAWAH INI DENGAN URL & KEY DARI SUPABASE ANDA
     const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+   // Mencegah deklarasi ganda yang menyebabkan error
+let supabase;
+if (!window.supabaseClient) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.supabaseClient = supabase;
+} else {
+    supabase = window.supabaseClient;
+}
+// -------------------------------------------------------------
     // -------------------------------------------------------------
 
     let appState = {
