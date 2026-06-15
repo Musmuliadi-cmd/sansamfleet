@@ -26,11 +26,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
+  <!-- Setup Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- PWA Manifest dinamis agar bisa di-install langsung di HP Android -->
   <link id="manifest-placeholder" rel="manifest">
-
-  <!-- Setup Supabase JS (Disiapkan untuk Integrasi Nanti) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     tailwind.config = {
@@ -61,23 +61,11 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #10121A;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #1D2230;
-      border-radius: 4px;
-    }
-    .pulsing-dot {
-      animation: pulse 2s infinite;
-    }
-    .pulsing-green-dot {
-      animation: pulseGreen 2s infinite;
-    }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #10121A; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #1D2230; border-radius: 4px; }
+    .pulsing-dot { animation: pulse 2s infinite; }
+    .pulsing-green-dot { animation: pulseGreen 2s infinite; }
     @keyframes pulse {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 92, 255, 0.7); }
       70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(0, 92, 255, 0); }
@@ -88,12 +76,8 @@
       70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(0, 204, 68, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 204, 68, 0); }
     }
-    .tab-pane {
-      transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-    }
-    .active-scale:active {
-      transform: scale(0.96);
-    }
+    .tab-pane { transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out; }
+    .active-scale:active { transform: scale(0.96); }
     @keyframes loading {
       0% { transform: translateX(-100%); }
       100% { transform: translateX(200%); }
@@ -117,7 +101,7 @@
       <div class="w-12 h-1 bg-brand-border rounded-full overflow-hidden">
         <div class="h-full w-1/2 bg-brand-blue rounded-full animate-[loading_1.5s_infinite_ease-in-out]"></div>
       </div>
-      <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Memuat Database</span>
+      <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Menghubungkan Server Cloud...</span>
     </div>
   </div>
 
@@ -133,12 +117,10 @@
       </div>
 
       <div class="space-y-3 pt-2">
-        <!-- Tombol Driver -->
         <button onclick="loginAsDriver()" class="active-scale w-full bg-brand-black border border-brand-border hover:border-brand-green text-white font-bold py-3.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-steering-wheel text-brand-green"></i> Masuk Sebagai Driver Armada
         </button>
         
-        <!-- Tombol Admin -->
         <div class="bg-brand-black border border-brand-border rounded-xl p-3 space-y-3">
           <button onclick="togglePinInput()" class="w-full text-gray-300 hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition">
             <i class="fa-solid fa-user-tie text-brand-blue"></i> Masuk Sebagai Admin / Pemilik
@@ -157,7 +139,6 @@
   <header class="border-b border-brand-border bg-brand-black/95 sticky top-0 z-50 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
       
-      <!-- Brand Header -->
       <div class="text-left">
         <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
           CV SANSAM GROUP
@@ -171,9 +152,7 @@
         </span>
       </div>
       
-      <!-- PWA Install Button, Keluar & Live Date -->
       <div class="flex items-center gap-2">
-        <!-- Tombol Keluar (Logout) -->
         <button onclick="logoutAccount()" class="active-scale bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">KELUAR</span>
         </button>
@@ -195,7 +174,6 @@
 
     <!-- METRICS GRID -->
     <section class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6" id="metrics-container">
-      <!-- Metric 1: Total Omzet (Hanya Admin) -->
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Pendapatan</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-white leading-tight" id="metric-total-omzet">Rp 0</h3>
@@ -204,7 +182,6 @@
         </span>
       </div>
 
-      <!-- Metric 2: Cash Di Driver (Bisa Dilihat Semua) -->
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cash Sisa (Di Driver)</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-amber-500 leading-tight" id="metric-cash-driver">Rp 0</h3>
@@ -213,7 +190,6 @@
         </span>
       </div>
 
-      <!-- Metric 3: Total Panjar Driver (Bisa Dilihat Semua) -->
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Panjar Driver</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-sky-400 leading-tight" id="metric-total-panjar">Rp 0</h3>
@@ -222,7 +198,6 @@
         </span>
       </div>
 
-      <!-- Metric 4: Transfer Masuk (Hanya Admin) -->
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Lunas / TF Kasir</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-brand-green leading-tight" id="metric-tf-masuk">Rp 0</h3>
@@ -231,7 +206,6 @@
         </span>
       </div>
 
-      <!-- Metric 5: Bon / Piutang (Hanya Admin) -->
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Bon (Tempo)</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-rose-500 leading-tight" id="metric-bon-total">Rp 0</h3>
@@ -264,7 +238,6 @@
     <div id="tab-content-dashboard" class="tab-pane block space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Live Driver Status list -->
         <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
           <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
             <i class="fa-solid fa-users text-brand-blue"></i> Radar Keaktifan & Kondisi Driver
@@ -274,7 +247,6 @@
           </div>
         </div>
 
-        <!-- Chart Penjualan -->
         <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
           <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center justify-between">
             <span><i class="fa-solid fa-chart-bar text-brand-green"></i> Distribusi Ritase Driver</span>
@@ -286,7 +258,6 @@
         </div>
       </div>
 
-      <!-- Feed Aktivitas -->
       <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
         <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
           <i class="fa-solid fa-bell text-brand-blue"></i> Laporan Operasional Masuk
@@ -299,7 +270,6 @@
 
     <!-- TAB 2: INPUT DIRECT FORM (RITASE & PENGELUARAN) -->
     <div id="tab-content-input" class="tab-pane hidden">
-      <!-- Sub-Tab Switcher -->
       <div class="flex bg-brand-black p-1.5 rounded-2xl border border-brand-border mb-6 max-w-md mx-auto">
         <button type="button" onclick="switchInputSubTab('ritase')" id="sub-input-btn-ritase" class="flex-1 text-center py-2.5 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale">
           <i class="fa-solid fa-truck-pickup mr-1.5"></i> Laporan Ritase
@@ -309,7 +279,6 @@
         </button>
       </div>
 
-      <!-- Sub-Tab 1: FORM INPUT RITASE -->
       <div id="sub-tab-ritase" class="block max-w-2xl mx-auto bg-brand-card border border-brand-border p-5 rounded-2xl">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-10 h-10 rounded-xl bg-brand-blue/10 border border-brand-blue/30 flex items-center justify-center text-brand-blue">
@@ -350,7 +319,6 @@
             </div>
           </div>
 
-          <!-- Jenis Muatan -->
           <div>
             <div class="flex justify-between items-center mb-1.5">
               <label for="direct-muatan" class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Jenis Muatan</label>
@@ -367,7 +335,6 @@
             <input type="text" id="direct-muatan" required placeholder="Pilih muatan atau tulis manual..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue transition">
           </div>
 
-          <!-- Rute / Tujuan -->
           <div>
             <div class="flex justify-between items-center mb-1.5">
               <label for="direct-rute" class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Tujuan / Rute</label>
@@ -383,7 +350,6 @@
             <input type="text" id="direct-rute" required placeholder="Pilih rute di atas atau tulis manual..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue transition">
           </div>
 
-          <!-- Metode Pembayaran -->
           <div class="border-t border-brand-border pt-4">
             <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Pilih Metode Pembayaran</label>
             <div class="grid grid-cols-3 gap-2">
@@ -403,12 +369,11 @@
             <input type="hidden" id="direct-selected-payment" required value="">
           </div>
 
-          <!-- Nominal Ongkos -->
           <div>
             <div class="flex justify-between items-center mb-1">
               <label for="direct-nominal" class="block text-xs font-bold text-gray-300 uppercase tracking-wider">
                 Nominal Pembayaran (Rp) 
-                <span id="optional-label" class="text-gray-500 font-normal lowercase">(Wajib diisi)</span>
+                <span id="optional-label" class="text-rose-500 font-bold lowercase">(Wajib diisi)</span>
               </label>
             </div>
             
@@ -423,7 +388,6 @@
             </div>
           </div>
 
-          <!-- Upload Foto Timemark -->
           <div>
             <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Laporan Bongkar (Bukti Timemark)</label>
             <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-5 bg-brand-black hover:border-brand-green/40 transition">
@@ -434,7 +398,7 @@
                   <i class="fa-solid fa-camera text-sm"></i>
                 </div>
                 <p class="text-xs font-bold text-gray-300">Ambil / Pilih Foto Geotag HP</p>
-                <p class="text-[9px] text-gray-500">Kamera HP langsung atau galeri</p>
+                <p class="text-[9px] text-gray-500">Foto otomatis dikompres hemat data</p>
               </div>
 
               <div id="direct-photo-preview-container" class="hidden w-full space-y-2 pointer-events-none">
@@ -449,14 +413,13 @@
             </div>
           </div>
 
-          <!-- Simpan Button -->
           <button type="submit" class="active-scale w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow-lg shadow-brand-blue/20 flex items-center justify-center gap-2">
             <i class="fa-solid fa-circle-check"></i> Simpan Laporan Ritase
           </button>
         </form>
       </div>
 
-      <!-- Sub-Tab 2: FORM PENGELUARAN DRIVER (Solar, Panjar Driver, Dll) -->
+      <!-- FORM PENGELUARAN DRIVER (Solar, Panjar Driver, Dll) -->
       <div id="sub-tab-pengeluaran" class="hidden max-w-2xl mx-auto bg-brand-card border border-brand-border p-5 rounded-2xl">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
@@ -469,7 +432,6 @@
         </div>
 
         <form id="driver-expense-form" onsubmit="handleExpenseSubmit(event)" class="space-y-5">
-          <!-- Pemberi Cash -->
           <div>
             <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Pemberi Cash (Uang Kas Siapa?)</label>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -504,7 +466,6 @@
             </div>
           </div>
 
-          <!-- Kategori Pengeluaran (Wajib) -->
           <div>
             <div class="flex justify-between items-center mb-1.5">
               <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Kategori Pengeluaran (Wajib)</label>
@@ -520,7 +481,6 @@
             <input type="hidden" id="exp-category" required value="">
           </div>
 
-          <!-- Penerima atau Tujuan Alokasi -->
           <div>
             <div id="recipient-text-wrapper">
               <label for="exp-recipient" class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Penerima Alokasi Dana (Toko / Nama Tempat)</label>
@@ -537,7 +497,6 @@
             </div>
           </div>
 
-          <!-- Nominal -->
           <div>
             <label for="exp-nominal" class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal Uang Pengeluaran / Transfer (Rp)</label>
             <div class="relative">
@@ -546,13 +505,11 @@
             </div>
           </div>
 
-          <!-- Keterangan / Catatan -->
           <div>
             <label for="exp-note" class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Keterangan Catatan Tambahan</label>
             <textarea id="exp-note" rows="2" placeholder="Contoh: Pinjam saldo beli solar rute Bolabakka atau panjar darurat..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue transition"></textarea>
           </div>
 
-          <!-- Upload Bukti Pengeluaran -->
           <div>
             <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Unggah Bukti Nota / Foto Serah Terima</label>
             <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-4 bg-brand-black hover:border-brand-green/40 transition">
@@ -563,7 +520,7 @@
                   <i class="fa-solid fa-file-invoice-dollar text-sm"></i>
                 </div>
                 <p class="text-xs font-bold text-gray-300">Ambil Foto Bukti</p>
-                <p class="text-[9px] text-gray-500 font-medium">Kamera HP langsung atau galeri</p>
+                <p class="text-[9px] text-gray-500 font-medium">Foto otomatis dikompres</p>
               </div>
 
               <div id="exp-photo-preview-container" class="hidden w-full space-y-2 pointer-events-none">
@@ -575,7 +532,6 @@
             </div>
           </div>
 
-          <!-- Submit Button -->
           <button type="submit" class="active-scale w-full bg-amber-500 hover:bg-amber-600 text-brand-black font-extrabold py-3 px-6 rounded-xl text-xs transition shadow-lg shadow-amber-500/10 flex items-center justify-center gap-2">
             <i class="fa-solid fa-circle-check"></i> Simpan Catatan / Transfer Kas
           </button>
@@ -585,7 +541,6 @@
 
     <!-- TAB 3: REKAP PENJUALAN TABLE, PENGELUARAN, & PANJAR -->
     <div id="tab-content-rekap" class="tab-pane hidden space-y-4 admin-only-tab">
-      <!-- Sub-Tab Switcher (3 Tabs) -->
       <div class="flex bg-brand-black p-1.5 rounded-2xl border border-brand-border mb-4 max-w-lg overflow-x-auto custom-scrollbar">
         <button type="button" onclick="switchRekapSubTab('ritase')" id="sub-rekap-btn-ritase" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale">
           <i class="fa-solid fa-file-invoice mr-1.5"></i> Log Ritase Penjualan
@@ -615,7 +570,6 @@
           </div>
         </div>
 
-        <!-- Filter Controls -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-3.5 bg-brand-black border border-brand-border rounded-xl">
           <div>
             <label for="filter-driver" class="block text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Filter Driver</label>
@@ -646,7 +600,6 @@
           </div>
         </div>
 
-        <!-- Responsive Table -->
         <div class="overflow-x-auto custom-scrollbar rounded-xl border border-brand-border">
           <table class="w-full text-left text-xs min-w-[900px]">
             <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
@@ -684,7 +637,6 @@
           </div>
         </div>
 
-        <!-- Expense Table -->
         <div class="overflow-x-auto custom-scrollbar rounded-xl border border-brand-border">
           <table class="w-full text-left text-xs min-w-[800px]">
             <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
@@ -721,12 +673,10 @@
           </div>
         </div>
 
-        <!-- Dynamic Summary Cards for Panjar -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="panjar-driver-summary-cards">
           <!-- Dinamis -->
         </div>
 
-        <!-- History of Panjar Requests Table -->
         <div class="space-y-3">
           <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
             <i class="fa-solid fa-history text-sky-400"></i> Log Pengambilan Panjar Harian
@@ -757,7 +707,6 @@
     <div id="tab-content-absensi" class="tab-pane hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Form Absen -->
         <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 rounded-xl bg-brand-green/10 border border-brand-green/30 flex items-center justify-center text-brand-green">
@@ -780,7 +729,6 @@
               </select>
             </div>
 
-            <!-- Kondisi Driver -->
             <div>
               <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Status / Kondisi Driver Saat Ini</label>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -821,7 +769,6 @@
           </form>
         </div>
 
-        <!-- Log Absensi -->
         <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
           <h3 class="text-base font-bold mb-4 flex items-center gap-2 text-white">
             <i class="fa-solid fa-calendar-check text-brand-blue"></i> Riwayat Kehadiran Driver Hari Ini
@@ -858,14 +805,12 @@
           </span>
         </div>
 
-        <!-- SVG Map simulation -->
         <div class="relative bg-[#07080b] border border-brand-border rounded-xl h-80 overflow-hidden flex items-center justify-center">
           <svg viewBox="0 0 800 400" class="w-full h-full opacity-80" id="simulated-map-svg">
             <rect width="100%" height="100%" fill="#07080b" />
             <path d="M 150 200 L 400 120 L 680 220 L 450 310 Z" fill="none" stroke="#252d40" stroke-width="3.5" stroke-dasharray="6 4" />
             <path d="M 400 120 L 450 310" fill="none" stroke="#252d40" stroke-width="3.5" stroke-dasharray="6 4" />
 
-            <!-- Major Waypoints -->
             <g transform="translate(150, 200)">
               <circle r="14" fill="#005CFF" fill-opacity="0.1"/>
               <circle r="5" fill="#005CFF" />
@@ -890,7 +835,6 @@
               <text y="22" fill="#E5E7EB" font-size="10" font-weight="bold" text-anchor="middle">Siwa - Belopa</text>
             </g>
 
-            <!-- Truck Markers -->
             <g id="truck-ikki-marker" transform="translate(150, 200)">
               <circle r="12" fill="#005CFF" fill-opacity="0.35" class="pulsing-dot" />
               <polygon points="0,-8 6,6 -6,6" fill="#005CFF" transform="rotate(45)"/>
@@ -1077,18 +1021,32 @@
     </button>
   </div>
 
+  <!-- JAVASCRIPT APP LOGIC -->
   <script>
     // -------------------------------------------------------------
     // PERSIAPAN SUPABASE (DATABASE ONLINE)
     // -------------------------------------------------------------
-    // Nanti setelah Anda membuat akun Supabase, copas URL & KEY Anda di bawah ini:
-    // const SUPABASE_URL = 'https://xyzabcdefgh.supabase.co';
-    // const SUPABASE_KEY = 'eyJhbGciOiJIUz...';
-    // const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    //
-    // Fungsi `saveState()` di bawah nantinya akan kita ganti dari:
-    // localStorage.setItem(...) menjadi supabase.from('data_ritase').insert(...)
+    // GANTI 2 BARIS DI BAWAH INI DENGAN URL & KEY DARI SUPABASE ANDA
+    const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_brb0jFYF4kEZaklkz7I9Ig_yvJyvri8';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     // -------------------------------------------------------------
+
+    let appState = {
+      ritase: [],
+      absensi: [],
+      pengeluaran: [],
+      drivers: {
+        "IKKI": { plate: "DW 8549 BN", status: "Jalan" },
+        "FAUZI": { plate: "DD 8554 HD", status: "Jalan" },
+        "ASO": { plate: "DD 8601 RN", status: "Jalan" }
+      }
+    };
+
+    let directSelectedPayment = "";
+    let base64Photo = "";
+    let base64ExpensePhoto = "";
+    let driverDistributionChart = null;
 
     // --- SISTEM AUTENTIKASI & HAK AKSES ---
     let currentRole = localStorage.getItem('sansam_role') || null;
@@ -1106,7 +1064,7 @@
 
     function loginAsAdmin() {
       const pin = document.getElementById('admin-pin').value;
-      if (pin === "123456") { // PIN ADMIN SEMENTARA
+      if (pin === "123456") {
         currentRole = 'ADMIN';
         localStorage.setItem('sansam_role', 'ADMIN');
         applyRoleUI();
@@ -1125,94 +1083,173 @@
       if (!currentRole) return;
       document.getElementById('login-modal').classList.add('hidden');
 
-      const rekapTabBtn = document.getElementById('tab-btn-rekap');
-      const mobileNavBtns = document.querySelectorAll('.mobile-nav-btn');
-      const omzetCard = document.getElementById('metric-total-omzet').parentElement;
-      const tfCard = document.getElementById('metric-tf-masuk').parentElement;
-      const bonCard = document.getElementById('metric-bon-total').parentElement;
       const badgeHeader = document.getElementById('header-role-badge');
 
       if (currentRole === 'DRIVER') {
         badgeHeader.innerText = "Mode Terbatas (Akses Driver)";
         badgeHeader.className = "text-[9px] text-amber-500 font-bold tracking-[0.2em] uppercase block mt-0.5";
         
-        // Sembunyikan Elemen Admin
-        if(rekapTabBtn) rekapTabBtn.classList.add('hidden');
-        if(mobileNavBtns[2]) mobileNavBtns[2].classList.add('hidden'); 
-        if(omzetCard) omzetCard.classList.add('hidden');
-        if(tfCard) tfCard.classList.add('hidden');
-        if(bonCard) bonCard.classList.add('hidden');
+        document.getElementById('tab-btn-rekap').classList.add('hidden');
+        document.querySelectorAll('.mobile-nav-btn')[2].classList.add('hidden'); 
+        
+        const metricContainers = document.querySelectorAll('.admin-only-metric');
+        metricContainers.forEach(el => el.classList.add('hidden'));
       } else {
         badgeHeader.innerText = "Akses Penuh (Admin/Pemilik)";
         badgeHeader.className = "text-[9px] text-brand-blue font-bold tracking-[0.2em] uppercase block mt-0.5";
 
-        // Tampilkan Elemen Admin
-        if(rekapTabBtn) rekapTabBtn.classList.remove('hidden');
-        if(mobileNavBtns[2]) mobileNavBtns[2].classList.remove('hidden');
-        if(omzetCard) omzetCard.classList.remove('hidden');
-        if(tfCard) tfCard.classList.remove('hidden');
-        if(bonCard) bonCard.classList.remove('hidden');
+        document.getElementById('tab-btn-rekap').classList.remove('hidden');
+        document.querySelectorAll('.mobile-nav-btn')[2].classList.remove('hidden');
+        
+        const metricContainers = document.querySelectorAll('.admin-only-metric');
+        metricContainers.forEach(el => el.classList.remove('hidden'));
       }
       
-      // Reset ulang form input agar menyesuaikan hak akses
       setDirectPayment('Cash'); 
     }
 
-    // PWA Manifest & SW setup
-    const manifest = {
-      "name": "CV SANSAM GROUP",
-      "short_name": "Sansam",
-      "description": "Sistem PWA Manajemen Logistik CV Sansam",
-      "start_url": window.location.href,
-      "display": "standalone",
-      "background_color": "#07080B",
-      "theme_color": "#07080B",
-      "orientation": "portrait-primary",
-      "icons": [
-        {
-          "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2307080B'/><path d='M25 35 C25 18, 48 12, 60 22 C72 32, 58 42, 48 52 C38 62, 32 78, 55 78 C72 78, 78 68, 78 58' fill='none' stroke='%23005CFF' stroke-width='12' stroke-linecap='round'/><path d='M75 65 C75 82, 52 88, 40 78 C28 68, 42 58, 52 48 C62 38, 68 22, 45 22 C28 22, 22 32, 22 42' fill='none' stroke='%2300CC44' stroke-width='12' stroke-linecap='round'/></svg>",
-          "sizes": "192x192",
-          "type": "image/svg+xml"
-        }
-      ]
-    };
-    const stringManifest = JSON.stringify(manifest);
-    const blobManifest = new Blob([stringManifest], {type: 'application/json'});
-    document.getElementById('manifest-placeholder').setAttribute('href', URL.createObjectURL(blobManifest));
+    // INITIAL LOAD
+    window.onload = function() {
+      setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        if (splash) splash.classList.add('opacity-0', 'pointer-events-none');
+      }, 1500);
 
-    if ('serviceWorker' in navigator && window.location.protocol === 'https:' && !window.location.hostname.includes('usercontent.goog')) {
+      if (!currentRole) {
+        document.getElementById('login-modal').classList.remove('hidden');
+      } else {
+        applyRoleUI();
+      }
+
+      const d = new Date();
+      const options = { day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('current-date-el').innerText = d.toLocaleDateString('id-ID', options);
+
+      initChart();
+      startGpsSimulation();
+      
+      // Load from Supabase Online Database
+      loadSupabaseData();
+      setupRealtimeSync();
+    };
+
+    async function loadSupabaseData() {
+      if(SUPABASE_URL.includes('ISI_URL')) {
+        console.log("Supabase belum disetting. Menjalankan memori lokal fallback.");
+        refreshAllUI();
+        return;
+      }
+
       try {
-        const swCode = `
-          self.addEventListener('install', (e) => self.skipWaiting());
-          self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
-          self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => new Response("Koneksi Lokal."))));
-        `;
-        const blob = new Blob([swCode], { type: 'application/javascript' });
-        const blobURL = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(blobURL)
-          .catch(err => console.log('Pendaftaran Service Worker dilewati di lingkungan ini.'));
-      } catch (e) {
-        console.log('Service Worker tidak dapat diinisialisasi:', e);
+        const { data: ritaseData } = await supabase.from('ritase').select('*').order('timestamp', { ascending: false });
+        if(ritaseData) appState.ritase = ritaseData;
+
+        const { data: expData } = await supabase.from('pengeluaran').select('*').order('timestamp', { ascending: false });
+        if(expData) appState.pengeluaran = expData;
+
+        const { data: absData } = await supabase.from('absensi').select('*').order('timestamp', { ascending: false });
+        if(absData) appState.absensi = absData;
+
+        refreshAllUI();
+      } catch (err) {
+        console.log("Gagal menghubungkan Supabase.", err);
       }
     }
 
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('pwa-install-btn').classList.remove('hidden');
-    });
+    function setupRealtimeSync() {
+      if(SUPABASE_URL.includes('ISI_URL')) return;
 
-    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          document.getElementById('pwa-install-btn').classList.add('hidden');
+      supabase.channel('public-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'ritase' }, () => { loadSupabaseData(); })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'pengeluaran' }, () => { loadSupabaseData(); })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'absensi' }, () => { loadSupabaseData(); })
+        .subscribe();
+    }
+
+    function refreshAllUI() {
+      updateMetrics();
+      renderDashboardActivities();
+      renderRekapTable();
+      renderExpenseTable();
+      renderAbsensi();
+      renderDriverStatusList();
+      renderPanjarRecap();
+      updateCharts();
+      buildPriceHistory();
+      showSourceCashInHand('IKKI');
+    }
+
+    // CRUD HELPER UNTUK SUPABASE
+    async function insertToDB(table, record) {
+      if(SUPABASE_URL.includes('ISI_URL')) return;
+      const { error } = await supabase.from(table).insert([record]);
+      if(error) console.error("Error Insert:", error);
+    }
+
+    async function updateDB(table, id, updates) {
+      if(SUPABASE_URL.includes('ISI_URL')) return;
+      const { error } = await supabase.from(table).update(updates).eq('id', id);
+      if(error) console.error("Error Update:", error);
+    }
+
+    async function deleteFromDB(table, id) {
+      if(SUPABASE_URL.includes('ISI_URL')) return;
+      const { error } = await supabase.from(table).delete().eq('id', id);
+      if(error) console.error("Error Delete:", error);
+    }
+
+    // IMAGE COMPRESSION UNTUK MENGHEMAT STORAGE DATABASE
+    function resizeImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const MAX_WIDTH = 800; // Kompres ukuran agar db supabase ringan
+          
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Ubah ke JPEG kualitas 60% agar file sangat kecil (<100kb)
+          callback(canvas.toDataURL('image/jpeg', 0.6));
         }
-        deferredPrompt = null;
+        img.src = e.target.result;
       }
-    });
+      reader.readAsDataURL(file);
+    }
+
+    function processDirectPhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      resizeImage(file, function(compressedBase64) {
+        base64Photo = compressedBase64;
+        document.getElementById('direct-upload-placeholder').classList.add('hidden');
+        document.getElementById('direct-photo-preview-container').classList.remove('hidden');
+        document.getElementById('direct-processed-photo-preview').src = base64Photo;
+      });
+    }
+
+    function processExpensePhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      resizeImage(file, function(compressedBase64) {
+        base64ExpensePhoto = compressedBase64;
+        document.getElementById('exp-upload-placeholder').classList.add('hidden');
+        document.getElementById('exp-photo-preview-container').classList.remove('hidden');
+        document.getElementById('exp-processed-photo-preview').src = base64ExpensePhoto;
+      });
+    }
 
     // TOAST & CUSTOM DIALOGS UTILITIES
     function showToast(title, desc, type = 'success') {
@@ -1311,86 +1348,6 @@
       document.getElementById('custom-dialog-modal').classList.add('hidden');
     }
 
-    // STATE STORE ENGINE (v5) - SEMENTARA MENGGUNAKAN LOCAL STORAGE
-    const STORAGE_KEY = "sansam_pwa_system_records_v5";
-    let appState = {
-      ritase: [],
-      absensi: [],
-      pengeluaran: [],
-      drivers: {
-        "IKKI": { plate: "DW 8549 BN", status: "Jalan" },
-        "FAUZI": { plate: "DD 8554 HD", status: "Jalan" },
-        "ASO": { plate: "DD 8601 RN", status: "Jalan" }
-      }
-    };
-
-    const defaultData = {
-      ritase: [
-        { id: "r-1", timestamp: "12/06/2026 15:54", driver: "ASO", plate: "DD 8601 RN", rute: "Bolabakka", muatan: "Pasir Kasar", nominal: 550000, payment: "Cash", status: "Sudah Disetor", photo: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&auto=format&fit=crop&q=60" },
-        { id: "r-2", timestamp: "12/06/2026 18:10", driver: "IKKI", plate: "DW 8549 BN", rute: "Doping", muatan: "Kerikil", nominal: 1000000, payment: "Cash", status: "Belum Disetor", photo: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=600&auto=format&fit=crop&q=60" },
-        { id: "r-3", timestamp: "13/06/2026 09:30", driver: "FAUZI", plate: "DD 8554 HD", rute: "Belopa", muatan: "Batu Belopa", nominal: 0, payment: "Bon", status: "Piutang", photo: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=600&auto=format&fit=crop&q=60" }
-      ],
-      absensi: [
-        { timestamp: "13/06/2026 07:10", name: "ASO", tipe: "Jalan", uangJalan: 150000, status: "Aktif" },
-        { timestamp: "13/06/2026 07:15", name: "IKKI", tipe: "Istirahat", uangJalan: 150000, status: "Aktif" },
-        { timestamp: "13/06/2026 07:45", name: "FAUZI", tipe: "Jalan", uangJalan: 150000, status: "Aktif" }
-      ],
-      pengeluaran: [
-        { id: "exp-1", timestamp: "12/06/2026 16:30", source: "ASO", category: "Solar", recipient: "SPBU Wajo 74.912", nominal: 250000, note: "Solar untuk jalan rute Bolabakka", photo: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&auto=format&fit=crop&q=60", status: "Active" },
-        { id: "exp-2", timestamp: "13/06/2026 10:15", source: "IKKI", category: "Transfer Kas", recipient: "FAUZI", nominal: 150000, note: "Bagi saldo cash untuk panjar darurat", photo: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=600&auto=format&fit=crop&q=60", status: "Active" }
-      ]
-    };
-
-    let directSelectedPayment = "";
-    let base64Photo = "";
-    let base64ExpensePhoto = "";
-    let driverDistributionChart = null;
-
-    // INITIAL LOAD
-    window.onload = function() {
-      setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) splash.classList.add('opacity-0', 'pointer-events-none');
-      }, 1500);
-
-      // CEK LOGIN
-      if (!currentRole) {
-        document.getElementById('login-modal').classList.remove('hidden');
-      } else {
-        applyRoleUI();
-      }
-
-      const d = new Date();
-      const options = { day: 'numeric', month: 'long', year: 'numeric' };
-      document.getElementById('current-date-el').innerText = d.toLocaleDateString('id-ID', options);
-
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        appState = JSON.parse(raw);
-        if (!appState.pengeluaran) appState.pengeluaran = defaultData.pengeluaran;
-      } else {
-        appState.ritase = defaultData.ritase;
-        appState.absensi = defaultData.absensi;
-        appState.pengeluaran = defaultData.pengeluaran;
-        saveState();
-      }
-
-      updateMetrics();
-      renderDashboardActivities();
-      renderRekapTable();
-      renderExpenseTable();
-      renderAbsensi();
-      renderDriverStatusList();
-      initChart();
-      startGpsSimulation();
-      buildPriceHistory();
-      showSourceCashInHand('IKKI');
-    };
-
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-    }
-
     // MULTI-TABS SWAP
     function switchTab(tabId) {
       document.querySelectorAll('.tab-pane').forEach(el => {
@@ -1439,7 +1396,6 @@
       }
     }
 
-    // TOGGLE SUB-TABS (INPUT)
     function switchInputSubTab(subTab) {
       if (subTab === 'ritase') {
         document.getElementById('sub-tab-ritase').classList.remove('hidden');
@@ -1455,7 +1411,6 @@
       }
     }
 
-    // TOGGLE SUB-TABS REKAPAN (RITASE vs EXPENSE vs PANJAR)
     function switchRekapSubTab(subTab) {
       if (subTab === 'ritase') {
         document.getElementById('sub-tab-rekap-ritase').classList.remove('hidden');
@@ -1571,7 +1526,6 @@
       }
     }
 
-    // MODIFIKASI: PENGUNCIAN HARGA OTOMATIS BERDASARKAN ROLE
     function setDirectPayment(method) {
       directSelectedPayment = method;
       document.getElementById('direct-selected-payment').value = method;
@@ -1590,22 +1544,23 @@
       const nominalInput = document.getElementById('direct-nominal');
       const optLabel = document.getElementById('optional-label');
       
-      // LOGIKA DRIVER (Kunci kolom jika bukan Cash)
+      // LOGIKA PENGUNCIAN HARGA (KHUSUS DRIVER)
       if (currentRole === 'DRIVER') {
         if (method === "Cash") {
           nominalInput.disabled = false;
           nominalInput.value = '';
           nominalInput.setAttribute('required', 'true');
           nominalInput.classList.remove('opacity-50', 'bg-zinc-900', 'cursor-not-allowed');
-          optLabel.innerText = "(Wajib diisi nominal fisik uang)";
-          optLabel.className = "text-rose-500 font-bold";
+          optLabel.innerText = "(Wajib diisi nominal kas)";
+          optLabel.className = "text-rose-500 font-bold lowercase";
         } else {
+          // Jika pilih TF atau Bon, kunci input dan paksa jadi Rp 0
           nominalInput.disabled = true;
           nominalInput.value = '0';
           nominalInput.removeAttribute('required');
           nominalInput.classList.add('opacity-50', 'bg-zinc-900', 'cursor-not-allowed');
-          optLabel.innerText = "(Dikunci - Harga diatur Admin)";
-          optLabel.className = "text-amber-500 font-bold";
+          optLabel.innerText = "(Dikunci - Harga akan diatur Admin)";
+          optLabel.className = "text-amber-500 font-bold lowercase";
         }
       } 
       // LOGIKA ADMIN (Bisa isi nominal apa saja)
@@ -1614,12 +1569,12 @@
         nominalInput.classList.remove('opacity-50', 'bg-zinc-900', 'cursor-not-allowed');
         if (method === "Cash") {
           nominalInput.setAttribute('required', 'true');
-          optLabel.innerText = "(Wajib diisi)";
-          optLabel.className = "text-rose-500 font-bold";
+          optLabel.innerText = "(Wajib diisi untuk Cash)";
+          optLabel.className = "text-rose-500 font-bold lowercase";
         } else {
           nominalInput.removeAttribute('required');
           optLabel.innerText = "(Opsional untuk Admin)";
-          optLabel.className = "text-gray-500 font-normal";
+          optLabel.className = "text-gray-500 font-normal lowercase";
         }
       }
     }
@@ -1645,21 +1600,8 @@
       }
     }
 
-    function processDirectPhoto(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        base64Photo = e.target.result;
-        document.getElementById('direct-upload-placeholder').classList.add('hidden');
-        document.getElementById('direct-photo-preview-container').classList.remove('hidden');
-        document.getElementById('direct-processed-photo-preview').src = base64Photo;
-      };
-      reader.readAsDataURL(file);
-    }
-
     // DIRECT RITASE SAVE
-    function handleDirectSubmit(e) {
+    async function handleDirectSubmit(e) {
       e.preventDefault();
       const selectedRadio = document.querySelector('input[name="direct_driver"]:checked');
       if (!selectedRadio) {
@@ -1672,8 +1614,6 @@
 
       const rute = document.getElementById('direct-rute').value;
       const muatan = document.getElementById('direct-muatan').value;
-      
-      // Ambil nominal (jika dikunci karena TF/Bon, nilainya akan 0)
       let nominal = parseFloat(document.getElementById('direct-nominal').value) || 0;
 
       if (!directSelectedPayment) {
@@ -1703,8 +1643,12 @@
         photo: base64Photo || "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&auto=format&fit=crop&q=60"
       };
 
+      // Tampilkan optimis UI
       appState.ritase.unshift(newRecord);
-      saveState();
+      refreshAllUI();
+      
+      // Kirim Data Ke Supabase Cloud
+      await insertToDB('ritase', newRecord);
 
       document.getElementById('direct-ritase-form').reset();
       directSelectedPayment = "";
@@ -1716,32 +1660,14 @@
         btn.classList.add('border-brand-border', 'bg-brand-black');
       });
 
-      updateMetrics();
-      renderDashboardActivities();
-      renderRekapTable();
-      updateCharts();
-      buildPriceHistory();
-      setDirectPayment('Cash'); // Reset to Cash
+      setDirectPayment('Cash'); 
 
-      showToast('Laporan Disimpan', `Data ritase driver ${name} berhasil disimpan.`, 'success');
+      showToast('Laporan Terkirim', `Data ritase driver ${name} berhasil disimpan ke server.`, 'success');
       switchTab('dashboard');
     }
 
-    function processExpensePhoto(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        base64ExpensePhoto = e.target.result;
-        document.getElementById('exp-upload-placeholder').classList.add('hidden');
-        document.getElementById('exp-photo-preview-container').classList.remove('hidden');
-        document.getElementById('exp-processed-photo-preview').src = base64ExpensePhoto;
-      };
-      reader.readAsDataURL(file);
-    }
-
     // DIRECT EXPENSE & TRANSFER SAVE
-    function handleExpenseSubmit(e) {
+    async function handleExpenseSubmit(e) {
       e.preventDefault();
       const sourceRadio = document.querySelector('input[name="exp_source"]:checked');
       if (!sourceRadio) {
@@ -1803,7 +1729,7 @@
       saveExpense(source, category, recipient, nominal, note);
     }
 
-    function saveExpense(source, category, recipient, nominal, note) {
+    async function saveExpense(source, category, recipient, nominal, note) {
       const newExp = {
         id: "exp-" + Date.now(),
         timestamp: new Date().toLocaleString('id-ID', { hour12: false }).replace(',', ''),
@@ -1817,7 +1743,10 @@
       };
 
       appState.pengeluaran.unshift(newExp);
-      saveState();
+      refreshAllUI();
+      
+      // Kirim Ke Supabase Cloud
+      await insertToDB('pengeluaran', newExp);
 
       document.getElementById('driver-expense-form').reset();
       document.getElementById('exp-recipient').value = "";
@@ -1831,11 +1760,6 @@
       document.getElementById('recipient-text-wrapper').classList.remove('hidden');
       document.getElementById('recipient-driver-wrapper').classList.add('hidden');
 
-      updateMetrics();
-      renderDashboardActivities();
-      renderExpenseTable();
-      updateAllSourcesCashLabels();
-
       const notifMsg = category === "Transfer Kas" 
         ? `Sukses mentransfer Rp ${nominal.toLocaleString('id-ID')} dari ${source} ke ${recipient}.`
         : `Pengeluaran ${category} sebesar Rp ${nominal.toLocaleString('id-ID')} telah berhasil dicatat.`;
@@ -1845,7 +1769,7 @@
     }
 
     // ATTENDANCE SUBMIT
-    function handleAttendanceSubmit(e) {
+    async function handleAttendanceSubmit(e) {
       e.preventDefault();
       const name = document.getElementById('absensi-driver-select').value;
       const conditionRadio = document.querySelector('input[name="absensi_tipe"]:checked');
@@ -1859,6 +1783,7 @@
       const condition = conditionRadio.value;
 
       const newAbsen = {
+        id: "abs-" + Date.now(),
         timestamp: new Date().toLocaleString('id-ID', { hour12: false }).replace(',', ''),
         name: name,
         tipe: condition,
@@ -1867,13 +1792,11 @@
       };
 
       appState.absensi.unshift(newAbsen);
-      saveState();
+      refreshAllUI();
+      
+      await insertToDB('absensi', newAbsen);
 
       document.getElementById('attendance-form').reset();
-      renderAbsensi();
-      renderDriverStatusList();
-      updateMetrics();
-
       showToast('Absensi Tersimpan', `Status ${name} sekarang diperbarui menjadi: ${condition}`, 'success');
     }
 
@@ -1930,7 +1853,6 @@
         if (item.status === "Sudah Disetor") badgeColor = "bg-emerald-500/10 text-brand-green border border-brand-green/30";
         if (item.status === "Piutang") badgeColor = "bg-rose-500/10 text-rose-500 border border-rose-500/30";
 
-        // Tampilan nominal khusus di Feed (agar TF/Bon yang 0 tidak kelihatan jelek)
         let nominalDisplay = `Rp ${item.nominal.toLocaleString('id-ID')}`;
         if (item.nominal === 0 && (item.payment === "Transfer" || item.payment === "Bon")) {
           nominalDisplay = `<span class="text-amber-500 italic text-[11px]"><i class="fa-solid fa-clock-rotate-left"></i> Dicek Admin</span>`;
@@ -1958,7 +1880,7 @@
       });
     }
 
-    // MAIN REKAP TABLE (Khusus Admin)
+    // MAIN REKAP TABLE
     function renderRekapTable(filteredData = null) {
       const tbody = document.getElementById('rekap-table-body');
       tbody.innerHTML = "";
@@ -2203,15 +2125,12 @@
         confirmText: 'Ya, Selesaikan',
         cancelText: 'Batal',
         type: 'success',
-        onConfirm: () => {
+        onConfirm: async () => {
           item.status = "Settled";
-          saveState();
-          updateMetrics();
-          renderDashboardActivities();
-          renderExpenseTable();
-          renderDriverStatusList();
-          renderPanjarRecap();
-          updateAllSourcesCashLabels();
+          refreshAllUI();
+
+          await updateDB('pengeluaran', id, { status: "Settled" });
+          
           showToast('Panjar Selesai', `Transaksi panjar driver ${item.source} telah berhasil diselesaikan/dipotong.`, 'success');
         }
       });
@@ -2270,7 +2189,6 @@
               </div>
             </div>
             
-            <!-- Kas Wallet Section -->
             <div class="flex items-center justify-between pt-2.5 border-t border-brand-border/40">
               <div>
                 <span class="text-[9px] text-gray-500 uppercase font-bold block">Cash Di Tangan</span>
@@ -2291,7 +2209,6 @@
 
     // SETOR KAS AKHIR / SETTLE WALLET ENGINE
     function settleDriverWallet(driverName) {
-      // Driver tidak boleh menekan tombol Setor Kasir (Hanya Admin)
       if (currentRole === 'DRIVER') {
         showToast('Akses Ditolak', 'Hanya Admin/Kasir yang berhak memverifikasi serah terima kas.', 'error');
         return;
@@ -2302,21 +2219,15 @@
       
       let ritaseCash = 0;
       appState.ritase.forEach(item => {
-        if (item.driver === driverName && item.payment === "Cash" && item.status === "Belum Disetor") {
-          ritaseCash += item.nominal;
-        }
+        if (item.driver === driverName && item.payment === "Cash" && item.status === "Belum Disetor") ritaseCash += item.nominal;
       });
 
       let expenseCash = 0;
       let transferInCash = 0;
       appState.pengeluaran.forEach(exp => {
         const isActive = (exp.status === undefined || exp.status === "Active");
-        if (exp.source === driverName && isActive) {
-          expenseCash += exp.nominal;
-        }
-        if (exp.category === "Transfer Kas" && exp.recipient === driverName && isActive) {
-          transferInCash += exp.nominal;
-        }
+        if (exp.source === driverName && isActive) expenseCash += exp.nominal;
+        if (exp.category === "Transfer Kas" && exp.recipient === driverName && isActive) transferInCash += exp.nominal;
       });
 
       showCustomDialog({
@@ -2331,69 +2242,30 @@
         confirmText: 'Ya, Terima & Selesaikan',
         cancelText: 'Batal',
         type: 'success',
-        onConfirm: () => {
-          // 1. Ubah status semua ritase cash yang menggantung menjadi "Sudah Disetor"
+        onConfirm: async () => {
+          
           appState.ritase.forEach(item => {
             if (item.driver === driverName && item.payment === "Cash" && item.status === "Belum Disetor") {
               item.status = "Sudah Disetor";
+              updateDB('ritase', item.id, {status: "Sudah Disetor"});
             }
           });
 
-          // 2. Tandai semua log belanja driver di jalan menjadi "Settled"
           appState.pengeluaran.forEach(exp => {
             const isActive = (exp.status === undefined || exp.status === "Active");
             if (exp.source === driverName && isActive) {
               exp.status = "Settled";
+              updateDB('pengeluaran', exp.id, {status: "Settled"});
             }
             if (exp.category === "Transfer Kas" && exp.recipient === driverName && isActive) {
               exp.status = "Settled";
+              updateDB('pengeluaran', exp.id, {status: "Settled"});
             }
           });
 
-          saveState();
-          updateMetrics();
-          renderDashboardActivities();
-          renderRekapTable();
-          renderExpenseTable();
-          renderDriverStatusList();
-          renderPanjarRecap();
-          updateCharts();
-
+          refreshAllUI();
           showToast('Kas Driver Selesai', `Serah terima kas driver ${driverName} sebesar Rp ${cashInHand.toLocaleString('id-ID')} berhasil. Saldo driver di-reset ke Rp 0.`, 'success');
         }
-      });
-    }
-
-    // POPULATE ABSENSI
-    function renderAbsensi() {
-      const tbody = document.getElementById('absensi-table-body');
-      tbody.innerHTML = "";
-
-      if (appState.absensi.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Belum ada absensi hari ini.</td></tr>`;
-        return;
-      }
-
-      appState.absensi.forEach(item => {
-        let conditionColor = "text-brand-green bg-emerald-500/10 border border-emerald-500/20";
-        if (item.tipe === "Istirahat") conditionColor = "text-amber-500 bg-amber-500/10 border border-amber-500/20";
-        if (item.tipe === "Sakit") conditionColor = "text-rose-500 bg-rose-500/10 border border-rose-500/20";
-        if (item.tipe === "Izin") conditionColor = "text-orange-500 bg-orange-500/10 border border-orange-500/20";
-        if (item.tipe === "Selesai Dinas") conditionColor = "text-gray-400 bg-zinc-800 border border-zinc-700";
-
-        tbody.innerHTML += `
-          <tr class="hover:bg-brand-card/30 transition border-b border-brand-border/40">
-            <td class="p-4 text-gray-400 font-mono">${item.timestamp}</td>
-            <td class="p-4 font-bold text-white">${item.name}</td>
-            <td class="p-4">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${conditionColor}">
-                ${item.tipe}
-              </span>
-            </td>
-            <td class="p-4 text-right font-semibold text-brand-green">Rp ${item.uangJalan.toLocaleString('id-ID')}</td>
-            <td class="p-4 text-right text-gray-500 text-[10px]">Sukses Terkirim</td>
-          </tr>
-        `;
       });
     }
 
@@ -2402,31 +2274,25 @@
       const idx = appState.ritase.findIndex(item => item.id === id);
       if (idx !== -1) {
         const driverName = appState.ritase[idx].driver;
-        
         showCustomDialog({
           title: 'Terima Setoran Kas?',
           message: `Konfirmasi penerimaan kas dari pengiriman driver ${driverName} ke ${appState.ritase[idx].rute}.`,
           confirmText: 'Ya, Terima Setoran',
           cancelText: 'Batal',
           type: 'info',
-          onConfirm: () => {
+          onConfirm: async () => {
             appState.ritase[idx].status = "Sudah Disetor";
-            saveState();
+            refreshAllUI();
             
-            updateMetrics();
-            renderDashboardActivities();
-            renderRekapTable();
-            renderDriverStatusList();
-            renderPanjarRecap();
-            updateCharts();
+            await updateDB('ritase', id, {status: "Sudah Disetor"});
 
-            showToast('Setoran Diterima', `Kas dari pengiriman ${driverName} sukses disetor ke kasir CV SANSAM GROUP.`, 'success');
+            showToast('Setoran Diterima', `Kas dari pengiriman ${driverName} sukses disetor ke kasir.`, 'success');
           }
         });
       }
     }
 
-    // PENAGIHAN HARGA BON
+    // PENAGIHAN HARGA BON / ATUR HARGA TF (OLEH ADMIN)
     function settlePriceAndPay(id) {
       const item = appState.ritase.find(x => x.id === id);
       if (!item) return;
@@ -2440,18 +2306,12 @@
         confirmText: 'Simpan & Lunasi',
         cancelText: 'Batal',
         type: 'info',
-        onConfirm: (finalPrice) => {
+        onConfirm: async (finalPrice) => {
           item.nominal = finalPrice;
           item.status = "Sudah Disetor"; 
-          saveState();
-
-          updateMetrics();
-          renderDashboardActivities();
-          renderRekapTable();
-          renderDriverStatusList();
-          renderPanjarRecap();
-          updateCharts();
-          buildPriceHistory();
+          
+          refreshAllUI();
+          await updateDB('ritase', id, {nominal: finalPrice, status: "Sudah Disetor"});
 
           showToast('Transaksi Diperbarui', `Uang masuk sebesar Rp ${finalPrice.toLocaleString('id-ID')} dicatat lunas.`, 'success');
         }
@@ -2495,7 +2355,7 @@
       }
     }
 
-    function saveEditRecord(e) {
+    async function saveEditRecord(e) {
       e.preventDefault();
 
       const id = document.getElementById('edit-record-id').value;
@@ -2525,15 +2385,11 @@
         appState.ritase[idx].status = status;
         appState.ritase[idx].nominal = nominal;
 
-        saveState();
-
-        updateMetrics();
-        renderDashboardActivities();
-        renderRekapTable();
-        renderDriverStatusList();
-        renderPanjarRecap();
-        updateCharts();
-        buildPriceHistory();
+        refreshAllUI();
+        
+        await updateDB('ritase', id, {
+          driver: name, plate: plate, muatan: muatan, rute: rute, payment: payment, status: status, nominal: nominal
+        });
 
         closeEditModal();
         showToast('Perubahan Disimpan', 'Data laporan ritase berhasil diperbarui.', 'success');
@@ -2551,17 +2407,11 @@
         confirmText: 'Ya, Hapus!',
         cancelText: 'Batal',
         type: 'warning',
-        onConfirm: () => {
+        onConfirm: async () => {
           appState.ritase = appState.ritase.filter(x => x.id !== id);
-          saveState();
-
-          updateMetrics();
-          renderDashboardActivities();
-          renderRekapTable();
-          renderDriverStatusList();
-          renderPanjarRecap();
-          updateCharts();
-          buildPriceHistory();
+          refreshAllUI();
+          
+          await deleteFromDB('ritase', id);
 
           showToast('Berhasil Dihapus', 'Data ritase telah dihapus dari sistem CV Sansam Group.', 'success');
         }
@@ -2578,16 +2428,11 @@
         confirmText: 'Ya, Hapus',
         cancelText: 'Batal',
         type: 'warning',
-        onConfirm: () => {
+        onConfirm: async () => {
           appState.pengeluaran = appState.pengeluaran.filter(x => x.id !== id);
-          saveState();
+          refreshAllUI();
 
-          updateMetrics();
-          renderDashboardActivities();
-          renderExpenseTable();
-          renderDriverStatusList();
-          renderPanjarRecap();
-          updateAllSourcesCashLabels();
+          await deleteFromDB('pengeluaran', id);
 
           showToast('Berhasil Dihapus', 'Catatan pengeluaran kas telah berhasil dihapus.', 'success');
         }
@@ -2651,65 +2496,50 @@
       document.getElementById('photo-modal').classList.add('hidden');
     }
 
-    // EXPORTS CSV
+    // EXPORTS CSV (SEMUA BAGIAN)
     function exportToCSV() {
       let csvContent = "data:text/csv;charset=utf-8,";
       csvContent += "ID,Tanggal,Nama Driver,Plat Kendaraan,Rute Tujuan,Volume Muatan,Nominal Jual,Pembayaran,Status Setoran\r\n";
-
       appState.ritase.forEach(item => {
         let row = `"${item.id}","${item.timestamp}","${item.driver}","${item.plate}","${item.rute}","${item.muatan}",${item.nominal},"${item.payment}","${item.status}"`;
         csvContent += row + "\r\n";
       });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Rekap_SANSAM_Logistik_${Date.now()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      triggerDownload(csvContent, `Rekap_SANSAM_Logistik_${Date.now()}.csv`);
     }
 
     function exportExpensesToCSV() {
       let csvContent = "data:text/csv;charset=utf-8,";
       csvContent += "ID,Tanggal,Sumber Dana,Kategori,Penerima/Alokasi,Nominal,Keterangan\r\n";
-
       appState.pengeluaran.forEach(item => {
         let row = `"${item.id}","${item.timestamp}","${item.source}","${item.category}","${item.recipient}",${item.nominal},"${item.note || ''}"`;
         csvContent += row + "\r\n";
       });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Rekap_Pengeluaran_SANSAM_${Date.now()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      triggerDownload(csvContent, `Rekap_Pengeluaran_SANSAM_${Date.now()}.csv`);
     }
 
     function exportPanjarToCSV() {
       let csvContent = "data:text/csv;charset=utf-8,";
       csvContent += "ID,Tanggal,Nama Driver,Kategori,Jumlah Panjar,Catatan,Status\r\n";
-
       const panjarData = appState.pengeluaran.filter(item => item.category === "Panjar Driver");
-      
       panjarData.forEach(item => {
         const status = (item.status === undefined || item.status === "Active") ? "Belum Settle" : "Selesai (Settled)";
         let row = `"${item.id}","${item.timestamp}","${item.source}","${item.category}",${item.nominal},"${item.note || ''}","${status}"`;
         csvContent += row + "\r\n";
       });
+      triggerDownload(csvContent, `Rekap_Panjar_SANSAM_${Date.now()}.csv`);
+    }
 
+    function triggerDownload(csvContent, filename) {
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Rekap_Panjar_SANSAM_${Date.now()}.csv`);
+      link.setAttribute("download", filename);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
 
-    // PREMIUM EXPORTS TO PDF (DENGAN KOP CV SANSAM GROUP)
+    // PREMIUM EXPORTS TO PDF (SEMUA BAGIAN)
     function exportToPDF() {
       try {
         const { jsPDF } = window.jspdf;
@@ -2717,12 +2547,10 @@
 
         doc.setFillColor(16, 18, 26);
         doc.rect(0, 0, 297, 45, 'F');
-
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(22);
         doc.text("CV SANSAM GROUP", 15, 18);
-        
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(156, 163, 175);
@@ -2741,39 +2569,17 @@
 
         const headers = [["Tanggal/Waktu", "Driver", "Plat Nomor", "Rute Tujuan", "Muatan", "Ongkos Jual", "Metode", "Status Setoran"]];
         const rows = appState.ritase.map(item => [
-          item.timestamp,
-          item.driver,
-          item.plate,
-          item.rute,
-          item.muatan,
+          item.timestamp, item.driver, item.plate, item.rute, item.muatan,
           item.nominal > 0 ? "Rp " + item.nominal.toLocaleString('id-ID') : "Belum Diisi",
-          item.payment,
-          item.status
+          item.payment, item.status
         ]);
 
         doc.autoTable({
-          head: headers,
-          body: rows,
-          startY: 50,
-          theme: 'grid',
-          headStyles: { 
-            fillColor: [0, 92, 255], 
-            textColor: [255, 255, 255],
-            fontStyle: 'bold',
-            halign: 'center'
-          },
-          bodyStyles: { 
-            textColor: [50, 50, 50],
-            fontSize: 9
-          },
-          alternateRowStyles: {
-            fillColor: [245, 247, 250]
-          },
-          columnStyles: {
-            5: { halign: 'right', fontStyle: 'bold' },
-            6: { halign: 'center' },
-            7: { halign: 'center' }
-          }
+          head: headers, body: rows, startY: 50, theme: 'grid',
+          headStyles: { fillColor: [0, 92, 255], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
+          bodyStyles: { textColor: [50, 50, 50], fontSize: 9 },
+          alternateRowStyles: { fillColor: [245, 247, 250] },
+          columnStyles: { 5: { halign: 'right', fontStyle: 'bold' }, 6: { halign: 'center' }, 7: { halign: 'center' } }
         });
 
         const finalY = doc.previousAutoTable.finalY + 15;
@@ -2781,21 +2587,16 @@
         doc.setTextColor(40, 40, 40);
         doc.text("Disetujui Oleh,", 20, finalY);
         doc.text("Dibuat Oleh,", 220, finalY);
-        
         doc.setLineWidth(0.3);
         doc.setDrawColor(150, 150, 150);
         doc.line(20, finalY + 22, 65, finalY + 22);
         doc.line(220, finalY + 22, 265, finalY + 22);
-
         doc.text("Kasir CV SANSAM", 20, finalY + 26);
         doc.text("Driver Bersangkutan", 220, finalY + 26);
 
         doc.save(`Laporan_Ritase_CV_SANSAM_${Date.now()}.pdf`);
         showToast("PDF Diunduh", "Berkas laporan Ritase PDF berhasil diekspor.", "success");
-      } catch (err) {
-        console.error(err);
-        showToast("Ekspor PDF Gagal", "Gagal memproses dokumen PDF.", "error");
-      }
+      } catch (err) { showToast("Ekspor PDF Gagal", "Gagal memproses dokumen PDF.", "error"); }
     }
 
     function exportExpensesToPDF() {
@@ -2805,12 +2606,10 @@
 
         doc.setFillColor(16, 18, 26);
         doc.rect(0, 0, 210, 42, 'F');
-
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(20);
         doc.text("CV SANSAM GROUP", 15, 18);
-        
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(156, 163, 175);
@@ -2829,35 +2628,15 @@
 
         const headers = [["Tanggal", "Sumber Dana", "Kategori", "Penerima/Alokasi", "Nominal", "Catatan"]];
         const rows = appState.pengeluaran.map(item => [
-          item.timestamp,
-          item.source,
-          item.category,
-          item.recipient,
-          "Rp " + item.nominal.toLocaleString('id-ID'),
-          item.note || "-"
+          item.timestamp, item.source, item.category, item.recipient, "Rp " + item.nominal.toLocaleString('id-ID'), item.note || "-"
         ]);
 
         doc.autoTable({
-          head: headers,
-          body: rows,
-          startY: 48,
-          theme: 'grid',
-          headStyles: { 
-            fillColor: [245, 158, 11],
-            textColor: [16, 18, 26],
-            fontStyle: 'bold',
-            halign: 'center'
-          },
-          bodyStyles: { 
-            textColor: [50, 50, 50],
-            fontSize: 9
-          },
-          alternateRowStyles: {
-            fillColor: [254, 252, 243]
-          },
-          columnStyles: {
-            4: { halign: 'right', fontStyle: 'bold' }
-          }
+          head: headers, body: rows, startY: 48, theme: 'grid',
+          headStyles: { fillColor: [245, 158, 11], textColor: [16, 18, 26], fontStyle: 'bold', halign: 'center' },
+          bodyStyles: { textColor: [50, 50, 50], fontSize: 9 },
+          alternateRowStyles: { fillColor: [254, 252, 243] },
+          columnStyles: { 4: { halign: 'right', fontStyle: 'bold' } }
         });
 
         const finalY = doc.previousAutoTable.finalY + 15;
@@ -2865,21 +2644,16 @@
         doc.setTextColor(40, 40, 40);
         doc.text("Saksi Kantor,", 20, finalY);
         doc.text("Penyetor Kas,", 140, finalY);
-        
         doc.setLineWidth(0.3);
         doc.setDrawColor(150, 150, 150);
         doc.line(20, finalY + 22, 65, finalY + 22);
         doc.line(140, finalY + 22, 185, finalY + 22);
-
         doc.text("Kasir Sansam", 20, finalY + 26);
         doc.text("Driver Pengirim", 140, finalY + 26);
 
         doc.save(`Laporan_Kas_Pengeluaran_CV_SANSAM_${Date.now()}.pdf`);
         showToast("PDF Diunduh", "Berkas Laporan Kas PDF berhasil diunduh.", "success");
-      } catch (err) {
-        console.error(err);
-        showToast("Ekspor PDF Gagal", "Gagal memproses dokumen PDF.", "error");
-      }
+      } catch (err) { showToast("Ekspor PDF Gagal", "Gagal memproses dokumen PDF.", "error"); }
     }
 
     function exportPanjarToPDF() {
@@ -2889,12 +2663,10 @@
 
         doc.setFillColor(16, 18, 26);
         doc.rect(0, 0, 210, 42, 'F');
-
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(20);
         doc.text("CV SANSAM GROUP", 15, 18);
-        
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(156, 163, 175);
@@ -2927,56 +2699,32 @@
         const rows = appState.pengeluaran
           .filter(item => item.category === "Panjar Driver")
           .map(item => [
-            item.timestamp,
-            item.source,
-            item.category,
-            "Rp " + item.nominal.toLocaleString('id-ID'),
-            item.note || "-",
-            (item.status === undefined || item.status === "Active") ? "Belum Settle" : "Selesai (Settled)"
+            item.timestamp, item.source, item.category, "Rp " + item.nominal.toLocaleString('id-ID'),
+            item.note || "-", (item.status === undefined || item.status === "Active") ? "Belum Settle" : "Selesai (Settled)"
           ]);
 
         doc.autoTable({
-          head: headers,
-          body: rows,
-          startY: startTextY + 28,
-          theme: 'grid',
-          headStyles: { 
-            fillColor: [14, 165, 233], 
-            textColor: [16, 18, 26],
-            fontStyle: 'bold',
-            halign: 'center'
-          },
-          bodyStyles: { 
-            textColor: [50, 50, 50],
-            fontSize: 9
-          },
-          alternateRowStyles: {
-            fillColor: [240, 249, 255]
-          },
-          columnStyles: {
-            3: { halign: 'right', fontStyle: 'bold' }
-          }
+          head: headers, body: rows, startY: startTextY + 28, theme: 'grid',
+          headStyles: { fillColor: [14, 165, 233], textColor: [16, 18, 26], fontStyle: 'bold', halign: 'center' },
+          bodyStyles: { textColor: [50, 50, 50], fontSize: 9 },
+          alternateRowStyles: { fillColor: [240, 249, 255] },
+          columnStyles: { 3: { halign: 'right', fontStyle: 'bold' } }
         });
 
         const finalY = doc.previousAutoTable.finalY + 15;
         doc.setFontSize(10);
         doc.text("Disetujui Kasir,", 20, finalY);
         doc.text("Pimpinan CV Sansam Group,", 140, finalY);
-        
         doc.setLineWidth(0.3);
         doc.setDrawColor(150, 150, 150);
         doc.line(20, finalY + 22, 65, finalY + 22);
         doc.line(140, finalY + 22, 185, finalY + 22);
-
         doc.text("Kasir Operasional", 20, finalY + 26);
         doc.text("Manajer Logistik", 140, finalY + 26);
 
         doc.save(`Laporan_Panjar_SANSAM_${Date.now()}.pdf`);
         showToast("PDF Diunduh", "Berkas laporan panjar driver PDF berhasil diunduh.", "success");
-      } catch (err) {
-        console.error(err);
-        showToast("Ekspor PDF Gagal", "Gagal memproses dokumen PDF.", "error");
-      }
+      } catch (err) { showToast("Ekspor PDF Gagal", "Gagal memproses dokumen PDF.", "error"); }
     }
 
     // CHART VISUALIZATIONS
@@ -2991,36 +2739,16 @@
           datasets: [{
             label: 'Jumlah Ritase Berjalan',
             data: [counts.IKKI, counts.FAUZI, counts.ASO],
-            backgroundColor: [
-              'rgba(0, 92, 255, 0.7)',
-              'rgba(0, 204, 68, 0.7)',
-              'rgba(239, 68, 68, 0.7)'
-            ],
-            borderColor: [
-              '#005CFF',
-              '#00CC44',
-              '#EF4444'
-            ],
-            borderWidth: 2,
-            borderRadius: 8
+            backgroundColor: ['rgba(0, 92, 255, 0.7)', 'rgba(0, 204, 68, 0.7)', 'rgba(239, 68, 68, 0.7)'],
+            borderColor: ['#005CFF', '#00CC44', '#EF4444'],
+            borderWidth: 2, borderRadius: 8
           }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
+          responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
           scales: {
-            y: {
-              grid: { color: '#1D2230' },
-              ticks: { color: '#9CA3AF', stepSize: 1 },
-              beginAtZero: true
-            },
-            x: {
-              grid: { display: false },
-              ticks: { color: '#9CA3AF' }
-            }
+            y: { grid: { color: '#1D2230' }, ticks: { color: '#9CA3AF', stepSize: 1 }, beginAtZero: true },
+            x: { grid: { display: false }, ticks: { color: '#9CA3AF' } }
           }
         }
       });
@@ -3036,11 +2764,7 @@
 
     function getDriverChartData() {
       let counts = { IKKI: 0, FAUZI: 0, ASO: 0 };
-      appState.ritase.forEach(item => {
-        if (counts.hasOwnProperty(item.driver)) {
-          counts[item.driver]++;
-        }
-      });
+      appState.ritase.forEach(item => { if (counts.hasOwnProperty(item.driver)) counts[item.driver]++; });
       return counts;
     }
 
@@ -3060,7 +2784,6 @@
         let fauziX = 400 + Math.cos(step * 0.08) * 40;
         let fauziY = 120 + Math.sin(step * 0.08) * 40;
         if (fauziMarker) fauziMarker.setAttribute('transform', `translate(${fauziX}, ${fauziY})`);
-
         if (asoMarker) asoMarker.setAttribute('transform', `translate(400, 120)`);
       }, 1000);
     }
