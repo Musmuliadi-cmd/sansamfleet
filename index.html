@@ -768,16 +768,18 @@
         if (i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor") cash += i.nominal; 
       });
       
-      // Hitung pengeluaran operasional (KECUALI PANJAR)
+      // Hitung pengeluaran operasional dan PANJAR (untuk memotong cash jika dia megang uang ritase)
       appState.pengeluaran.forEach(e => {
         const isActive = (e.status === undefined || e.status === "Active");
-        // PERHATIAN: Panjar Driver TIDAK ikut menambah/mengurangi Kas Fisik Harian
-        if (isActive && e.category !== "Panjar Driver") {
+        // Semua pengeluaran (termasuk Panjar Driver) memotong kas fisik di tangannya
+        if (isActive) {
           if (e.source === driverName) cash -= e.nominal;
           if (e.category === "Transfer Kas" && e.recipient === driverName) cash += e.nominal;
         }
       });
-      return cash;
+      
+      // Mencegah saldo menjadi minus (jika driver mengambil panjar lebih besar dari cash yang dipegang, maka cash = 0)
+      return Math.max(0, cash);
     }
     
     function showSourceCashInHand() {
@@ -896,7 +898,7 @@
 
       showCustomDialog({
         title: `Terima Setoran ${driverName}?`,
-        message: `Driver ${driverName} akan menyetor kas fisik sebesar Rp ${totalCash.toLocaleString('id-ID')} ke Admin.\n\nTindakan ini otomatis melunaskan riwayat ritase tunai & pengeluaran operasional (KECUALI PANJAR DRIVER) yang menggantung di driver ini. Lanjutkan?`,
+        message: `Driver ${driverName} akan menyetor kas fisik sebesar Rp ${totalCash.toLocaleString('id-ID')} ke Admin.\n\nTindakan ini akan otomatis melunaskan riwayat ritase tunai & pengeluaran operasional yang menggantung (KECUALI PANJAR). Lanjutkan?`,
         type: 'info',
         onConfirm: async () => {
           showLoader(true);
@@ -904,24 +906,20 @@
           // 1. Update Ritase yg belum disetor
           const pendingRitase = appState.ritase.filter(i => i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor");
           for (let r of pendingRitase) {
-            await updateDB('ritase', r.id, { status: "Sudah Disetor" });
-            r.status = "Sudah Disetor"; 
+            r.status = "Sudah Disetor"; await updateDB('ritase', r.id, { status: "Sudah Disetor" });
           }
 
-          // 2. Update Pengeluaran operasional (KECUALI PANJAR DRIVER)
+          // 2. Update Pengeluaran yg statusnya masih Active yg memotong kas dia (KECUALI PANJAR)
           const pendingExp = appState.pengeluaran.filter(e => 
             (e.status === undefined || e.status === "Active") && 
-            e.category !== "Panjar Driver" && // PENTING: Mencegah Panjar ikut lunas otomatis
+            e.category !== "Panjar Driver" && // JANGAN SETTLE PANJAR SECARA OTOMATIS
             (e.source === driverName || (e.category === "Transfer Kas" && e.recipient === driverName))
           );
-          
           for (let e of pendingExp) {
-            await updateDB('pengeluaran', e.id, { status: "Settled" });
-            e.status = "Settled"; 
+            e.status = "Settled"; await updateDB('pengeluaran', e.id, { status: "Settled" });
           }
 
-          refreshAllUI();
-          showLoader(false);
+          showLoader(false); refreshAllUI();
           showToast('Setoran Diterima', `Seluruh setoran kas dari ${driverName} berhasil dibukukan. Panjar tidak terpengaruh.`, 'success');
         }
       });
