@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-title" content="Sansam Fleet">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/664/664468.png">
   
-  <!-- PWA Manifest dinamis agar bisa di-install langsung di HP Android -->
+  <!-- PWA Manifest dinamis -->
   <link id="manifest-placeholder" rel="manifest">
   
   <!-- Tailwind CSS CDN -->
@@ -26,7 +26,7 @@
   <!-- ChartJS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- jsPDF & jsPDF AutoTable untuk Download PDF via CDN -->
+  <!-- jsPDF & jsPDF AutoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
@@ -82,10 +82,10 @@
     </div>
   </div>
 
-  <!-- GLOBAL LOADER (For waiting DB inserts) -->
+  <!-- GLOBAL LOADER -->
   <div id="global-loader" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999999] flex flex-col items-center justify-center hidden">
     <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-blue mb-4"></i>
-    <p class="text-xs font-bold text-white tracking-widest uppercase">Menyinkronkan ke Server...</p>
+    <p class="text-xs font-bold text-white tracking-widest uppercase">Memproses ke Server...</p>
   </div>
 
   <!-- ROLE GATEWAY / PINTU MASUK -->
@@ -135,7 +135,7 @@
       </div>
       
       <div class="flex items-center gap-2">
-        <!-- TOMBOL PASANG PWA (Untuk Install ke Home Screen) -->
+        <!-- TOMBOL PASANG PWA -->
         <button id="pwa-install-btn" class="hidden active-scale bg-brand-blue hover:bg-brand-blue/90 text-white text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition shadow-lg shadow-brand-blue/25">
           <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">PASANG APP</span>
         </button>
@@ -416,7 +416,7 @@
       </div>
     </div>
 
-    <!-- TAB 4: ABSENSI DRIVER (Sesuai Struktur Database Asli Supabase) -->
+    <!-- TAB 4: ABSENSI DRIVER -->
     <div id="tab-content-absensi" class="tab-pane hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
@@ -454,7 +454,7 @@
           <div class="overflow-x-auto rounded-xl border border-brand-border">
             <table class="w-full text-left text-xs min-w-[500px]">
               <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
-                <tr><th class="p-3.5">Jam Log</th><th class="p-3.5">Nama Driver</th><th class="p-3.5">Status Kondisi</th></tr>
+                <tr><th class="p-3.5">Jam Log</th><th class="p-3.5">Nama Driver</th><th class="p-3.5">Status Kondisi</th><th class="p-3.5 text-right">Aksi</th></tr>
               </thead>
               <tbody id="absensi-table-body" class="divide-y divide-brand-border"></tbody>
             </table>
@@ -483,7 +483,7 @@
     <div class="flex-grow"><p id="toast-title" class="text-xs font-bold text-white">Notif</p><p id="toast-desc" class="text-[10px] text-gray-400">Deskripsi</p></div>
   </div>
 
-  <!-- CUSTOM DIALOG MODAL (Untuk Peringatan Install dll) -->
+  <!-- CUSTOM DIALOG MODAL (Aman & mendukung Callback Hapus) -->
   <div id="custom-dialog-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
     <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl">
       <div class="p-6 text-center space-y-4">
@@ -493,8 +493,8 @@
           <p id="dialog-message" class="text-xs text-gray-400 leading-relaxed whitespace-pre-line">Isi keterangan detail disini.</p>
         </div>
         <div class="flex items-center justify-center gap-2 pt-2">
-          <button id="dialog-cancel-btn" onclick="closeCustomDialog()" class="active-scale px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-xl text-xs font-semibold transition hidden">Batal</button>
-          <button id="dialog-confirm-btn" onclick="closeCustomDialog()" class="active-scale px-4 py-2 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl text-xs font-bold transition">Mengerti</button>
+          <button id="dialog-cancel-btn" class="active-scale px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-xl text-xs font-semibold transition hidden">Batal</button>
+          <button id="dialog-confirm-btn" class="active-scale px-4 py-2 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl text-xs font-bold transition">Mengerti</button>
         </div>
       </div>
     </div>
@@ -528,11 +528,10 @@
     let driverDistributionChart = null;
 
     // =====================================================================
-    // 2. PWA INSTALL LOGIC (PERBAIKAN FITUR PASANG KE HP)
+    // 2. PWA INSTALL LOGIC 
     // =====================================================================
     let deferredPrompt;
 
-    // A. Generate Manifest secara dinamis
     const manifestData = {
       "name": "CV SANSAM GROUP", "short_name": "SansamFleet", "start_url": ".", "display": "standalone",
       "background_color": "#07080B", "theme_color": "#07080B",
@@ -541,15 +540,12 @@
     const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
     document.getElementById('manifest-placeholder').href = URL.createObjectURL(manifestBlob);
 
-    // B. Register dummy Service Worker agar browser memunculkan tombol Install (Wajib untuk PWA)
     if ('serviceWorker' in navigator) {
       const swCode = `self.addEventListener('install', (e) => self.skipWaiting()); self.addEventListener('fetch', (e) => {});`;
       const swBlob = new Blob([swCode], { type: 'text/javascript' });
       navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log("SW Error", err));
     }
 
-    // C. Deteksi perangkat & tampilkan tombol
-    const isMobileOrTablet = () => window.innerWidth <= 800;
     const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
@@ -558,12 +554,8 @@
       if (!isStandalone) document.getElementById('pwa-install-btn').classList.remove('hidden');
     });
 
-    // Jika iOS (karena iOS tidak mendukung event beforeinstallprompt otomatis)
-    if (isIos() && !isStandalone) {
-      document.getElementById('pwa-install-btn').classList.remove('hidden');
-    }
+    if (isIos() && !isStandalone) { document.getElementById('pwa-install-btn').classList.remove('hidden'); }
 
-    // D. Aksi ketika tombol "PASANG APP" ditekan
     document.getElementById('pwa-install-btn')?.addEventListener('click', async () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
@@ -585,17 +577,45 @@
       }
     });
 
-    // Custom Dialog Logic
-    function showCustomDialog({ title, message, type='info' }) {
+    // Custom Dialog Logic dengan Callback Hapus
+    let pendingConfirmAction = null;
+    function showCustomDialog({ title, message, type='info', onConfirm }) {
       document.getElementById('dialog-title').innerText = title;
       document.getElementById('dialog-message').innerText = message;
+      const icon = document.getElementById('dialog-icon');
+      
+      if(type === 'warning') {
+          icon.className = "fa-solid fa-triangle-exclamation text-2xl text-rose-500";
+          icon.parentElement.className = "w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-rose-500/10 border border-rose-500/30";
+          document.getElementById('dialog-confirm-btn').className = "active-scale px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition";
+      } else {
+          icon.className = "fa-solid fa-circle-info text-2xl text-brand-blue";
+          icon.parentElement.className = "w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-brand-blue/10 border border-brand-blue/30";
+          document.getElementById('dialog-confirm-btn').className = "active-scale px-4 py-2 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl text-xs font-bold transition";
+      }
+
+      const cancelBtn = document.getElementById('dialog-cancel-btn');
+      if (onConfirm) {
+        cancelBtn.classList.remove('hidden');
+        pendingConfirmAction = onConfirm;
+      } else {
+        cancelBtn.classList.add('hidden');
+        pendingConfirmAction = null;
+      }
       document.getElementById('custom-dialog-modal').classList.remove('hidden');
     }
+
+    document.getElementById('dialog-cancel-btn').addEventListener('click', closeCustomDialog);
+    document.getElementById('dialog-confirm-btn').addEventListener('click', () => {
+      closeCustomDialog();
+      if(pendingConfirmAction) pendingConfirmAction();
+    });
+
     function closeCustomDialog() { document.getElementById('custom-dialog-modal').classList.add('hidden'); }
 
 
     // =====================================================================
-    // 3. FUNGSI GAMBAR, KOMPRESI & SUPABASE
+    // 3. FUNGSI GAMBAR, KOMPRESI & SUPABASE DATABASE CORE
     // =====================================================================
     function resizeImage(file, callback) {
       const reader = new FileReader();
@@ -637,14 +657,36 @@
     async function insertToDB(table, record) {
       try {
         const { error } = await supabaseClient.from(table).insert([record]);
-        if (error) { showToast('Gagal Menyimpan', `Supabase menolak data. Pesan: ${error.message}`, 'error'); return false; }
+        if (error) { showToast('Gagal Menyimpan', `Supabase menolak. Pesan: ${error.message}`, 'error'); return false; }
         return true; 
       } catch (err) { showToast('Koneksi Gagal', 'Tidak terhubung server.', 'error'); return false; }
     }
     async function updateDB(table, id, updates) { await supabaseClient.from(table).update(updates).eq('id', id); }
     
+    // FUNGSI HAPUS DATA KE DATABASE
+    async function deleteRecord(id, tableType) {
+      showCustomDialog({
+        title: 'Hapus Data Permanen?',
+        message: 'Data yang dihapus tidak akan bisa dikembalikan lagi. Lanjutkan hapus data ini?',
+        type: 'warning',
+        onConfirm: async () => {
+          showLoader(true);
+          const { error } = await supabaseClient.from(tableType).delete().eq('id', id);
+          showLoader(false);
+
+          if (error) {
+            showToast('Gagal Menghapus', error.message, 'error');
+          } else {
+            appState[tableType] = appState[tableType].filter(x => x.id !== id);
+            refreshAllUI();
+            showToast('Berhasil Dihapus', 'Data telah dihapus dari sistem.', 'success');
+          }
+        }
+      });
+    }
+
     // =====================================================================
-    // 4. SUBMIT FORM & SINKRONISASI 
+    // 4. SUBMIT FORM (CREATE)
     // =====================================================================
     async function handleDirectSubmit(e) {
       e.preventDefault();
@@ -712,7 +754,7 @@
 
       if (!name || !condition) return showToast('Error', 'Pilih Driver & Status', 'error');
 
-      // PERBAIKAN: Menghilangkan uangJalan dari pengiriman tabel Absensi (sesuai Supabase)
+      // 100% SESUAI SUPABASE: Tidak ada field uang jalan
       const newAbsen = {
         id: "abs-" + Date.now(), timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
         name: name, tipe: condition, status: "Active"
@@ -781,6 +823,7 @@
       });
     }
 
+    // RENDER: RITASE (DENGAN TOMBOL HAPUS)
     function renderRekapTable() {
       const b = document.getElementById('rekap-table-body'); b.innerHTML = "";
       appState.ritase.forEach(i => {
@@ -788,17 +831,25 @@
         let btn = (i.status === "Belum Disetor" && i.payment === "Cash") ? `<button onclick="approveDeposit('${i.id}')" class="bg-brand-green/20 text-brand-green px-2 py-1 rounded text-[10px] font-bold">Terima Setoran</button>` : `<span class="text-[10px] text-gray-500">Selesai</span>`;
         if(i.status === "Piutang" || i.nominal === 0) btn = `<button onclick="settlePriceAndPay('${i.id}')" class="bg-brand-blue/20 text-brand-blue px-2 py-1 rounded text-[10px] font-bold">Atur Lunas</button>`;
         
-        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${i.timestamp}</td><td class="p-3 font-bold">${i.driver}</td><td class="p-3">${i.rute}</td><td class="p-3">${i.muatan}</td><td class="p-3 text-right font-bold text-white">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center">${i.payment}</td><td class="p-3 text-center ${badgeColor} font-bold text-[10px]">${i.status}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${i.photo}')"><i class="fa-solid fa-image"></i></td><td class="p-3 text-right">${btn}</td></tr>`;
+        // TOMBOL HAPUS DITAMBAHKAN
+        let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="deleteRecord('${i.id}', 'ritase')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Data"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
+        
+        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${i.timestamp}</td><td class="p-3 font-bold">${i.driver}</td><td class="p-3">${i.rute}</td><td class="p-3">${i.muatan}</td><td class="p-3 text-right font-bold text-white">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center">${i.payment}</td><td class="p-3 text-center ${badgeColor} font-bold text-[10px]">${i.status}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${i.photo}')"><i class="fa-solid fa-image"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
 
+    // RENDER: PENGELUARAN KAS (DENGAN TOMBOL HAPUS)
     function renderExpenseTable() {
       const b = document.getElementById('expense-table-body'); b.innerHTML = "";
       appState.pengeluaran.forEach(e => {
-        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${e.timestamp}</td><td class="p-3 font-bold text-amber-500">${e.source}</td><td class="p-3">${e.category}</td><td class="p-3">${e.recipient}</td><td class="p-3 text-right font-bold text-rose-500">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${e.photo}')"><i class="fa-solid fa-receipt"></i></td><td class="p-3 text-right text-gray-500 text-[10px]">Terekam</td></tr>`;
+        // TOMBOL HAPUS DITAMBAHKAN
+        let actionCell = `<div class="flex justify-end"><button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Transaksi"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
+        
+        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${e.timestamp}</td><td class="p-3 font-bold text-amber-500">${e.source}</td><td class="p-3">${e.category}</td><td class="p-3">${e.recipient}</td><td class="p-3 text-right font-bold text-rose-500">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${e.photo}')"><i class="fa-solid fa-receipt"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
 
+    // RENDER: REKAP PANJAR (DENGAN TOMBOL HAPUS)
     function renderPanjarRecap() {
       const cards = document.getElementById('panjar-driver-summary-cards'); cards.innerHTML = "";
       ["IKKI", "FAUZI", "ASO"].forEach(name => {
@@ -811,7 +862,11 @@
       appState.pengeluaran.filter(e => e.category === "Panjar Driver").forEach(e => {
         let status = (e.status === undefined || e.status === "Active") ? "Aktif" : "Selesai";
         let btn = status === "Aktif" ? `<button onclick="settleSinglePanjar('${e.id}')" class="bg-sky-500/20 text-sky-400 px-2 py-1 rounded text-[10px] font-bold">Potong Panjar</button>` : `<span class="text-gray-500 text-[10px]">Settled</span>`;
-        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3">${e.timestamp}</td><td class="p-3 font-bold">${e.source}</td><td class="p-3 text-sky-400 font-bold">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center text-[10px] font-bold">${status}</td><td class="p-3 text-right">${btn}</td></tr>`;
+        
+        // TOMBOL HAPUS DITAMBAHKAN
+        let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Panjar"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
+
+        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3">${e.timestamp}</td><td class="p-3 font-bold">${e.source}</td><td class="p-3 text-sky-400 font-bold">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center text-[10px] font-bold">${status}</td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
 
@@ -823,12 +878,16 @@
       });
     }
 
+    // RENDER: ABSENSI (DENGAN TOMBOL HAPUS)
     function renderAbsensi() {
       const b = document.getElementById('absensi-table-body');
       if(!b) return;
       b.innerHTML = "";
       appState.absensi.forEach(i => {
-        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card/30"><td class="p-3 text-[11px]">${i.timestamp}</td><td class="p-3 font-bold text-white">${i.name}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-brand-border">${i.tipe}</span></td></tr>`;
+        // TOMBOL HAPUS DITAMBAHKAN
+        let actionCell = `<div class="flex justify-end"><button onclick="deleteRecord('${i.id}', 'absensi')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Absensi"><i class="fa-solid fa-trash text-[10px]"></i></button></div>`;
+        
+        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card/30"><td class="p-3 text-[11px]">${i.timestamp}</td><td class="p-3 font-bold text-white">${i.name}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-brand-border">${i.tipe}</span></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
 
@@ -933,7 +992,7 @@
       link.download = filename; document.body.appendChild(link); link.click();
     }
 
-    // DOWNLOADS PDF (Sederhana via autoTable)
+    // DOWNLOADS PDF
     function exportToPDF() {
       const { jsPDF } = window.jspdf; const doc = new jsPDF('l');
       doc.text("Laporan Ritase Penjualan CV SANSAM", 14, 15);
