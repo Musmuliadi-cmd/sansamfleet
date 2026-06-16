@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -5,20 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>CV SANSAM GROUP - Fleet App</title>
   
+  <!-- PWA Setup untuk Android & iOS -->
   <meta name="theme-color" content="#07080B">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Sansam Fleet">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/664/664468.png">
   
+  <!-- PWA Manifest dinamis agar bisa di-install langsung di HP Android -->
+  <link id="manifest-placeholder" rel="manifest">
+  
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts & FontAwesome Premium Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- ChartJS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- jsPDF & jsPDF AutoTable untuk Download PDF via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Setup Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link id="manifest-placeholder" rel="manifest">
 
   <script>
     tailwind.config = {
@@ -45,10 +59,14 @@
     .tab-pane { transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out; }
     .active-scale:active { transform: scale(0.96); }
     @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+    
+    /* Loading overlay full screen */
+    #global-loader { transition: opacity 0.3s ease; }
   </style>
 </head>
 <body class="min-h-screen pb-24 md:pb-6 overflow-x-hidden">
 
+  <!-- NATIVE-LIKE SPLASH SCREEN -->
   <div id="splash-screen" class="fixed inset-0 bg-brand-black z-[999999] flex flex-col items-center justify-center transition-all duration-700">
     <div class="text-center space-y-4 animate-bounce">
       <div class="w-20 h-20 bg-gradient-to-tr from-brand-blue to-brand-green rounded-3xl mx-auto flex items-center justify-center shadow-xl shadow-brand-blue/20">
@@ -67,6 +85,13 @@
     </div>
   </div>
 
+  <!-- GLOBAL LOADER (For waiting DB inserts) -->
+  <div id="global-loader" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999999] flex flex-col items-center justify-center hidden">
+    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-blue mb-4"></i>
+    <p class="text-xs font-bold text-white tracking-widest uppercase">Menyinkronkan ke Server...</p>
+  </div>
+
+  <!-- ROLE GATEWAY / PINTU MASUK -->
   <div id="login-modal" class="fixed inset-0 bg-brand-black/95 backdrop-blur-md z-[99999] flex flex-col items-center justify-center p-4 transition-all duration-500 hidden">
     <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-6">
       <div class="w-16 h-16 bg-brand-blue/10 rounded-2xl mx-auto flex items-center justify-center border border-brand-blue/30 shadow-lg shadow-brand-blue/20">
@@ -76,10 +101,12 @@
         <h2 class="text-xl font-black text-white">SANSAM FLEET</h2>
         <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Pilih Akses Masuk</p>
       </div>
+
       <div class="space-y-3 pt-2">
         <button onclick="loginAsDriver()" class="active-scale w-full bg-brand-black border border-brand-border hover:border-brand-green text-white font-bold py-3.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-steering-wheel text-brand-green"></i> Masuk Sebagai Driver Armada
         </button>
+        
         <div class="bg-brand-black border border-brand-border rounded-xl p-3 space-y-3">
           <button onclick="togglePinInput()" class="w-full text-gray-300 hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition">
             <i class="fa-solid fa-user-tie text-brand-blue"></i> Masuk Sebagai Admin / Pemilik
@@ -94,25 +121,30 @@
     </div>
   </div>
 
+  <!-- TOP HEADER -->
   <header class="border-b border-brand-border bg-brand-black/95 sticky top-0 z-50 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
       <div class="text-left">
         <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
           CV SANSAM GROUP
-          <span id="sync-status" class="inline-flex items-center gap-1 text-[9px] bg-brand-blue/10 text-brand-blue border border-brand-blue/20 px-2 py-0.5 rounded-full font-bold">
-            <i class="fa-solid fa-arrows-rotate fa-spin"></i> SYNC...
+          <span id="sync-status" class="inline-flex items-center gap-1 text-[9px] bg-brand-green/10 text-brand-green border border-brand-green/20 px-2 py-0.5 rounded-full font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-green pulsing-green-dot"></span>
+            ONLINE
           </span>
         </h1>
         <span class="text-[9px] text-gray-400 font-bold tracking-[0.25em] uppercase block mt-0.5" id="header-role-badge">
           Aplikasi Manajemen Internal
         </span>
       </div>
+      
       <div class="flex items-center gap-2">
-        <button onclick="logoutAccount()" class="active-scale bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">KELUAR</span>
-        </button>
+        <!-- TOMBOL PASANG PWA (Akan muncul jika HP mendukung Install App) -->
         <button id="pwa-install-btn" class="hidden active-scale bg-brand-blue hover:bg-brand-blue/90 text-white text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition shadow-lg shadow-brand-blue/25">
           <i class="fa-solid fa-download"></i> PASANG
+        </button>
+
+        <button onclick="logoutAccount()" class="active-scale bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">KELUAR</span>
         </button>
         <div class="hidden sm:flex items-center gap-2 bg-brand-card px-3.5 py-2 rounded-xl border border-brand-border">
           <i class="fa-regular fa-calendar-days text-brand-green"></i>
@@ -122,6 +154,7 @@
     </div>
   </header>
 
+  <!-- MAIN APP CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 py-6">
 
     <!-- METRICS GRID -->
@@ -129,53 +162,64 @@
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Pendapatan</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-white leading-tight" id="metric-total-omzet">Rp 0</h3>
-        <span class="text-[9px] text-brand-green flex items-center gap-1 mt-2 font-semibold"><i class="fa-solid fa-circle text-[5px] pulsing-green-dot"></i> Total Ritase Aktif</span>
       </div>
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cash Sisa (Di Driver)</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-amber-500 leading-tight" id="metric-cash-driver">Rp 0</h3>
-        <span class="text-[9px] text-gray-400 flex items-center gap-1 mt-2 font-semibold"><i class="fa-solid fa-handshake"></i> Terpotong Solar/Panjar</span>
       </div>
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Panjar Driver</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-sky-400 leading-tight" id="metric-total-panjar">Rp 0</h3>
-        <span class="text-[9px] text-sky-300 flex items-center gap-1 mt-2 font-semibold"><i class="fa-solid fa-hand-holding-dollar"></i> Kas Pinjaman Aktif</span>
       </div>
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Lunas / TF Kasir</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-brand-green leading-tight" id="metric-tf-masuk">Rp 0</h3>
-        <span class="text-[9px] text-gray-400 flex items-center gap-1 mt-2 font-semibold"><i class="fa-solid fa-building-columns"></i> Masuk Rekening</span>
       </div>
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Bon (Tempo)</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-rose-500 leading-tight" id="metric-bon-total">Rp 0</h3>
-        <span class="text-[9px] text-rose-400 flex items-center gap-1 mt-2 font-semibold"><i class="fa-solid fa-file-invoice-dollar"></i> Tunggu Pelunasan</span>
       </div>
     </section>
 
     <!-- DESKTOP TOP NAVIGATION TAB BAR -->
     <div class="hidden md:flex border-b border-brand-border mb-6 gap-2 py-1">
-      <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-brand-blue text-brand-blue bg-brand-card/50"><i class="fa-solid fa-chart-pie"></i> Dashboard Utama</button>
-      <button onclick="switchTab('input')" id="tab-btn-input" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white"><i class="fa-solid fa-truck-pickup text-brand-blue"></i> Input Data & Kas</button>
-      <button onclick="switchTab('rekap')" id="tab-btn-rekap" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white admin-only-tab"><i class="fa-solid fa-list-check"></i> Rekap Penjualan</button>
-      <button onclick="switchTab('absensi')" id="tab-btn-absensi" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white"><i class="fa-solid fa-clipboard-user"></i> Absensi Driver</button>
-      <button onclick="switchTab('tracking')" id="tab-btn-tracking" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white"><i class="fa-solid fa-map-location-dot text-rose-500"></i> Peta GPS Live</button>
+      <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-brand-blue text-brand-blue bg-brand-card/50">
+        <i class="fa-solid fa-chart-pie"></i> Dashboard Utama
+      </button>
+      <button onclick="switchTab('input')" id="tab-btn-input" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-truck-pickup text-brand-blue"></i> Input Data & Kas
+      </button>
+      <button onclick="switchTab('rekap')" id="tab-btn-rekap" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white admin-only-tab">
+        <i class="fa-solid fa-list-check"></i> Rekap Penjualan
+      </button>
+      <button onclick="switchTab('absensi')" id="tab-btn-absensi" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-clipboard-user"></i> Absensi Driver
+      </button>
+      <button onclick="switchTab('tracking')" id="tab-btn-tracking" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-map-location-dot text-rose-500"></i> Peta GPS Live
+      </button>
     </div>
 
     <!-- TAB 1: DASHBOARD -->
     <div id="tab-content-dashboard" class="tab-pane block space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2"><i class="fa-solid fa-users text-brand-blue"></i> Radar Keaktifan & Kondisi</h4>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-users text-brand-blue"></i> Radar Keaktifan
+          </h4>
           <div class="space-y-3" id="driver-status-list"></div>
         </div>
         <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center justify-between"><span><i class="fa-solid fa-chart-bar text-brand-green"></i> Distribusi Ritase Driver</span><span class="text-[10px] text-gray-500">Real-Time</span></h4>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center justify-between">
+            <span><i class="fa-solid fa-chart-bar text-brand-green"></i> Distribusi Ritase Driver</span>
+          </h4>
           <div class="h-60 relative"><canvas id="driverChart"></canvas></div>
         </div>
       </div>
       <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2"><i class="fa-solid fa-bell text-brand-blue"></i> Laporan Operasional Masuk</h4>
+        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-bell text-brand-blue"></i> Laporan Masuk Terakhir
+        </h4>
         <div class="space-y-3 max-h-64 overflow-y-auto custom-scrollbar pr-2" id="dashboard-recent-activities"></div>
       </div>
     </div>
@@ -183,300 +227,271 @@
     <!-- TAB 2: INPUT DIRECT FORM -->
     <div id="tab-content-input" class="tab-pane hidden">
       <div class="flex bg-brand-black p-1.5 rounded-2xl border border-brand-border mb-6 max-w-md mx-auto">
-        <button type="button" onclick="switchInputSubTab('ritase')" id="sub-input-btn-ritase" class="flex-1 text-center py-2.5 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale"><i class="fa-solid fa-truck-pickup mr-1.5"></i> Laporan Ritase</button>
-        <button type="button" onclick="switchInputSubTab('pengeluaran')" id="sub-input-btn-pengeluaran" class="flex-1 text-center py-2.5 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale"><i class="fa-solid fa-gas-pump mr-1.5"></i> Solar & Panjar Driver</button>
+        <button type="button" onclick="switchInputSubTab('ritase')" id="sub-input-btn-ritase" class="flex-1 text-center py-2.5 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale"><i class="fa-solid fa-truck-pickup mr-1.5"></i> Ritase Baru</button>
+        <button type="button" onclick="switchInputSubTab('pengeluaran')" id="sub-input-btn-pengeluaran" class="flex-1 text-center py-2.5 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale"><i class="fa-solid fa-gas-pump mr-1.5"></i> Keluar / Panjar</button>
       </div>
 
+      <!-- FORM RITASE -->
       <div id="sub-tab-ritase" class="block max-w-2xl mx-auto bg-brand-card border border-brand-border p-5 rounded-2xl">
         <form id="direct-ritase-form" onsubmit="handleDirectSubmit(event)" class="space-y-5">
           <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Pilih Driver & Unit</label>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Pilih Driver</label>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <label class="active-scale relative flex items-center gap-3 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="direct_driver" value="IKKI|DW 8549 BN" required class="accent-brand-blue w-4 h-4"><div><h5 class="text-xs font-bold text-white">IKKI</h5><p class="text-[9px] text-gray-400 mt-1">DW 8549 BN</p></div>
+                <input type="radio" name="direct_driver" value="IKKI|DW 8549 BN" required class="accent-brand-blue w-4 h-4">
+                <div><h5 class="text-xs font-bold text-white">IKKI</h5><p class="text-[9px] text-gray-400 mt-1">DW 8549 BN</p></div>
               </label>
               <label class="active-scale relative flex items-center gap-3 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="direct_driver" value="FAUZI|DD 8554 HD" class="accent-brand-blue w-4 h-4"><div><h5 class="text-xs font-bold text-white">FAUZI</h5><p class="text-[9px] text-gray-400 mt-1">DD 8554 HD</p></div>
+                <input type="radio" name="direct_driver" value="FAUZI|DD 8554 HD" class="accent-brand-blue w-4 h-4">
+                <div><h5 class="text-xs font-bold text-white">FAUZI</h5><p class="text-[9px] text-gray-400 mt-1">DD 8554 HD</p></div>
               </label>
               <label class="active-scale relative flex items-center gap-3 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="direct_driver" value="ASO|DD 8601 RN" class="accent-brand-blue w-4 h-4"><div><h5 class="text-xs font-bold text-white">ASO</h5><p class="text-[9px] text-gray-400 mt-1">DD 8601 RN</p></div>
+                <input type="radio" name="direct_driver" value="ASO|DD 8601 RN" class="accent-brand-blue w-4 h-4">
+                <div><h5 class="text-xs font-bold text-white">ASO</h5><p class="text-[9px] text-gray-400 mt-1">DD 8601 RN</p></div>
               </label>
             </div>
           </div>
           <div>
-            <div class="flex justify-between items-center mb-1.5"><label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Jenis Muatan</label><span class="text-[9px] text-brand-green italic font-bold">Tombol Cepat</span></div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Jenis Muatan</label>
             <div class="flex flex-wrap gap-1.5 mb-2">
-              <button type="button" onclick="quickFillMuatan('Pasir Halus')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Pasir Halus</button>
-              <button type="button" onclick="quickFillMuatan('Pasir Kasar')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Pasir Kasar</button>
-              <button type="button" onclick="quickFillMuatan('Kerikil')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Kerikil</button>
-              <button type="button" onclick="quickFillMuatan('Sirtu')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Sirtu</button>
-              <button type="button" onclick="quickFillMuatan('Batu Belopa')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Batu Belopa</button>
-              <button type="button" onclick="quickFillMuatan('Batu Sidrap')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Batu Sidrap</button>
+              <button type="button" onclick="quickFillMuatan('Pasir Halus')" class="active-scale bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Pasir Halus</button>
+              <button type="button" onclick="quickFillMuatan('Pasir Kasar')" class="active-scale bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Pasir Kasar</button>
+              <button type="button" onclick="quickFillMuatan('Kerikil')" class="active-scale bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Kerikil</button>
+              <button type="button" onclick="quickFillMuatan('Sirtu')" class="active-scale bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Sirtu</button>
+              <button type="button" onclick="quickFillMuatan('Batu Belopa')" class="active-scale bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Batu Belopa</button>
+              <button type="button" onclick="quickFillMuatan('Batu Sidrap')" class="active-scale bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Batu Sidrap</button>
             </div>
-            <input type="text" id="direct-muatan" required placeholder="Tulis manual muatan..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
+            <input type="text" id="direct-muatan" required placeholder="Tulis / pilih muatan..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
           </div>
           <div>
-            <div class="flex justify-between items-center mb-1.5"><label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Tujuan / Rute</label><span class="text-[9px] text-brand-green italic font-bold">Tombol Rute</span></div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Rute/Tujuan</label>
             <div class="flex flex-wrap gap-1.5 mb-2">
-              <button type="button" onclick="quickFillRute('Bolabakka')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Bolabakka</button>
-              <button type="button" onclick="quickFillRute('Doping')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Doping</button>
-              <button type="button" onclick="quickFillRute('Tarumpakkae')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Tarumpakkae</button>
-              <button type="button" onclick="quickFillRute('Siwa')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Siwa</button>
-              <button type="button" onclick="quickFillRute('Belopa')" class="active-scale bg-brand-black border border-brand-border hover:border-brand-blue text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition font-semibold">Belopa</button>
+              <button type="button" onclick="quickFillRute('Bolabakka')" class="active-scale bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Bolabakka</button>
+              <button type="button" onclick="quickFillRute('Doping')" class="active-scale bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Doping</button>
+              <button type="button" onclick="quickFillRute('Tarumpakkae')" class="active-scale bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Tarumpakkae</button>
+              <button type="button" onclick="quickFillRute('Siwa')" class="active-scale bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Siwa</button>
             </div>
-            <input type="text" id="direct-rute" required placeholder="Tulis manual rute..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
+            <input type="text" id="direct-rute" required placeholder="Cth: Bolabakka" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
           </div>
           <div class="border-t border-brand-border pt-4">
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Pilih Metode Pembayaran</label>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Metode Bayar</label>
             <div class="grid grid-cols-3 gap-2">
-              <button type="button" onclick="setDirectPayment('Cash')" id="pay-btn-Cash" class="active-scale pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue flex flex-col items-center gap-1.5"><i class="fa-solid fa-wallet text-amber-500 text-lg"></i>Cash</button>
-              <button type="button" onclick="setDirectPayment('Transfer')" id="pay-btn-Transfer" class="active-scale pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue flex flex-col items-center gap-1.5"><i class="fa-solid fa-building-columns text-brand-blue text-lg"></i>Transfer</button>
-              <button type="button" onclick="setDirectPayment('Bon')" id="pay-btn-Bon" class="active-scale pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue flex flex-col items-center gap-1.5"><i class="fa-solid fa-file-invoice text-rose-500 text-lg"></i>Bon</button>
+              <button type="button" onclick="setDirectPayment('Cash')" id="pay-btn-Cash" class="active-scale pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue">Cash</button>
+              <button type="button" onclick="setDirectPayment('Transfer')" id="pay-btn-Transfer" class="active-scale pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue">Transfer</button>
+              <button type="button" onclick="setDirectPayment('Bon')" id="pay-btn-Bon" class="active-scale pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue">Bon</button>
             </div>
             <input type="hidden" id="direct-selected-payment" required value="">
           </div>
           <div>
             <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal (Rp) <span id="optional-label" class="text-rose-500 font-bold lowercase"></span></label>
-            <div id="price-history-container" class="mb-2.5 hidden"><p class="text-[9px] text-gray-500 font-bold uppercase tracking-wider mb-1">Riwayat Harga Terakhir:</p><div id="price-history-buttons" class="flex flex-wrap gap-1.5"></div></div>
-            <div class="relative"><span class="absolute inset-y-0 left-0 flex items-center pl-4 text-brand-green font-bold text-xs">Rp</span><input type="number" id="direct-nominal" required placeholder="550000" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-10 pr-4 text-xs font-bold text-white focus:border-brand-blue"></div>
+            <input type="number" id="direct-nominal" required placeholder="550000" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs font-bold text-white focus:border-brand-blue">
           </div>
           <div>
             <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Laporan Bongkar (Bukti Timemark)</label>
             <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-5 bg-brand-black hover:border-brand-green/40 transition">
               <input type="file" id="direct-photo-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="processDirectPhoto(event)">
-              <div id="direct-upload-placeholder" class="text-center space-y-1.5 pointer-events-none"><div class="w-9 h-9 bg-brand-green/10 border border-brand-green/30 text-brand-green rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-camera"></i></div><p class="text-xs font-bold text-gray-300">Ambil Foto Geotag HP</p></div>
-              <div id="direct-photo-preview-container" class="hidden w-full space-y-2 pointer-events-none"><img id="direct-processed-photo-preview" class="w-full max-h-48 object-cover rounded-lg border border-brand-border" src=""><p class="text-[9px] text-brand-green text-center font-bold">✓ Bukti Foto dilampirkan.</p></div>
+              <div id="direct-upload-placeholder" class="text-center space-y-1.5 pointer-events-none">
+                <div class="w-9 h-9 bg-brand-green/10 border border-brand-green/30 text-brand-green rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-camera"></i></div>
+                <p class="text-xs font-bold text-gray-300">Ambil / Pilih Foto Geotag</p>
+              </div>
+              <div id="direct-photo-preview-container" class="hidden w-full space-y-2 pointer-events-none">
+                <img id="direct-processed-photo-preview" class="w-full max-h-48 object-cover rounded-lg border border-brand-border" src="">
+                <p class="text-[9px] text-brand-green text-center font-bold">✓ Foto dilampirkan.</p>
+              </div>
             </div>
           </div>
-          <button type="submit" class="w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2"><i class="fa-solid fa-circle-check"></i> Simpan Laporan Ritase</button>
+          <button type="submit" class="w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow-lg shadow-brand-blue/20">
+            <i class="fa-solid fa-circle-check"></i> Simpan Laporan Ritase
+          </button>
         </form>
       </div>
 
-      <!-- FORM PENGELUARAN DRIVER -->
+      <!-- FORM PENGELUARAN -->
       <div id="sub-tab-pengeluaran" class="hidden max-w-2xl mx-auto bg-brand-card border border-brand-border p-5 rounded-2xl">
         <form id="driver-expense-form" onsubmit="handleExpenseSubmit(event)" class="space-y-5">
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Uang Siapa? (Sumber Kas)</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              <label class="active-scale relative flex items-center gap-2 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="exp_source" value="IKKI" required class="accent-brand-blue" onchange="showSourceCashInHand('IKKI')"><div class="text-left"><h5 class="text-xs font-bold text-white leading-none">IKKI</h5><span id="cash-hand-IKKI" class="text-[9px] text-amber-500 font-bold block mt-1">Rp 0</span></div>
+           <div>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Uang Siapa? (Sumber)</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <label class="active-scale relative flex items-center gap-2 p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer">
+                <input type="radio" name="exp_source" value="IKKI" required class="accent-brand-blue" onchange="showSourceCashInHand()"><div class="text-left"><span class="text-xs font-bold text-white block">IKKI</span><span id="cash-hand-IKKI" class="text-[9px] text-amber-500 font-bold block mt-0.5">Rp 0</span></div>
               </label>
-              <label class="active-scale relative flex items-center gap-2 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="exp_source" value="FAUZI" class="accent-brand-blue" onchange="showSourceCashInHand('FAUZI')"><div class="text-left"><h5 class="text-xs font-bold text-white leading-none">FAUZI</h5><span id="cash-hand-FAUZI" class="text-[9px] text-amber-500 font-bold block mt-1">Rp 0</span></div>
+              <label class="active-scale relative flex items-center gap-2 p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer">
+                <input type="radio" name="exp_source" value="FAUZI" class="accent-brand-blue" onchange="showSourceCashInHand()"><div class="text-left"><span class="text-xs font-bold text-white block">FAUZI</span><span id="cash-hand-FAUZI" class="text-[9px] text-amber-500 font-bold block mt-0.5">Rp 0</span></div>
               </label>
-              <label class="active-scale relative flex items-center gap-2 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="exp_source" value="ASO" class="accent-brand-blue" onchange="showSourceCashInHand('ASO')"><div class="text-left"><h5 class="text-xs font-bold text-white leading-none">ASO</h5><span id="cash-hand-ASO" class="text-[9px] text-amber-500 font-bold block mt-1">Rp 0</span></div>
+              <label class="active-scale relative flex items-center gap-2 p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer">
+                <input type="radio" name="exp_source" value="ASO" class="accent-brand-blue" onchange="showSourceCashInHand()"><div class="text-left"><span class="text-xs font-bold text-white block">ASO</span><span id="cash-hand-ASO" class="text-[9px] text-amber-500 font-bold block mt-0.5">Rp 0</span></div>
               </label>
-              <label class="active-scale relative flex items-center gap-2 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="exp_source" value="KASIR" class="accent-brand-blue" onchange="showSourceCashInHand('KASIR')"><div class="text-left"><h5 class="text-xs font-bold text-white leading-none">KASIR</h5><span class="text-[9px] text-emerald-500 font-bold block mt-1">Kas Kantor</span></div>
+              <label class="active-scale relative flex items-center gap-2 p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer">
+                <input type="radio" name="exp_source" value="KASIR" class="accent-brand-blue" onchange="showSourceCashInHand()"><div class="text-left"><span class="text-xs font-bold text-white block">KASIR</span><span class="text-[9px] text-emerald-500 font-bold block mt-0.5">Kas Kantor</span></div>
               </label>
             </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Kategori Pengeluaran</label>
-            <div class="flex flex-wrap gap-1.5 mb-2">
-              <button type="button" onclick="setExpCategory('Solar')" id="exp-cat-btn-Solar" class="active-scale exp-category-btn bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg font-semibold">Beli Solar</button>
-              <button type="button" onclick="setExpCategory('Panjar Driver')" id="exp-cat-btn-PanjarDriver" class="active-scale exp-category-btn bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg font-semibold">Panjar Driver</button>
-              <button type="button" onclick="setExpCategory('Transfer Kas')" id="exp-cat-btn-TransferKas" class="active-scale exp-category-btn bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg font-bold"><i class="fa-solid fa-right-left text-brand-blue mr-1"></i> Transfer Kas</button>
-              <button type="button" onclick="setExpCategory('Ban & Sparepart')" id="exp-cat-btn-BanSparepart" class="active-scale exp-category-btn bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg font-semibold">Ban / Sparepart</button>
-              <button type="button" onclick="setExpCategory('Makan & Operasional')" id="exp-cat-btn-MakanOperasional" class="active-scale exp-category-btn bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg font-semibold">Makan / Parkir</button>
-            </div>
-            <input type="hidden" id="exp-category" required value="">
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Kategori</label>
+            <select id="exp-category" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue" onchange="handleCategoryChange()">
+              <option value="">-- Pilih --</option>
+              <option value="Solar">Beli Solar</option>
+              <option value="Panjar Driver">Panjar Driver</option>
+              <option value="Transfer Kas">Transfer Kas Antar Driver</option>
+              <option value="Ban & Sparepart">Ban & Sparepart</option>
+              <option value="Makan & Operasional">Makan / Parkir</option>
+            </select>
           </div>
-          <div>
-            <div id="recipient-text-wrapper">
-              <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Penerima Alokasi / Toko</label>
-              <input type="text" id="exp-recipient" placeholder="Cth: SPBU Bolabakka..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
-            </div>
-            <div id="recipient-driver-wrapper" class="hidden">
-              <label class="block text-xs font-bold text-brand-green uppercase tracking-wider mb-1.5">Driver Penerima Transfer</label>
-              <select id="exp-recipient-driver" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
-                <option value="">-- Pilih Driver --</option><option value="IKKI">IKKI</option><option value="FAUZI">FAUZI</option><option value="ASO">ASO</option>
-              </select>
-            </div>
+          
+          <div id="recipient-text-wrapper">
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Penerima / Keterangan Toko</label>
+            <input type="text" id="exp-recipient" placeholder="Cth: SPBU Bolabakka" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
           </div>
+          <div id="recipient-driver-wrapper" class="hidden">
+            <label class="block text-xs font-bold text-brand-green uppercase tracking-wider mb-1.5">Transfer Kas Ke Siapa?</label>
+            <select id="exp-recipient-driver" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
+              <option value="">-- Pilih Driver Penerima --</option>
+              <option value="IKKI">DW 8549 BN (IKKI)</option>
+              <option value="FAUZI">DD 8554 HD (FAUZI)</option>
+              <option value="ASO">DD 8601 RN (ASO)</option>
+            </select>
+          </div>
+
           <div>
             <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal Keluar (Rp)</label>
-            <div class="relative"><span class="absolute inset-y-0 left-0 flex items-center pl-4 text-brand-green font-bold text-xs">Rp</span><input type="number" id="exp-nominal" required placeholder="Jumlah..." class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-10 pr-4 text-xs font-bold text-white focus:border-brand-blue"></div>
+            <input type="number" id="exp-nominal" required placeholder="Jumlah pengeluaran..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs font-bold text-white focus:border-brand-blue">
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Catatan Tambahan</label>
-            <textarea id="exp-note" rows="2" placeholder="Catatan darurat..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue"></textarea>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Bukti Nota / Foto</label>
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Bukti Nota / Transfer</label>
             <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-4 bg-brand-black hover:border-brand-green/40 transition">
               <input type="file" id="exp-photo-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="processExpensePhoto(event)">
-              <div id="exp-upload-placeholder" class="text-center space-y-1.5 pointer-events-none"><div class="w-9 h-9 bg-brand-blue/10 border border-brand-blue/30 text-brand-blue rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-file-invoice-dollar"></i></div><p class="text-xs font-bold text-gray-300">Ambil Foto Bukti</p></div>
-              <div id="exp-photo-preview-container" class="hidden w-full space-y-2 pointer-events-none"><img id="exp-processed-photo-preview" class="w-full max-h-40 object-cover rounded-lg border border-brand-border" src=""><p class="text-[9px] text-brand-green text-center font-bold">✓ Bukti dilampirkan.</p></div>
+              <div id="exp-upload-placeholder" class="text-center space-y-1.5 pointer-events-none">
+                <div class="w-9 h-9 bg-brand-blue/10 border border-brand-blue/30 text-brand-blue rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-receipt"></i></div>
+                <p class="text-[9px] font-medium text-gray-500">Ambil Foto Bukti</p>
+              </div>
+              <div id="exp-photo-preview-container" class="hidden w-full space-y-2 pointer-events-none">
+                <img id="exp-processed-photo-preview" class="w-full max-h-40 object-cover rounded-lg border border-brand-border" src="">
+              </div>
             </div>
           </div>
-          <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-brand-black font-extrabold py-3 px-6 rounded-xl text-xs transition flex items-center justify-center gap-2"><i class="fa-solid fa-circle-check"></i> Simpan Catatan Kas</button>
+          <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-brand-black font-extrabold py-3 px-6 rounded-xl text-xs transition">
+            Simpan Pengeluaran
+          </button>
         </form>
       </div>
     </div>
 
-    <!-- TAB 3: REKAP PENJUALAN TABLE, PENGELUARAN & PANJAR -->
+    <!-- TAB 3: REKAP PENJUALAN TABLE, PENGELUARAN, & PANJAR -->
     <div id="tab-content-rekap" class="tab-pane hidden space-y-4 admin-only-tab">
       <div class="flex bg-brand-black p-1.5 rounded-2xl border border-brand-border mb-4 max-w-lg overflow-x-auto custom-scrollbar">
-        <button type="button" onclick="switchRekapSubTab('ritase')" id="sub-rekap-btn-ritase" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale"><i class="fa-solid fa-file-invoice mr-1.5"></i> Log Ritase</button>
-        <button type="button" onclick="switchRekapSubTab('pengeluaran')" id="sub-rekap-btn-pengeluaran" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale"><i class="fa-solid fa-file-invoice-dollar mr-1.5"></i> Log Pengeluaran</button>
-        <button type="button" onclick="switchRekapSubTab('panjar')" id="sub-rekap-btn-panjar" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale"><i class="fa-solid fa-hand-holding-dollar mr-1.5 text-sky-400"></i> Rekap Panjar</button>
+        <button type="button" onclick="switchRekapSubTab('ritase')" id="sub-rekap-btn-ritase" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale"><i class="fa-solid fa-file-invoice mr-1.5"></i> Ritase</button>
+        <button type="button" onclick="switchRekapSubTab('pengeluaran')" id="sub-rekap-btn-pengeluaran" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale"><i class="fa-solid fa-file-invoice-dollar mr-1.5"></i> Kas Keluar</button>
+        <button type="button" onclick="switchRekapSubTab('panjar')" id="sub-rekap-btn-panjar" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale"><i class="fa-solid fa-hand-holding-dollar mr-1.5"></i> Panjar</button>
       </div>
 
-      <!-- SUB TAB REKAP RITASE -->
       <div id="sub-tab-rekap-ritase" class="block bg-brand-card border border-brand-border p-5 rounded-2xl space-y-4">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div><h3 class="text-base font-bold text-white">Daftar Transaksi Ritase</h3></div>
-          <div class="flex items-center gap-2 w-full md:w-auto">
-            <button onclick="exportToCSV()" class="active-scale bg-brand-border hover:bg-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition ml-auto md:ml-0"><i class="fa-solid fa-file-excel text-brand-green"></i> Excel</button>
-            <button onclick="exportToPDF()" class="active-scale bg-brand-border hover:bg-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
-          </div>
+          <h3 class="text-base font-bold text-white">Log Ritase Transaksi</h3>
+          <button onclick="exportToCSV()" class="bg-brand-border border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2"><i class="fa-solid fa-file-excel text-brand-green"></i> Excel (CSV)</button>
         </div>
-        <div class="overflow-x-auto custom-scrollbar rounded-xl border border-brand-border">
-          <table class="w-full text-left text-xs min-w-[900px]">
-            <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
-              <tr><th class="p-3.5">Waktu</th><th class="p-3.5">Armada</th><th class="p-3.5">Rute</th><th class="p-3.5">Muatan</th><th class="p-3.5 text-right">Nominal</th><th class="p-3.5 text-center">Metode</th><th class="p-3.5 text-center">Setoran/Status</th><th class="p-3.5 text-center">Bukti</th><th class="p-3.5 text-right">Aksi</th></tr>
-            </thead>
-            <tbody id="rekap-table-body" class="divide-y divide-brand-border"></tbody>
-          </table>
-        </div>
+        <div class="overflow-x-auto rounded-xl border border-brand-border"><table class="w-full text-left text-xs min-w-[900px]"><thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border"><tr><th class="p-3.5">Waktu</th><th class="p-3.5">Driver</th><th class="p-3.5">Rute</th><th class="p-3.5">Muatan</th><th class="p-3.5 text-right">Nominal</th><th class="p-3.5 text-center">Metode</th><th class="p-3.5 text-center">Status</th><th class="p-3.5 text-center">Bukti</th><th class="p-3.5 text-right">Aksi</th></tr></thead><tbody id="rekap-table-body"></tbody></table></div>
       </div>
 
-      <!-- SUB TAB REKAP PENGELUARAN -->
       <div id="sub-tab-rekap-pengeluaran" class="hidden bg-brand-card border border-brand-border p-5 rounded-2xl space-y-4">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div><h3 class="text-base font-bold text-white">Log Pengeluaran Kas</h3></div>
-          <div class="flex items-center gap-2 w-full md:w-auto">
-            <button onclick="exportExpensesToPDF()" class="active-scale bg-brand-border hover:bg-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition ml-auto md:ml-0"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
-          </div>
+          <h3 class="text-base font-bold text-white">Log Pengeluaran Kas</h3>
+          <button onclick="exportExpensesToCSV()" class="bg-brand-border border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2"><i class="fa-solid fa-file-excel text-amber-500"></i> Excel (CSV)</button>
         </div>
-        <div class="overflow-x-auto custom-scrollbar rounded-xl border border-brand-border">
-          <table class="w-full text-left text-xs min-w-[800px]">
-            <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
-              <tr><th class="p-3.5">Waktu</th><th class="p-3.5">Sumber Dana</th><th class="p-3.5">Kategori</th><th class="p-3.5">Penerima</th><th class="p-3.5 text-right">Nominal</th><th class="p-3.5">Catatan</th><th class="p-3.5 text-center">Bukti</th><th class="p-3.5 text-right">Aksi</th></tr>
-            </thead>
-            <tbody id="expense-table-body" class="divide-y divide-brand-border"></tbody>
-          </table>
-        </div>
+        <div class="overflow-x-auto rounded-xl border border-brand-border"><table class="w-full text-left text-xs min-w-[800px]"><thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border"><tr><th class="p-3.5">Waktu</th><th class="p-3.5">Sumber Dana</th><th class="p-3.5">Kategori</th><th class="p-3.5">Penerima/Alokasi</th><th class="p-3.5 text-right">Nominal Keluar</th><th class="p-3.5 text-center">Bukti</th><th class="p-3.5 text-right">Aksi</th></tr></thead><tbody id="expense-table-body"></tbody></table></div>
       </div>
 
-      <!-- SUB TAB REKAP PANJAR DRIVER -->
       <div id="sub-tab-rekap-panjar" class="hidden bg-brand-card border border-brand-border p-5 rounded-2xl space-y-6">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div><h3 class="text-base font-bold text-white">Rekapitulasi Panjar Driver</h3></div>
-          <div class="flex items-center gap-2 w-full md:w-auto"><button onclick="exportPanjarToPDF()" class="active-scale bg-brand-border hover:bg-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition ml-auto md:ml-0"><i class="fa-solid fa-file-pdf text-sky-400"></i> PDF Panjar</button></div>
-        </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="panjar-driver-summary-cards"></div>
-        <div class="space-y-3">
-          <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-history text-sky-400"></i> Log Panjar Harian</h4>
-          <div class="overflow-x-auto custom-scrollbar rounded-xl border border-brand-border">
-            <table class="w-full text-left text-xs min-w-[750px]">
+        <div class="overflow-x-auto rounded-xl border border-brand-border"><table class="w-full text-left text-xs min-w-[750px]"><thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border"><tr><th class="p-3.5">Waktu</th><th class="p-3.5">Nama Driver</th><th class="p-3.5">Panjar</th><th class="p-3.5 text-center">Status</th><th class="p-3.5 text-right">Aksi</th></tr></thead><tbody id="panjar-table-body"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ABSENSI DRIVER DENGAN INPUT UANG JALAN -->
+    <div id="tab-content-absensi" class="tab-pane hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
+          <h3 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-id-card text-brand-green mr-2"></i> Mesin Absensi</h3>
+          <form id="attendance-form" onsubmit="handleAttendanceSubmit(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Pilih Driver</label>
+              <select id="absensi-driver-select" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
+                <option value="">-- Pilih --</option>
+                <option value="IKKI">DW 8549 BN (IKKI)</option>
+                <option value="FAUZI">DD 8554 HD (FAUZI)</option>
+                <option value="ASO">DD 8601 RN (ASO)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Status Saat Ini</label>
+              <div class="grid grid-cols-2 gap-2">
+                <label class="active-scale flex items-center justify-center p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Jalan" required class="accent-brand-green mr-1"><span class="text-[11px] font-bold text-white">Jalan (Aktif)</span></label>
+                <label class="active-scale flex items-center justify-center p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Istirahat" class="accent-amber-500 mr-1"><span class="text-[11px] font-bold text-white">Istirahat</span></label>
+                <label class="active-scale flex items-center justify-center p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Sakit" class="accent-rose-500 mr-1"><span class="text-[11px] font-bold text-white">Sakit</span></label>
+                <label class="active-scale flex items-center justify-center p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Izin" class="accent-orange-500 mr-1"><span class="text-[11px] font-bold text-white">Izin / Off</span></label>
+              </div>
+            </div>
+            
+            <!-- INPUT UANG JALAN YANG DIKEMBALIKAN -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Uang Jalan / Operasional (Rp)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-brand-green font-bold text-xs">Rp</span>
+                <input type="number" id="absensi-uang-jalan" placeholder="Contoh: 150000" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-10 pr-4 text-xs font-bold text-white focus:outline-none focus:border-brand-blue transition">
+              </div>
+            </div>
+
+            <button type="submit" class="w-full bg-brand-green hover:bg-brand-green/90 text-white font-bold py-3 px-6 rounded-xl text-xs transition">
+              Kirim Kehadiran
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
+          <h3 class="text-base font-bold mb-4 text-white"><i class="fa-solid fa-calendar-check text-brand-blue mr-2"></i> Riwayat Kehadiran</h3>
+          <div class="overflow-x-auto rounded-xl border border-brand-border">
+            <table class="w-full text-left text-xs min-w-[500px]">
               <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
-                <tr><th class="p-3.5">Waktu</th><th class="p-3.5">Nama Driver</th><th class="p-3.5 font-bold text-sky-400">Jumlah Panjar</th><th class="p-3.5">Catatan</th><th class="p-3.5 text-center">Status</th><th class="p-3.5 text-right">Aksi Settle</th></tr>
+                <tr><th class="p-3.5">Jam Log</th><th class="p-3.5">Nama Driver</th><th class="p-3.5">Status Kondisi</th><th class="p-3.5 text-right">Uang Jalan</th></tr>
               </thead>
-              <tbody id="panjar-table-body" class="divide-y divide-brand-border"></tbody>
+              <tbody id="absensi-table-body" class="divide-y divide-brand-border"></tbody>
             </table>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- TAB 4: ABSENSI DRIVER -->
-    <div id="tab-content-absensi" class="tab-pane hidden space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
-          <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-brand-green/10 flex items-center justify-center text-brand-green"><i class="fa-solid fa-id-card"></i></div><div><h3 class="text-base font-bold text-white">Absensi Driver</h3></div></div>
-          <form id="attendance-form" onsubmit="handleAttendanceSubmit(event)" class="space-y-4">
-            <select id="absensi-driver-select" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
-              <option value="">-- Pilih Driver --</option><option value="IKKI">IKKI</option><option value="FAUZI">FAUZI</option><option value="ASO">ASO</option>
-            </select>
-            <div class="grid grid-cols-2 gap-2">
-              <label class="active-scale flex items-center justify-center gap-1.5 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Jalan" required class="accent-brand-green"><span class="text-[11px] font-bold text-white">Jalan</span></label>
-              <label class="active-scale flex items-center justify-center gap-1.5 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Istirahat" class="accent-amber-500"><span class="text-[11px] font-bold text-white">Istirahat</span></label>
-              <label class="active-scale flex items-center justify-center gap-1.5 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Sakit" class="accent-rose-500"><span class="text-[11px] font-bold text-white">Sakit</span></label>
-              <label class="active-scale flex items-center justify-center gap-1.5 p-2.5 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Izin" class="accent-orange-500"><span class="text-[11px] font-bold text-white">Izin/Off</span></label>
-            </div>
-            <button type="submit" class="w-full bg-brand-green text-white font-bold py-3 px-6 rounded-xl text-xs flex items-center justify-center gap-2"><i class="fa-solid fa-fingerprint"></i> Kirim Kehadiran</button>
-          </form>
-        </div>
-        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
-          <h3 class="text-base font-bold mb-4 text-white"><i class="fa-solid fa-calendar-check text-brand-blue"></i> Riwayat Kehadiran</h3>
-          <div class="overflow-x-auto custom-scrollbar rounded-xl border border-brand-border">
-            <table class="w-full text-left text-xs"><tbody id="absensi-table-body" class="divide-y divide-brand-border"></tbody></table>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- TAB 5: TRACKING -->
+    <div id="tab-content-tracking" class="tab-pane hidden"><div class="bg-brand-card p-5 rounded-2xl text-center text-gray-500 py-20 border border-brand-border"><i class="fa-solid fa-map-location-dot text-4xl mb-4 block text-brand-blue"></i> GPS Radar Berjalan di Latar Belakang</div></div>
 
-    <!-- TAB 5: GPS TRACKING MAP -->
-    <div id="tab-content-tracking" class="tab-pane hidden space-y-6">
-      <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
-        <h3 class="text-base font-bold text-white mb-4">Pelacakan Geofence GPS</h3>
-        <div class="relative bg-[#07080b] border border-brand-border rounded-xl h-80 overflow-hidden flex items-center justify-center">
-          <svg viewBox="0 0 800 400" class="w-full h-full opacity-80" id="simulated-map-svg">
-            <rect width="100%" height="100%" fill="#07080b" />
-            <path d="M 150 200 L 400 120 L 680 220 L 450 310 Z" fill="none" stroke="#252d40" stroke-width="3.5" stroke-dasharray="6 4" />
-            <path d="M 400 120 L 450 310" fill="none" stroke="#252d40" stroke-width="3.5" stroke-dasharray="6 4" />
-            <g transform="translate(150, 200)"><circle r="14" fill="#005CFF" fill-opacity="0.1"/><circle r="5" fill="#005CFF"/><text y="-14" fill="#E5E7EB" font-size="10" font-weight="bold" text-anchor="middle">Tarumpakkae</text></g>
-            <g transform="translate(400, 120)"><circle r="14" fill="#00CC44" fill-opacity="0.1"/><circle r="5" fill="#00CC44"/><text y="-14" fill="#E5E7EB" font-size="10" font-weight="bold" text-anchor="middle">Bolabakka</text></g>
-            <g transform="translate(680, 220)"><circle r="14" fill="#F59E0B" fill-opacity="0.1"/><circle r="5" fill="#F59E0B"/><text y="-14" fill="#E5E7EB" font-size="10" font-weight="bold" text-anchor="middle">Doping</text></g>
-            <g transform="translate(450, 310)"><circle r="14" fill="#EF4444" fill-opacity="0.1"/><circle r="5" fill="#EF4444"/><text y="22" fill="#E5E7EB" font-size="10" font-weight="bold" text-anchor="middle">Siwa</text></g>
-            <g id="truck-ikki-marker" transform="translate(150, 200)"><circle r="12" fill="#005CFF" fill-opacity="0.35" class="pulsing-dot" /><polygon points="0,-8 6,6 -6,6" fill="#005CFF" transform="rotate(45)"/><text x="12" y="3" fill="#3B82F6" font-size="9" font-weight="bold">IKKI</text></g>
-            <g id="truck-fauzi-marker" transform="translate(400, 120)"><circle r="12" fill="#00CC44" fill-opacity="0.35" class="pulsing-green-dot" /><polygon points="0,-8 6,6 -6,6" fill="#00CC44" transform="rotate(130)"/><text x="12" y="3" fill="#10B981" font-size="9" font-weight="bold">FAUZI</text></g>
-          </svg>
-        </div>
-      </div>
-    </div>
   </main>
 
-  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <!-- MOBILE BOTTOM NAV -->
   <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-brand-card/95 border-t border-brand-border backdrop-blur-md py-3 px-3 flex justify-around items-center z-50">
     <button onclick="switchTab('dashboard')" class="active-scale mobile-nav-btn text-brand-blue flex flex-col items-center gap-1.5 transition-all"><i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[9px] font-bold">Dashboard</span></button>
     <button onclick="switchTab('input')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all"><i class="fa-solid fa-file-invoice text-lg"></i><span class="text-[9px] font-bold">Input Data</span></button>
     <button onclick="switchTab('rekap')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all admin-only-tab"><i class="fa-solid fa-list-check text-lg"></i><span class="text-[9px] font-bold">Rekapan</span></button>
     <button onclick="switchTab('absensi')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all"><i class="fa-solid fa-clipboard-user text-lg"></i><span class="text-[9px] font-bold">Absensi</span></button>
-    <button onclick="switchTab('tracking')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all"><i class="fa-solid fa-location-crosshairs text-lg"></i><span class="text-[9px] font-bold">GPS Map</span></button>
   </nav>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="custom-toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-brand-card border border-brand-border px-4 py-3 rounded-xl shadow-2xl z-[10000] flex items-center gap-3 transition-all duration-300 translate-y-[-100px] opacity-0 pointer-events-none max-w-sm w-[90%]">
+    <div id="toast-icon-bg" class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"><i id="toast-icon"></i></div>
+    <div class="flex-grow"><p id="toast-title" class="text-xs font-bold text-white">Notif</p><p id="toast-desc" class="text-[10px] text-gray-400">Deskripsi</p></div>
+  </div>
 
   <!-- PHOTO MODAL -->
   <div id="photo-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
     <div class="bg-brand-card border border-brand-border w-full max-w-lg rounded-2xl overflow-hidden relative shadow-2xl">
       <button onclick="closePhotoModal()" class="absolute top-3 right-3 bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black transition"><i class="fa-solid fa-xmark"></i></button>
-      <div class="p-4 border-b border-brand-border bg-brand-black"><h3 class="font-bold text-sm" id="modal-title">Detail Bukti Foto</h3><p class="text-[10px] text-gray-400" id="modal-subtitle">Detail transaksi</p></div>
-      <div class="p-4 flex justify-center bg-black"><img id="modal-image" class="w-full max-h-[350px] object-contain rounded-lg" src=""></div>
+      <div class="p-4 flex justify-center bg-black"><img id="modal-image" class="w-full max-h-[400px] object-contain rounded-lg" src=""></div>
     </div>
-  </div>
-
-  <!-- CUSTOM DIALOG MODAL (Settle Panjar & Setor) -->
-  <div id="custom-dialog-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
-    <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl">
-      <div class="p-6 text-center space-y-4">
-        <div id="dialog-icon-container" class="w-14 h-14 rounded-full mx-auto flex items-center justify-center"><i id="dialog-icon" class="text-xl"></i></div>
-        <div class="space-y-1"><h3 id="dialog-title" class="text-base font-bold text-white">Dialog</h3><p id="dialog-message" class="text-xs text-gray-400 whitespace-pre-line">Pesan</p></div>
-        <div id="dialog-input-container" class="hidden text-left mt-3">
-          <label id="dialog-input-label" class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Harga Jual</label>
-          <div class="relative"><span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-brand-green font-bold text-xs">Rp</span><input type="number" id="dialog-input-field" class="w-full bg-brand-black border border-brand-border rounded-xl py-2.5 pl-9 pr-4 text-xs font-bold text-white focus:border-brand-blue"></div>
-          <p id="dialog-input-error" class="text-[9px] text-rose-500 font-bold mt-1 hidden">✓ Harap masukkan nilai angka yang valid!</p>
-        </div>
-        <div class="flex items-center justify-center gap-2 pt-2">
-          <button id="dialog-cancel-btn" class="active-scale px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-xl text-xs font-semibold transition">Batal</button>
-          <button id="dialog-confirm-btn" class="active-scale px-4 py-2 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl text-xs font-bold transition">Konfirmasi</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CUSTOM TOAST NOTIFICATION -->
-  <div id="custom-toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-brand-card border border-brand-border px-4 py-3 rounded-xl shadow-2xl z-[10000] flex items-center gap-3 transition-all duration-300 translate-y-[-100px] opacity-0 pointer-events-none max-w-sm w-[90%]">
-    <div id="toast-icon-bg" class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"><i id="toast-icon"></i></div>
-    <div class="flex-grow"><p id="toast-title" class="text-xs font-bold text-white">Notif</p><p id="toast-desc" class="text-[10px] text-gray-400 mt-0.5">Deskripsi</p></div>
-    <button onclick="hideToast()" class="text-gray-500 hover:text-white transition"><i class="fa-solid fa-xmark text-xs"></i></button>
   </div>
 
   <script>
     // =====================================================================
-    // 1. SUPABASE CONFIGURATION - (KUNCI ANDA SUDAH DIPASANG)
+    // 1. SUPABASE CONFIGURATION (ASLI & AMAN)
     // =====================================================================
     (function() {
       const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
@@ -488,482 +503,462 @@
     })();
     const supabaseClient = window.supabaseClient;
 
-    // =====================================================================
-    // 2. STATE & VARIABLES
-    // =====================================================================
-    let appState = { 
-      ritase: [], absensi: [], pengeluaran: [], 
-      drivers: { "IKKI": { plate: "DW 8549 BN" }, "FAUZI": { plate: "DD 8554 HD" }, "ASO": { plate: "DD 8601 RN" } } 
-    };
+    // STATE & ROLE
+    let appState = { ritase: [], absensi: [], pengeluaran: [], drivers: { "IKKI": { plate: "DW 8549 BN" }, "FAUZI": { plate: "DD 8554 HD" }, "ASO": { plate: "DD 8601 RN" } } };
     let directSelectedPayment = "Cash";
-    let currentRole = localStorage.getItem('sansam_role') || null;
     let base64Photo = "";
     let base64ExpensePhoto = "";
+    let currentRole = localStorage.getItem('sansam_role') || null;
     let driverDistributionChart = null;
 
     // =====================================================================
-    // 3. DATABASE SYNC & API CALLS
+    // 2. PWA INSTALL LOGIC (Tombol Pasang di HP)
     // =====================================================================
-    async function loadSupabaseData() {
-      try {
-        const syncBadge = document.getElementById('sync-status');
-        if(syncBadge) {
-            syncBadge.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin"></i> SYNC...`;
-            syncBadge.className = "inline-flex items-center gap-1 text-[9px] bg-brand-blue/10 text-brand-blue border border-brand-blue/20 px-2 py-0.5 rounded-full font-bold";
-        }
+    let deferredPrompt;
 
-        const [ritaseRes, expRes, absRes] = await Promise.all([
-          supabaseClient.from('ritase').select('*').order('timestamp', { ascending: false }),
-          supabaseClient.from('pengeluaran').select('*').order('timestamp', { ascending: false }),
-          supabaseClient.from('absensi').select('*').order('timestamp', { ascending: false })
-        ]);
+    // Generate Dynamic Manifest for Android/Chrome
+    const manifestData = {
+      "name": "CV SANSAM GROUP",
+      "short_name": "SansamFleet",
+      "start_url": ".",
+      "display": "standalone",
+      "background_color": "#07080B",
+      "theme_color": "#07080B",
+      "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/664/664468.png", "sizes": "512x512", "type": "image/png"}]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+    document.getElementById('manifest-placeholder').href = URL.createObjectURL(manifestBlob);
 
-        if (ritaseRes.error) throw ritaseRes.error;
+    // Listen to install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = document.getElementById('pwa-install-btn');
+      if(installBtn) installBtn.classList.remove('hidden');
+    });
 
-        appState.ritase = ritaseRes.data || [];
-        appState.pengeluaran = expRes.data || [];
-        appState.absensi = absRes.data || [];
-
-        refreshAllUI();
-        
-        if(syncBadge) {
-            syncBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-brand-green pulsing-green-dot"></span> ONLINE`;
-            syncBadge.className = "inline-flex items-center gap-1 text-[9px] bg-brand-green/10 text-brand-green border border-brand-green/20 px-2 py-0.5 rounded-full font-bold";
-        }
-      } catch (err) {
-        console.error("Supabase Load Error:", err);
-        const syncBadge = document.getElementById('sync-status');
-        if(syncBadge) {
-            syncBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ERROR`;
-            syncBadge.className = "inline-flex items-center gap-1 text-[9px] bg-rose-500/10 text-rose-500 border border-rose-500/20 px-2 py-0.5 rounded-full font-bold";
-        }
-        showToast('Koneksi Gagal', 'Data di layar mungkin tidak sinkron dengan server.', 'error');
+    document.getElementById('pwa-install-btn')?.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') { console.log('Aplikasi mulai dipasang.'); }
+        deferredPrompt = null;
+        document.getElementById('pwa-install-btn').classList.add('hidden');
       }
+    });
+
+
+    // =====================================================================
+    // 3. FUNGSI GAMBAR, KOMPRESI & SUPABASE
+    // =====================================================================
+    function resizeImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width, height = img.height;
+          const MAX_WIDTH = 800; 
+          if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          callback(canvas.toDataURL('image/jpeg', 0.6));
+        }
+        img.src = e.target.result;
+      }
+      reader.readAsDataURL(file);
     }
 
-    function setupRealtimeSync() {
-      supabaseClient.channel('public-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'ritase' }, () => { loadSupabaseData(); })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'pengeluaran' }, () => { loadSupabaseData(); })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'absensi' }, () => { loadSupabaseData(); })
-        .subscribe();
+    function processDirectPhoto(event) {
+      const file = event.target.files[0]; if (!file) return;
+      resizeImage(file, function(res) {
+        base64Photo = res;
+        document.getElementById('direct-upload-placeholder').classList.add('hidden');
+        document.getElementById('direct-photo-preview-container').classList.remove('hidden');
+        document.getElementById('direct-processed-photo-preview').src = res;
+      });
+    }
+
+    function processExpensePhoto(event) {
+      const file = event.target.files[0]; if (!file) return;
+      resizeImage(file, function(res) {
+        base64ExpensePhoto = res;
+        document.getElementById('exp-upload-placeholder').classList.add('hidden');
+        document.getElementById('exp-photo-preview-container').classList.remove('hidden');
+        document.getElementById('exp-processed-photo-preview').src = res;
+      });
     }
 
     async function insertToDB(table, record) {
       try {
         const { error } = await supabaseClient.from(table).insert([record]);
-        if (error) { showToast('Gagal Disimpan', `Ditolak Server: ${error.message}`, 'error'); return false; }
-        return true;
-      } catch (err) { showToast('Koneksi Gagal', 'Jaringan terputus dari server.', 'error'); return false; }
+        if (error) {
+          showToast('Gagal Menyimpan', `Supabase menolak data. Pesan: ${error.message}`, 'error');
+          return false;
+        }
+        return true; 
+      } catch (err) {
+        showToast('Koneksi Gagal', 'Tidak terhubung server.', 'error');
+        return false;
+      }
     }
 
     async function updateDB(table, id, updates) {
-      try {
-        const { error } = await supabaseClient.from(table).update(updates).eq('id', id);
-        if(error) showToast('Gagal Update', error.message, 'error');
-      } catch (err) { console.error(err); }
+      await supabaseClient.from(table).update(updates).eq('id', id);
     }
-
-    async function deleteFromDB(table, id) {
-      try {
-        const { error } = await supabaseClient.from(table).delete().eq('id', id);
-        if(error) showToast('Gagal Hapus', error.message, 'error');
-      } catch (err) { console.error(err); }
-    }
-
+    
     // =====================================================================
-    // 4. SUBMIT FORM HANDLERS
+    // 4. SUBMIT FORM & SINKRONISASI 
     // =====================================================================
     async function handleDirectSubmit(e) {
       e.preventDefault();
       const driverStr = document.querySelector('input[name="direct_driver"]:checked')?.value;
-      if (!driverStr) return showToast('Error', 'Pilih Driver & Unit', 'error');
+      if (!driverStr) return showToast('Error', 'Pilih Driver', 'error');
       
       const [name, plate] = driverStr.split('|');
       const rute = document.getElementById('direct-rute').value;
       const muatan = document.getElementById('direct-muatan').value;
       let nominal = parseFloat(document.getElementById('direct-nominal').value) || 0;
 
-      if (!directSelectedPayment) return showToast('Error', 'Pilih Metode Bayar', 'error');
       let defaultStatus = directSelectedPayment === "Transfer" ? "Sudah Disetor" : (directSelectedPayment === "Bon" ? "Piutang" : "Belum Disetor");
 
       const newRecord = {
-        id: "r-" + Date.now(), timestamp: new Date().toLocaleString('id-ID', { hour12: false }).replace(',', ''),
+        id: "r-" + Date.now(), timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
         driver: name, plate: plate, rute: rute, muatan: muatan, nominal: nominal,
         payment: directSelectedPayment, status: defaultStatus, photo: base64Photo || ""
       };
 
-      // Optimistic UI update
-      appState.ritase.unshift(newRecord);
-      refreshAllUI();
-      document.getElementById('direct-ritase-form').reset();
-      resetPhotoUI();
-      showToast('Memproses', 'Mengirim data ke server...', 'success');
-      switchTab('dashboard');
+      showLoader(true);
+      const isSuccess = await insertToDB('ritase', newRecord);
+      showLoader(false);
 
-      await insertToDB('ritase', newRecord);
+      if (isSuccess) {
+        appState.ritase.unshift(newRecord); refreshAllUI();
+        document.getElementById('direct-ritase-form').reset();
+        base64Photo = "";
+        document.getElementById('direct-photo-preview-container').classList.add('hidden');
+        document.getElementById('direct-upload-placeholder').classList.remove('hidden');
+        showToast('Sukses', 'Data ritase terkirim ke server pusat!', 'success');
+        switchTab('dashboard');
+      }
     }
 
     async function handleExpenseSubmit(e) {
       e.preventDefault();
       const source = document.querySelector('input[name="exp_source"]:checked')?.value;
       const category = document.getElementById('exp-category').value;
-      let recipient = category === "Transfer Kas" ? document.getElementById('exp-recipient-driver').value : document.getElementById('exp-recipient').value;
       const nominal = parseFloat(document.getElementById('exp-nominal').value) || 0;
-      const note = document.getElementById('exp-note').value;
+      
+      let recipient = "";
+      if (category === "Transfer Kas") {
+        recipient = document.getElementById('exp-recipient-driver').value;
+        if(source === recipient) return showToast('Error','Pemberi & Penerima Kas tidak boleh sama','error');
+      } else {
+        recipient = document.getElementById('exp-recipient').value;
+      }
 
-      if(!source || !category || !recipient || nominal <= 0) return showToast('Error','Lengkapi data form','error');
+      if(!source || !category || !recipient || nominal <= 0) return showToast('Error','Lengkapi data','error');
 
       const newExp = {
-        id: "exp-" + Date.now(), timestamp: new Date().toLocaleString('id-ID', { hour12: false }).replace(',', ''),
-        source: source, category: category, recipient: recipient, nominal: nominal, note: note, photo: base64ExpensePhoto || "", status: "Active"
+        id: "exp-" + Date.now(), timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
+        source: source, category: category, recipient: recipient, nominal: nominal, note: "", status: "Active", photo: base64ExpensePhoto || ""
       };
 
-      appState.pengeluaran.unshift(newExp);
-      refreshAllUI();
-      document.getElementById('driver-expense-form').reset();
-      resetPhotoUI();
-      showToast('Sukses', 'Pengeluaran/Panjar dicatat!', 'success');
-      switchTab('dashboard');
+      showLoader(true);
+      const isSuccess = await insertToDB('pengeluaran', newExp);
+      showLoader(false);
 
-      await insertToDB('pengeluaran', newExp);
+      if (isSuccess) {
+        appState.pengeluaran.unshift(newExp); refreshAllUI();
+        document.getElementById('driver-expense-form').reset();
+        base64ExpensePhoto = "";
+        document.getElementById('exp-photo-preview-container').classList.add('hidden');
+        document.getElementById('exp-upload-placeholder').classList.remove('hidden');
+        showToast('Sukses', 'Pengeluaran/Transfer berhasil dicatat server.', 'success');
+        switchTab('dashboard');
+      }
     }
 
     async function handleAttendanceSubmit(e) {
       e.preventDefault();
       const name = document.getElementById('absensi-driver-select').value;
-      const conditionRadio = document.querySelector('input[name="absensi_tipe"]:checked');
-      if(!name || !conditionRadio) return showToast('Error', 'Lengkapi absensi', 'error');
+      const condition = document.querySelector('input[name="absensi_tipe"]:checked')?.value;
+      const uangJalan = parseFloat(document.getElementById('absensi-uang-jalan').value) || 0;
 
-      const newAbsen = { id: "abs-" + Date.now(), timestamp: new Date().toLocaleString('id-ID'), name: name, tipe: conditionRadio.value, uangJalan: 0, status: "Active" };
-      appState.absensi.unshift(newAbsen);
-      refreshAllUI();
-      showToast('Sukses', `Kehadiran ${name} dicatat`, 'success');
+      if (!name || !condition) return showToast('Error', 'Pilih Driver & Status', 'error');
 
-      await insertToDB('absensi', newAbsen);
+      const newAbsen = {
+        id: "abs-" + Date.now(), timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
+        name: name, tipe: condition, uangJalan: uangJalan, status: "Active"
+      };
+
+      showLoader(true);
+      const isSuccess = await insertToDB('absensi', newAbsen);
+      showLoader(false);
+
+      if (isSuccess) {
+        appState.absensi.unshift(newAbsen); refreshAllUI();
+        document.getElementById('attendance-form').reset();
+        showToast('Absensi Tersimpan', `Uang jalan Rp ${uangJalan.toLocaleString('id-ID')} & Kehadiran ${name} sukses.`, 'success');
+      }
     }
 
     // =====================================================================
-    // 5. UPDATE TAMPILAN (UI) LENGKAP
-    // =====================================================================
-    function refreshAllUI() {
-      updateMetrics(); renderDashboardActivities(); renderRekapTable(); renderExpenseTable();
-      renderAbsensi(); renderDriverStatusList(); renderPanjarRecap(); updateCharts(); showSourceCashInHand('IKKI');
-    }
-
-    function updateMetrics() {
-      let total = 0, tf = 0, bon = 0, totalPanjar = 0;
-      appState.ritase.forEach(i => {
-        total += i.nominal;
-        if(i.payment === "Transfer" || i.status === "Sudah Disetor") tf += i.nominal;
-        if(i.payment === "Bon") bon += i.nominal;
-      });
-      appState.pengeluaran.forEach(e => {
-        if(e.category === "Panjar Driver" && (e.status === undefined || e.status === "Active")) totalPanjar += e.nominal;
-      });
-      let cashInHand = getDriverCashInHand("IKKI") + getDriverCashInHand("FAUZI") + getDriverCashInHand("ASO");
-
-      document.getElementById('metric-total-omzet').innerText = "Rp " + total.toLocaleString('id-ID');
-      document.getElementById('metric-tf-masuk').innerText = "Rp " + tf.toLocaleString('id-ID');
-      document.getElementById('metric-bon-total').innerText = "Rp " + bon.toLocaleString('id-ID');
-      document.getElementById('metric-total-panjar').innerText = "Rp " + totalPanjar.toLocaleString('id-ID');
-      document.getElementById('metric-cash-driver').innerText = "Rp " + Math.max(0, cashInHand).toLocaleString('id-ID');
-    }
-
-    function renderRekapTable() {
-      const b = document.getElementById('rekap-table-body'); b.innerHTML = "";
-      if(appState.ritase.length === 0) return b.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-gray-500">Kosong</td></tr>`;
-      appState.ritase.forEach(item => {
-        let badgeColor = item.status === "Sudah Disetor" ? "bg-emerald-500/10 text-brand-green border-brand-green/30" : (item.status === "Piutang" ? "bg-rose-500/10 text-rose-500 border-rose-500/30" : "bg-amber-500/10 text-amber-500 border-amber-500/30");
-        let actionBtn = "";
-        if (item.status === "Belum Disetor" && item.payment === "Cash") {
-          actionBtn = `<button onclick="approveDeposit('${item.id}')" title="Terima Setoran" class="active-scale bg-brand-green/10 text-brand-green px-2.5 py-1.5 rounded text-[10px] font-bold border border-brand-green/30">Setor</button>`;
-        } else if (item.status === "Piutang" || item.nominal === 0) {
-          actionBtn = `<button onclick="settlePriceAndPay('${item.id}')" title="Atur Harga" class="active-scale bg-brand-blue/10 text-brand-blue px-2.5 py-1.5 rounded text-[10px] font-bold border border-brand-blue/30">Atur Harga</button>`;
-        }
-        b.innerHTML += `
-          <tr class="hover:bg-brand-card/30 border-b border-brand-border/40">
-            <td class="p-4 text-[11px]">${item.timestamp}</td><td class="p-4 font-bold text-white">${item.driver}</td><td class="p-4">${item.rute}</td><td class="p-4">${item.muatan}</td><td class="p-4 text-right font-bold">Rp ${item.nominal.toLocaleString()}</td>
-            <td class="p-4 text-center"><span class="px-2 py-0.5 bg-zinc-900 border border-brand-border text-[10px] rounded">${item.payment}</span></td>
-            <td class="p-4 text-center"><span class="text-[9px] px-2 py-0.5 rounded font-extrabold border ${badgeColor}">${item.status}</span></td>
-            <td class="p-4 text-center"><button onclick="viewPhoto('${item.photo}')" class="text-brand-blue"><i class="fa-solid fa-image-portrait"></i></button></td>
-            <td class="p-4 text-right"><div class="flex items-center justify-end gap-1.5">${actionBtn}<button onclick="deleteFromDB('ritase', '${item.id}'); appState.ritase = appState.ritase.filter(x=>x.id!=='${item.id}'); refreshAllUI();" class="text-rose-500 p-1.5"><i class="fa-solid fa-trash-can"></i></button></div></td>
-          </tr>`;
-      });
-    }
-
-    function renderExpenseTable() {
-      const b = document.getElementById('expense-table-body'); b.innerHTML = "";
-      if(appState.pengeluaran.length === 0) return b.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">Kosong</td></tr>`;
-      appState.pengeluaran.forEach(item => {
-        b.innerHTML += `
-          <tr class="border-b border-brand-border/40">
-            <td class="p-4 text-[11px]">${item.timestamp}</td><td class="p-4 font-bold text-white">${item.source}</td><td class="p-4 text-amber-500 text-[10px]">${item.category}</td><td class="p-4">${item.recipient}</td>
-            <td class="p-4 text-right font-bold text-rose-500">Rp ${item.nominal.toLocaleString()}</td><td class="p-4 text-gray-400">${item.note||'-'}</td>
-            <td class="p-4 text-center"><button onclick="viewPhoto('${item.photo}')" class="text-brand-blue"><i class="fa-solid fa-receipt"></i></button></td>
-            <td class="p-4 text-right"><button onclick="deleteFromDB('pengeluaran', '${item.id}'); appState.pengeluaran = appState.pengeluaran.filter(x=>x.id!=='${item.id}'); refreshAllUI();" class="text-rose-500 p-1.5"><i class="fa-solid fa-trash-can"></i></button></td>
-          </tr>`;
-      });
-    }
-
-    function renderPanjarRecap() {
-      const cards = document.getElementById('panjar-driver-summary-cards'); const b = document.getElementById('panjar-table-body');
-      if(!cards || !b) return; cards.innerHTML = ""; b.innerHTML = "";
-      ["IKKI", "FAUZI", "ASO"].forEach(name => {
-        const total = getDriverPanjarTotal(name); const hand = getDriverCashInHand(name);
-        cards.innerHTML += `<div class="bg-brand-black border border-brand-border p-4 rounded-xl">
-          <div class="flex items-center gap-2 mb-2"><div class="w-8 h-8 rounded bg-sky-500/10 flex items-center justify-center text-sky-400 font-bold">${name.substring(0,2)}</div><h4 class="font-bold text-white">${name}</h4></div>
-          <div><span class="text-[9px] text-gray-500 block">Total Panjar Aktif</span><span class="text-sm font-black text-sky-400">Rp ${total.toLocaleString()}</span></div>
-          <div class="mt-2 text-[10px] border-t border-brand-border pt-2"><span class="text-gray-400">Kas di Driver: </span><span class="text-white font-bold">Rp ${hand.toLocaleString()}</span></div>
-        </div>`;
-      });
-      appState.pengeluaran.filter(e => e.category === "Panjar Driver").forEach(item => {
-        const isActive = (item.status === undefined || item.status === "Active");
-        const statusBadge = isActive ? `<span class="bg-sky-500/10 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded text-[9px]">Belum Settle</span>` : `<span class="bg-zinc-800 text-gray-500 px-2 py-0.5 rounded text-[9px]">Selesai</span>`;
-        const actionBtn = isActive ? `<button onclick="settleSinglePanjar('${item.id}')" class="bg-sky-500/10 text-sky-400 px-2 py-1 rounded text-[9px] font-bold">Potong Panjar</button>` : `<span class="text-[9px] text-zinc-600">Selesai ✓</span>`;
-        b.innerHTML += `<tr class="border-b border-brand-border/40"><td class="p-3 text-[11px]">${item.timestamp}</td><td class="p-3 font-bold">${item.source}</td><td class="p-3 font-bold text-sky-400">Rp ${item.nominal.toLocaleString()}</td><td class="p-3">${item.note||'-'}</td><td class="p-3 text-center">${statusBadge}</td><td class="p-3 text-right">${actionBtn}</td></tr>`;
-      });
-    }
-
-    function renderDriverStatusList() {
-      const c = document.getElementById('driver-status-list'); c.innerHTML = "";
-      ["IKKI", "FAUZI", "ASO"].forEach(name => {
-        const cashHand = getDriverCashInHand(name);
-        c.innerHTML += `<div class="p-4 rounded-xl bg-brand-black border border-brand-border space-y-2">
-          <div class="flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded bg-brand-blue/10 text-brand-blue flex items-center justify-center font-bold">${name.substring(0,2)}</div><h5 class="text-sm font-bold text-white">${name}</h5></div></div>
-          <div class="flex items-center justify-between pt-2 border-t border-brand-border/40">
-            <div><span class="text-[9px] text-gray-500 block">Cash Di Tangan</span><span class="text-xs font-extrabold ${cashHand>0?'text-amber-500':'text-gray-400'}">Rp ${cashHand.toLocaleString()}</span></div>
-            ${cashHand>0 ? `<button onclick="settleDriverWallet('${name}')" class="bg-brand-green/10 text-brand-green border border-brand-green/30 px-2.5 py-1 rounded-[10px] text-[10px] font-extrabold">Setor Kasir</button>` : `<span class="text-[9px] text-zinc-600">Kas 0</span>`}
-          </div></div>`;
-      });
-    }
-
-    function renderDashboardActivities() {
-      const c = document.getElementById('dashboard-recent-activities'); c.innerHTML = "";
-      appState.ritase.slice(0, 5).forEach(item => {
-        let badgeColor = item.status === "Sudah Disetor" ? "bg-emerald-500/10 text-brand-green" : "bg-amber-500/10 text-amber-500";
-        c.innerHTML += `<div class="flex justify-between p-3 bg-brand-black border border-brand-border rounded-xl mb-2"><div><h5 class="text-xs font-bold text-white">${item.driver} - <span class="text-gray-400">${item.rute}</span></h5><p class="text-[10px] text-gray-500">${item.timestamp}</p></div><div class="text-right"><span class="text-xs font-bold text-white">Rp ${item.nominal.toLocaleString()}</span><span class="block text-[9px] font-extrabold px-1 rounded mt-1 ${badgeColor}">${item.payment}</span></div></div>`;
-      });
-    }
-    
-    function renderAbsensi() {
-      const b = document.getElementById('absensi-table-body'); b.innerHTML = "";
-      appState.absensi.forEach(i => {
-        b.innerHTML += `<tr><td class="p-3 text-[11px]">${i.timestamp}</td><td class="p-3 font-bold">${i.name}</td><td class="p-3 text-[10px] text-brand-green">${i.tipe}</td></tr>`;
-      });
-    }
-
-    // =====================================================================
-    // 6. UTILITIES (CALCULATIONS, ADMIN SETTLEMENTS, DIALOGS)
+    // 5. RENDERING, KAS LOGIC & UI HELPER 
     // =====================================================================
     function getDriverCashInHand(driverName) {
       let cash = 0;
       appState.ritase.forEach(i => { if (i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor") cash += i.nominal; });
       appState.pengeluaran.forEach(e => {
-        if((e.status === undefined || e.status === "Active")) {
-          if (e.source === driverName) cash -= e.nominal;
-          if (e.category === "Transfer Kas" && e.recipient === driverName) cash += e.nominal;
-        }
+        const isActive = (e.status === undefined || e.status === "Active");
+        if (e.source === driverName && isActive) cash -= e.nominal;
+        if (e.category === "Transfer Kas" && e.recipient === driverName && isActive) cash += e.nominal;
       });
       return cash;
     }
-
-    function getDriverPanjarTotal(driverName) {
-      let total = 0;
-      appState.pengeluaran.forEach(e => { if (e.source === driverName && e.category === "Panjar Driver" && (e.status === undefined || e.status === "Active")) total += e.nominal; });
-      return total;
-    }
-
-    function updateAllSourcesCashLabels() {
-      ["IKKI", "FAUZI", "ASO"].forEach(n => {
-        const el = document.getElementById(`cash-hand-${n}`);
-        if(el) el.innerText = "Rp " + getDriverCashInHand(n).toLocaleString('id-ID');
-      });
-    }
-    function showSourceCashInHand() { updateAllSourcesCashLabels(); }
-
-    function settleDriverWallet(name) {
-      if(currentRole === 'DRIVER') return showToast('Akses Ditolak', 'Hanya Admin', 'error');
-      const cash = getDriverCashInHand(name); if(cash <= 0) return;
-      showCustomDialog({
-        title: `Konfirmasi Setor Kas - ${name}`, message: `Terima setoran uang fisik sebesar Rp ${cash.toLocaleString('id-ID')}?`,
-        confirmText: 'Ya, Terima', cancelText: 'Batal', type: 'success',
-        onConfirm: async () => {
-          appState.ritase.forEach(i => { if (i.driver === name && i.payment === "Cash" && i.status === "Belum Disetor") { i.status = "Sudah Disetor"; updateDB('ritase', i.id, {status: "Sudah Disetor"}); }});
-          appState.pengeluaran.forEach(e => { if ((e.source === name || (e.category === "Transfer Kas" && e.recipient === name)) && (e.status === undefined || e.status === "Active")) { e.status = "Settled"; updateDB('pengeluaran', e.id, {status: "Settled"}); }});
-          refreshAllUI(); showToast('Selesai', `Kas ${name} disetor.`, 'success');
-        }
+    
+    function showSourceCashInHand() {
+      ["IKKI", "FAUZI", "ASO"].forEach(name => {
+        const el = document.getElementById(`cash-hand-${name}`);
+        if(el) el.innerText = "Rp " + getDriverCashInHand(name).toLocaleString('id-ID');
       });
     }
 
-    function approveDeposit(id) {
-      showCustomDialog({ title: 'Terima Setoran?', message: 'Konfirmasi kas disetor ke admin.', confirmText: 'Terima', cancelText: 'Batal', type: 'info',
-        onConfirm: async () => { 
-          const i = appState.ritase.find(x=>x.id===id); if(i){ i.status = "Sudah Disetor"; refreshAllUI(); await updateDB('ritase', id, {status: "Sudah Disetor"}); showToast('Sukses', 'Setoran diterima', 'success');}
-        }
+    function refreshAllUI() {
+      updateMetrics(); renderDashboardActivities(); renderRekapTable(); renderExpenseTable();
+      renderPanjarRecap(); renderDriverStatusList(); renderAbsensi(); showSourceCashInHand(); updateCharts();
+    }
+
+    function updateMetrics() {
+      let totalOmzet = 0, tfMasuk = 0, bonTotal = 0, totalPanjar = 0;
+      appState.ritase.forEach(i => {
+        totalOmzet += i.nominal;
+        if (i.payment === "Transfer" || (i.payment === "Cash" && i.status === "Sudah Disetor")) tfMasuk += i.nominal;
+        else if (i.payment === "Bon") bonTotal += i.nominal;
+      });
+      appState.pengeluaran.forEach(e => {
+        if (e.category === "Panjar Driver" && (e.status === undefined || e.status === "Active") && e.source !== "KASIR") totalPanjar += e.nominal;
+      });
+      let cashSisa = Math.max(0, getDriverCashInHand("IKKI") + getDriverCashInHand("FAUZI") + getDriverCashInHand("ASO"));
+      
+      const rp = v => "Rp " + v.toLocaleString('id-ID');
+      document.getElementById('metric-total-omzet').innerText = rp(totalOmzet);
+      document.getElementById('metric-cash-driver').innerText = rp(cashSisa);
+      document.getElementById('metric-total-panjar').innerText = rp(totalPanjar);
+      document.getElementById('metric-tf-masuk').innerText = rp(tfMasuk);
+      document.getElementById('metric-bon-total').innerText = rp(bonTotal);
+    }
+
+    function renderDashboardActivities() {
+      const c = document.getElementById('dashboard-recent-activities'); c.innerHTML = "";
+      appState.ritase.slice(0, 5).forEach(i => {
+        c.innerHTML += `<div class="p-3 border-b border-brand-border bg-brand-black rounded-lg mb-2"><span class="text-xs font-bold text-white">${i.driver} (${i.rute})</span> - <span class="text-brand-green font-bold text-[10px]">Rp ${i.nominal.toLocaleString('id-ID')}</span></div>`;
       });
     }
 
-    function settlePriceAndPay(id) {
-      showCustomDialog({ title: 'Atur Harga', message: 'Masukkan harga riil pengiriman ini', showInput: true, inputVal: 0, confirmText: 'Lunas', cancelText: 'Batal', type: 'info',
-        onConfirm: async (val) => { 
-          const i = appState.ritase.find(x=>x.id===id); if(i){ i.nominal = val; i.status = "Sudah Disetor"; refreshAllUI(); await updateDB('ritase', id, {nominal: val, status: "Sudah Disetor"}); showToast('Sukses', 'Harga diupdate', 'success');}
-        }
+    function renderRekapTable() {
+      const b = document.getElementById('rekap-table-body'); b.innerHTML = "";
+      appState.ritase.forEach(i => {
+        let badgeColor = i.status === "Sudah Disetor" ? "text-brand-green" : (i.status === "Piutang" ? "text-rose-500" : "text-amber-500");
+        let btn = (i.status === "Belum Disetor" && i.payment === "Cash") ? `<button onclick="approveDeposit('${i.id}')" class="bg-brand-green/20 text-brand-green px-2 py-1 rounded text-[10px] font-bold">Terima Setoran</button>` : `<span class="text-[10px] text-gray-500">Selesai</span>`;
+        if(i.status === "Piutang" || i.nominal === 0) btn = `<button onclick="settlePriceAndPay('${i.id}')" class="bg-brand-blue/20 text-brand-blue px-2 py-1 rounded text-[10px] font-bold">Atur Lunas</button>`;
+        
+        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${i.timestamp}</td><td class="p-3 font-bold">${i.driver}</td><td class="p-3">${i.rute}</td><td class="p-3">${i.muatan}</td><td class="p-3 text-right font-bold text-white">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center">${i.payment}</td><td class="p-3 text-center ${badgeColor} font-bold text-[10px]">${i.status}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${i.photo}')"><i class="fa-solid fa-image"></i></td><td class="p-3 text-right">${btn}</td></tr>`;
       });
     }
 
-    function settleSinglePanjar(id) {
-      showCustomDialog({ title: 'Potong Panjar?', message: 'Selesaikan transaksi panjar ini?', confirmText: 'Ya', cancelText: 'Batal', type: 'success',
-        onConfirm: async () => { 
-          const e = appState.pengeluaran.find(x=>x.id===id); if(e){ e.status = "Settled"; refreshAllUI(); await updateDB('pengeluaran', id, {status: "Settled"}); showToast('Sukses', 'Panjar dipotong', 'success');}
-        }
+    function renderExpenseTable() {
+      const b = document.getElementById('expense-table-body'); b.innerHTML = "";
+      appState.pengeluaran.forEach(e => {
+        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${e.timestamp}</td><td class="p-3 font-bold text-amber-500">${e.source}</td><td class="p-3">${e.category}</td><td class="p-3">${e.recipient}</td><td class="p-3 text-right font-bold text-rose-500">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${e.photo}')"><i class="fa-solid fa-receipt"></i></td><td class="p-3 text-right text-gray-500 text-[10px]">Terekam</td></tr>`;
       });
     }
 
-    function showCustomDialog({ title, message, showInput=false, inputVal=0, confirmText, cancelText, type, onConfirm }) {
-      document.getElementById('dialog-title').innerText = title; document.getElementById('dialog-message').innerText = message;
-      document.getElementById('dialog-icon').className = type === 'success' ? "fa-solid fa-check text-brand-green text-2xl" : "fa-solid fa-info text-brand-blue text-2xl";
-      document.getElementById('dialog-icon-container').className = type === 'success' ? "w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-brand-green/10" : "w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-brand-blue/10";
-      document.getElementById('dialog-input-container').classList.toggle('hidden', !showInput);
-      document.getElementById('dialog-input-field').value = inputVal;
-      document.getElementById('custom-dialog-modal').classList.remove('hidden');
-      document.getElementById('dialog-confirm-btn').onclick = () => {
-        if(showInput) { const val = parseFloat(document.getElementById('dialog-input-field').value); if(!val || val<=0) return; onConfirm(val); } else onConfirm();
-        document.getElementById('custom-dialog-modal').classList.add('hidden');
-      };
-      document.getElementById('dialog-cancel-btn').onclick = () => document.getElementById('custom-dialog-modal').classList.add('hidden');
+    function renderPanjarRecap() {
+      const cards = document.getElementById('panjar-driver-summary-cards'); cards.innerHTML = "";
+      ["IKKI", "FAUZI", "ASO"].forEach(name => {
+        let totalPanjar = 0;
+        appState.pengeluaran.forEach(e => { if(e.source === name && e.category === "Panjar Driver" && (e.status === undefined || e.status === "Active")) totalPanjar += e.nominal; });
+        cards.innerHTML += `<div class="p-4 bg-brand-black border border-brand-border rounded-xl"> <h4 class="font-bold text-white">${name}</h4> <p class="text-[9px] text-gray-500 mb-1">Panjar Aktif:</p> <span class="text-sky-400 font-bold text-lg">Rp ${totalPanjar.toLocaleString('id-ID')}</span></div>`;
+      });
+
+      const b = document.getElementById('panjar-table-body'); b.innerHTML = "";
+      appState.pengeluaran.filter(e => e.category === "Panjar Driver").forEach(e => {
+        let status = (e.status === undefined || e.status === "Active") ? "Aktif" : "Selesai";
+        let btn = status === "Aktif" ? `<button onclick="settleSinglePanjar('${e.id}')" class="bg-sky-500/20 text-sky-400 px-2 py-1 rounded text-[10px] font-bold">Potong Panjar</button>` : `<span class="text-gray-500 text-[10px]">Settled</span>`;
+        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3">${e.timestamp}</td><td class="p-3 font-bold">${e.source}</td><td class="p-3 text-sky-400 font-bold">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center text-[10px] font-bold">${status}</td><td class="p-3 text-right">${btn}</td></tr>`;
+      });
     }
 
+    function renderDriverStatusList() {
+      const b = document.getElementById('driver-status-list'); b.innerHTML = "";
+      ["IKKI", "FAUZI", "ASO"].forEach(name => {
+        const cashHand = getDriverCashInHand(name);
+        b.innerHTML += `<div class="p-3 border border-brand-border rounded-xl bg-brand-black mb-2 flex justify-between items-center"><div class="font-bold text-sm text-white">${name} <span class="block text-[9px] text-brand-green">Aktif Radar</span></div> <div class="text-right"><span class="text-[9px] text-gray-400 block">Uang Kas Fisik</span><span class="text-amber-500 font-bold text-sm animate-pulse">Rp ${cashHand.toLocaleString('id-ID')}</span></div></div>`;
+      });
+    }
+
+    function renderAbsensi() {
+      const b = document.getElementById('absensi-table-body');
+      if(!b) return;
+      b.innerHTML = "";
+      appState.absensi.forEach(i => {
+        let uangText = i.uangJalan > 0 ? `Rp ${i.uangJalan.toLocaleString('id-ID')}` : "-";
+        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card/30"><td class="p-3 text-[11px]">${i.timestamp}</td><td class="p-3 font-bold text-white">${i.name}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-brand-border">${i.tipe}</span></td><td class="p-3 text-right font-bold text-brand-green">${uangText}</td></tr>`;
+      });
+    }
+
+    // Aksi Setoran & Potongan Panjar (Admin)
+    async function approveDeposit(id) {
+      const item = appState.ritase.find(x => x.id === id); if(!item) return;
+      item.status = "Sudah Disetor"; refreshAllUI();
+      await updateDB('ritase', id, {status: "Sudah Disetor"});
+      showToast('Setoran Sukses', 'Kas fisik telah diterima oleh admin/kasir', 'success');
+    }
+
+    async function settlePriceAndPay(id) {
+      const item = appState.ritase.find(x => x.id === id); if(!item) return;
+      let newNominal = prompt("Masukkan Nominal Harga Lunas (Rp):", item.nominal);
+      if(newNominal && !isNaN(newNominal)) {
+        item.nominal = parseFloat(newNominal); item.status = "Sudah Disetor"; refreshAllUI();
+        await updateDB('ritase', id, {nominal: item.nominal, status: "Sudah Disetor"});
+        showToast('Sukses', 'Harga diatur dan dilunasi', 'success');
+      }
+    }
+
+    async function settleSinglePanjar(id) {
+      const item = appState.pengeluaran.find(x => x.id === id); if(!item) return;
+      item.status = "Settled"; refreshAllUI();
+      await updateDB('pengeluaran', id, {status: "Settled"});
+      showToast('Potongan Berhasil', `Panjar ${item.source} telah dipotong.`, 'success');
+    }
+
+    // Modal, Export & UX Tools
     function showToast(title, desc, type='success') {
       document.getElementById('toast-title').innerText = title; document.getElementById('toast-desc').innerText = desc;
-      document.getElementById('toast-icon').className = type==='error'?"fa-solid fa-xmark":"fa-solid fa-check";
-      document.getElementById('toast-icon-bg').className = type==='error'?"w-8 h-8 rounded bg-rose-500/10 text-rose-500 flex items-center justify-center flex-shrink-0":"w-8 h-8 rounded bg-brand-green/10 text-brand-green flex items-center justify-center flex-shrink-0";
-      const t = document.getElementById('custom-toast'); t.classList.remove('translate-y-[-100px]', 'opacity-0');
-      setTimeout(() => t.classList.add('translate-y-[-100px]', 'opacity-0'), 4000);
-    }
-    function hideToast() { document.getElementById('custom-toast').classList.add('translate-y-[-100px]', 'opacity-0'); }
-
-    // =====================================================================
-    // 7. PHOTO COMPRESSION & VIEWING
-    // =====================================================================
-    function resizeImage(file, callback) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image(); img.onload = function() {
-          const canvas = document.createElement('canvas'); let w = img.width, h = img.height;
-          if (w > 800) { h = Math.round((h * 800) / w); w = 800; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          callback(canvas.toDataURL('image/jpeg', 0.6));
-        }; img.src = e.target.result;
-      }; reader.readAsDataURL(file);
+      const icon = document.getElementById('toast-icon');
+      icon.className = type === 'error' ? "fa-solid fa-xmark text-rose-500" : "fa-solid fa-check text-brand-green";
+      const t = document.getElementById('custom-toast');
+      t.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => t.classList.add('translate-y-[-100px]', 'opacity-0', 'pointer-events-none'), 3000);
     }
 
-    function processDirectPhoto(e) { if(e.target.files[0]) resizeImage(e.target.files[0], b => { base64Photo = b; document.getElementById('direct-upload-placeholder').classList.add('hidden'); document.getElementById('direct-photo-preview-container').classList.remove('hidden'); document.getElementById('direct-processed-photo-preview').src = b; }); }
-    function processExpensePhoto(e) { if(e.target.files[0]) resizeImage(e.target.files[0], b => { base64ExpensePhoto = b; document.getElementById('exp-upload-placeholder').classList.add('hidden'); document.getElementById('exp-photo-preview-container').classList.remove('hidden'); document.getElementById('exp-processed-photo-preview').src = b; }); }
-    function resetPhotoUI() { 
-      base64Photo = ""; base64ExpensePhoto = ""; 
-      document.getElementById('direct-upload-placeholder').classList.remove('hidden'); document.getElementById('direct-photo-preview-container').classList.add('hidden');
-      document.getElementById('exp-upload-placeholder').classList.remove('hidden'); document.getElementById('exp-photo-preview-container').classList.add('hidden');
+    function viewPhoto(src) {
+      if(!src) return showToast('Info', 'Tidak ada foto dilampirkan', 'error');
+      document.getElementById('modal-image').src = src;
+      document.getElementById('photo-modal').classList.remove('hidden');
     }
-    function viewPhoto(src) { if(!src) return; document.getElementById('modal-image').src = src; document.getElementById('photo-modal').classList.remove('hidden'); }
     function closePhotoModal() { document.getElementById('photo-modal').classList.add('hidden'); }
 
-    // =====================================================================
-    // 8. TABS & UI HELPERS
-    // =====================================================================
     function switchTab(t) {
-      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden')); document.getElementById(`tab-content-${t}`).classList.remove('hidden');
-      document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('text-brand-blue', 'border-b-2', 'border-brand-blue', 'bg-brand-card/50'); btn.classList.add('text-gray-400'); });
-      const act = document.getElementById(`tab-btn-${t}`); if(act) act.classList.add('text-brand-blue', 'border-b-2', 'border-brand-blue', 'bg-brand-card/50');
-      document.querySelectorAll('.mobile-nav-btn').forEach(b => { b.classList.remove('text-brand-blue'); b.classList.add('text-gray-500'); });
-      const mob = document.querySelectorAll('.mobile-nav-btn');
-      if(t==='dashboard'&&mob[0]) mob[0].classList.add('text-brand-blue'); if(t==='input'&&mob[1]) mob[1].classList.add('text-brand-blue');
-      if(t==='rekap'&&mob[2]) mob[2].classList.add('text-brand-blue'); if(t==='absensi'&&mob[3]) mob[3].classList.add('text-brand-blue'); if(t==='tracking'&&mob[4]) mob[4].classList.add('text-brand-blue');
-      if(t==='dashboard'&&driverDistributionChart) driverDistributionChart.update();
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-content-${t}`).classList.remove('hidden');
+      if (t === 'dashboard' && driverDistributionChart) { setTimeout(()=>driverDistributionChart.update(), 100); }
     }
-
     function switchInputSubTab(s) {
-      document.getElementById('sub-tab-ritase').classList.toggle('hidden', s !== 'ritase'); document.getElementById('sub-tab-pengeluaran').classList.toggle('hidden', s === 'ritase');
-      document.getElementById('sub-input-btn-ritase').className = s==='ritase'?"flex-1 text-center py-2.5 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale":"flex-1 text-center py-2.5 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
-      document.getElementById('sub-input-btn-pengeluaran').className = s==='pengeluaran'?"flex-1 text-center py-2.5 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale":"flex-1 text-center py-2.5 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
-      if(s==='pengeluaran') showSourceCashInHand();
+      document.getElementById('sub-tab-ritase').classList.toggle('hidden', s !== 'ritase');
+      document.getElementById('sub-tab-pengeluaran').classList.toggle('hidden', s === 'ritase');
+    }
+    function switchRekapSubTab(s) {
+      document.getElementById('sub-tab-rekap-ritase').classList.toggle('hidden', s !== 'ritase');
+      document.getElementById('sub-tab-rekap-pengeluaran').classList.toggle('hidden', s !== 'pengeluaran');
+      document.getElementById('sub-tab-rekap-panjar').classList.toggle('hidden', s !== 'panjar');
     }
 
-    function switchRekapSubTab(s) {
-      document.getElementById('sub-tab-rekap-ritase').classList.toggle('hidden', s!=='ritase'); document.getElementById('sub-tab-rekap-pengeluaran').classList.toggle('hidden', s!=='pengeluaran'); document.getElementById('sub-tab-rekap-panjar').classList.toggle('hidden', s!=='panjar');
-      document.getElementById('sub-rekap-btn-ritase').className = s==='ritase'?"flex-1 text-center py-2.5 px-3 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale":"flex-1 text-center py-2.5 px-3 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
-      document.getElementById('sub-rekap-btn-pengeluaran').className = s==='pengeluaran'?"flex-1 text-center py-2.5 px-3 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale":"flex-1 text-center py-2.5 px-3 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
-      document.getElementById('sub-rekap-btn-panjar').className = s==='panjar'?"flex-1 text-center py-2.5 px-3 text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale":"flex-1 text-center py-2.5 px-3 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale";
+    function handleCategoryChange() {
+      const cat = document.getElementById('exp-category').value;
+      if (cat === "Transfer Kas") {
+        document.getElementById('recipient-text-wrapper').classList.add('hidden');
+        document.getElementById('recipient-driver-wrapper').classList.remove('hidden');
+      } else {
+        document.getElementById('recipient-text-wrapper').classList.remove('hidden');
+        document.getElementById('recipient-driver-wrapper').classList.add('hidden');
+      }
+    }
+
+    function setDirectPayment(m) {
+      directSelectedPayment = m;
+      document.getElementById('direct-selected-payment').value = m;
+      const inp = document.getElementById('direct-nominal');
+      if(m !== 'Cash' && currentRole === 'DRIVER') { inp.value = 0; inp.disabled = true; } 
+      else { inp.disabled = false; if(m === 'Cash') inp.setAttribute('required', 'true'); }
     }
 
     function quickFillMuatan(v) { document.getElementById('direct-muatan').value = v; }
     function quickFillRute(v) { document.getElementById('direct-rute').value = v; }
-    function setDirectPayment(m) {
-      directSelectedPayment = m; document.getElementById('direct-selected-payment').value = m;
-      document.querySelectorAll('.pay-option-btn').forEach(b => { b.classList.remove('border-brand-blue', 'bg-brand-blue/10'); });
-      document.getElementById(`pay-btn-${m}`).classList.add('border-brand-blue', 'bg-brand-blue/10');
-      const inp = document.getElementById('direct-nominal');
-      if(m !== 'Cash' && currentRole === 'DRIVER') { inp.value = 0; inp.disabled = true; inp.classList.add('opacity-50'); }
-      else { inp.disabled = false; inp.classList.remove('opacity-50'); if(m==='Cash') inp.setAttribute('required', 'true'); }
+
+    function exportToCSV() {
+      let csv = "ID,Waktu,Driver,Rute,Muatan,Nominal,Metode,Status\n";
+      appState.ritase.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.driver}","${i.rute}","${i.muatan}",${i.nominal},"${i.payment}","${i.status}"\n`);
+      triggerDownload(csv, "Rekap_Ritase.csv");
     }
-    function setExpCategory(c) {
-      document.getElementById('exp-category').value = c;
-      document.querySelectorAll('.exp-category-btn').forEach(b => b.classList.remove('border-brand-blue', 'bg-brand-blue/10'));
-      document.getElementById(`exp-cat-btn-${c.replace(/\s+/g,'').replace('&','')}`).classList.add('border-brand-blue', 'bg-brand-blue/10');
-      document.getElementById('recipient-text-wrapper').classList.toggle('hidden', c==='Transfer Kas');
-      document.getElementById('recipient-driver-wrapper').classList.toggle('hidden', c!=='Transfer Kas');
+    function exportExpensesToCSV() {
+      let csv = "ID,Waktu,Sumber,Kategori,Penerima,Nominal\n";
+      appState.pengeluaran.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}","${i.category}","${i.recipient}",${i.nominal}\n`);
+      triggerDownload(csv, "Rekap_Pengeluaran.csv");
+    }
+    function triggerDownload(content, filename) {
+      const link = document.createElement("a");
+      link.href = encodeURI("data:text/csv;charset=utf-8," + content);
+      link.download = filename; document.body.appendChild(link); link.click();
     }
 
-    function initChart() {
-      const ctx = document.getElementById('driverChart').getContext('2d');
-      driverDistributionChart = new Chart(ctx, { type: 'bar', data: { labels: ['IKKI', 'FAUZI', 'ASO'], datasets: [{ label: 'Ritase', data: [0,0,0], backgroundColor: ['#005CFF', '#00CC44', '#EF4444'], borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1D2230' } }, x: { grid: { display: false } } } } });
+    // =====================================================================
+    // 6. INITIALIZATION & REALTIME SYNC
+    // =====================================================================
+    async function loadSupabaseData() {
+      try {
+        const [rRes, eRes, aRes] = await Promise.all([
+          supabaseClient.from('ritase').select('*').order('timestamp', { ascending: false }),
+          supabaseClient.from('pengeluaran').select('*').order('timestamp', { ascending: false }),
+          supabaseClient.from('absensi').select('*').order('timestamp', { ascending: false })
+        ]);
+        if (rRes.error) throw rRes.error;
+        appState.ritase = rRes.data || []; appState.pengeluaran = eRes.data || []; appState.absensi = aRes.data || [];
+        refreshAllUI();
+        document.getElementById('sync-status').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-brand-green pulsing-green-dot"></span> ONLINE`;
+      } catch (err) {
+        document.getElementById('sync-status').innerHTML = `ERROR`;
+        document.getElementById('sync-status').className = "inline-flex items-center gap-1 text-[9px] bg-rose-500/10 text-rose-500 border border-rose-500/20 px-2 py-0.5 rounded-full font-bold";
+      }
     }
-    function updateCharts() { if(driverDistributionChart){ let c={IKKI:0,FAUZI:0,ASO:0}; appState.ritase.forEach(i=>c[i.driver]++); driverDistributionChart.data.datasets[0].data = [c.IKKI,c.FAUZI,c.ASO]; driverDistributionChart.update(); } }
 
+    window.onload = function() {
+      setTimeout(() => { document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none'); }, 1000);
+      document.getElementById('current-date-el').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      if (!currentRole) document.getElementById('login-modal').classList.remove('hidden');
+      else applyRoleUI();
+      
+      const ctx = document.getElementById('driverChart')?.getContext('2d');
+      if (ctx) {
+        driverDistributionChart = new Chart(ctx, { type: 'bar', data: { labels: ['IKKI', 'FAUZI', 'ASO'], datasets: [{ label: 'Ritase', data: [0,0,0], backgroundColor: ['#005CFF', '#00CC44', '#EF4444'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1D2230' } } } } });
+      }
+
+      loadSupabaseData();
+      supabaseClient.channel('public-changes').on('postgres_changes', { event: '*', schema: 'public' }, () => { loadSupabaseData(); }).subscribe();
+    };
+
+    function updateCharts() {
+      if(driverDistributionChart) {
+        let counts = { IKKI:0, FAUZI:0, ASO:0 };
+        appState.ritase.forEach(i => { if(counts[i.driver] !== undefined) counts[i.driver]++ });
+        driverDistributionChart.data.datasets[0].data = [counts.IKKI, counts.FAUZI, counts.ASO];
+        driverDistributionChart.update();
+      }
+    }
+    function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
     function togglePinInput() { document.getElementById('pin-container').classList.toggle('hidden'); }
-    function loginAsDriver() { currentRole = 'DRIVER'; localStorage.setItem('sansam_role','DRIVER'); applyRoleUI(); showToast('Akses Driver','Berhasil Masuk','success'); }
-    function loginAsAdmin() { if(document.getElementById('admin-pin').value === '240302') { currentRole = 'ADMIN'; localStorage.setItem('sansam_role','ADMIN'); applyRoleUI(); showToast('Akses Admin','Berhasil Masuk','success'); } else document.getElementById('pin-error').classList.remove('hidden'); }
+    function loginAsDriver() { currentRole = 'DRIVER'; localStorage.setItem('sansam_role','DRIVER'); applyRoleUI(); }
+    function loginAsAdmin() { if(document.getElementById('admin-pin').value === '240302') { currentRole = 'ADMIN'; localStorage.setItem('sansam_role','ADMIN'); applyRoleUI(); } else document.getElementById('pin-error').classList.remove('hidden'); }
     function logoutAccount() { localStorage.removeItem('sansam_role'); location.reload(); }
     function applyRoleUI() {
       document.getElementById('login-modal').classList.add('hidden');
       document.querySelectorAll('.admin-only-tab, .admin-only-metric').forEach(el => el.classList.toggle('hidden', currentRole === 'DRIVER'));
-      document.getElementById('header-role-badge').innerText = currentRole === 'ADMIN' ? "Akses Penuh (Admin)" : "Akses Terbatas (Driver)";
-      setDirectPayment('Cash');
     }
-
-    // PDF EXPORTS
-    function exportToCSV() {
-      let csv = "data:text/csv;charset=utf-8,ID,Tanggal,Nama Driver,Rute Tujuan,Volume Muatan,Nominal,Pembayaran,Status\r\n";
-      appState.ritase.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.driver}","${i.rute}","${i.muatan}",${i.nominal},"${i.payment}","${i.status}"\r\n`);
-      const a = document.createElement("a"); a.href = encodeURI(csv); a.download = "Ritase.csv"; a.click();
-    }
-    function exportToPDF() {
-      const doc = new window.jspdf.jsPDF(); doc.text("Rekap Ritase CV SANSAM", 14, 15);
-      doc.autoTable({ head: [["Waktu", "Driver", "Rute", "Muatan", "Nominal", "Status"]], body: appState.ritase.map(i => [i.timestamp, i.driver, i.rute, i.muatan, i.nominal, i.status]), startY: 20 });
-      doc.save(`Ritase_${Date.now()}.pdf`);
-    }
-    function exportExpensesToPDF() {
-      const doc = new window.jspdf.jsPDF(); doc.text("Rekap Pengeluaran Kas CV SANSAM", 14, 15);
-      doc.autoTable({ head: [["Waktu", "Sumber", "Kategori", "Penerima", "Nominal"]], body: appState.pengeluaran.map(i => [i.timestamp, i.source, i.category, i.recipient, i.nominal]), startY: 20 });
-      doc.save(`Pengeluaran_${Date.now()}.pdf`);
-    }
-    function exportPanjarToPDF() {
-      const doc = new window.jspdf.jsPDF(); doc.text("Rekap Panjar Driver CV SANSAM", 14, 15);
-      doc.autoTable({ head: [["Waktu", "Driver", "Nominal", "Status"]], body: appState.pengeluaran.filter(e=>e.category==="Panjar Driver").map(i => [i.timestamp, i.source, i.nominal, i.status||"Active"]), startY: 20 });
-      doc.save(`Panjar_${Date.now()}.pdf`);
-    }
-
-    // INITIALIZATION
-    window.onload = function() {
-      setTimeout(() => document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none'), 1200);
-      document.getElementById('current-date-el').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      initChart();
-      if (!currentRole) document.getElementById('login-modal').classList.remove('hidden'); else applyRoleUI();
-      loadSupabaseData(); setupRealtimeSync();
-      
-      let step=0; setInterval(()=>{ step++; const i=document.getElementById('truck-ikki-marker'), f=document.getElementById('truck-fauzi-marker'); if(i) i.setAttribute('transform',`translate(${150+(Math.sin(step*0.05)+1)*265},${200})`); if(f) f.setAttribute('transform',`translate(${400+Math.cos(step*0.1)*30},${120+Math.sin(step*0.1)*30})`);}, 1000);
-    };
   </script>
 </body>
 </html>
+
+
+```
