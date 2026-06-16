@@ -762,24 +762,40 @@
     // =====================================================================
     function getDriverCashInHand(driverName) {
       let cash = 0;
-      
-      // Hitung pemasukan ritase Cash yang belum disetor
+      let timeline = [];
+
+      // Kumpulkan semua histori pemasukan ritase cash
       appState.ritase.forEach(i => { 
-        if (i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor") cash += i.nominal; 
-      });
-      
-      // Hitung pengeluaran operasional dan PANJAR (untuk memotong cash jika dia megang uang ritase)
-      appState.pengeluaran.forEach(e => {
-        const isActive = (e.status === undefined || e.status === "Active");
-        // Semua pengeluaran (termasuk Panjar Driver) memotong kas fisik di tangannya
-        if (isActive) {
-          if (e.source === driverName) cash -= e.nominal;
-          if (e.category === "Transfer Kas" && e.recipient === driverName) cash += e.nominal;
+        if (i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor") {
+          let timeMs = parseInt(i.id.split('-')[1]) || 0;
+          timeline.push({ type: 'in', nominal: i.nominal, time: timeMs });
         }
       });
       
-      // Mencegah saldo menjadi minus (jika driver mengambil panjar lebih besar dari cash yang dipegang, maka cash = 0)
-      return Math.max(0, cash);
+      // Kumpulkan histori pengeluaran & transfer kas
+      appState.pengeluaran.forEach(e => {
+        const isActive = (e.status === undefined || e.status === "Active");
+        if (isActive) {
+          let timeMs = parseInt(e.id.split('-')[1]) || 0;
+          if (e.source === driverName) timeline.push({ type: 'out', nominal: e.nominal, time: timeMs });
+          if (e.category === "Transfer Kas" && e.recipient === driverName) timeline.push({ type: 'in', nominal: e.nominal, time: timeMs });
+        }
+      });
+      
+      // Urutkan transaksi berdasarkan waktu secara kronologis (dari awal ke akhir)
+      timeline.sort((a, b) => a.time - b.time);
+
+      // Kalkulasi kas berjalan, tidak boleh tembus di bawah 0 (mines)
+      timeline.forEach(t => {
+        if (t.type === 'in') {
+          cash += t.nominal;
+        } else if (t.type === 'out') {
+          cash -= t.nominal;
+          if (cash < 0) cash = 0; // Reset ke 0 jika minus, sehingga cash baru tidak terpotong pengeluaran/panjar masa lalu
+        }
+      });
+
+      return cash;
     }
     
     function showSourceCashInHand() {
