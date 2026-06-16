@@ -135,18 +135,12 @@
       </div>
       
       <div class="flex items-center gap-2">
-        <!-- TOMBOL PASANG PWA -->
         <button id="pwa-install-btn" class="hidden active-scale bg-brand-blue hover:bg-brand-blue/90 text-white text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition shadow-lg shadow-brand-blue/25">
           <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">PASANG APP</span>
         </button>
-
         <button onclick="logoutAccount()" class="active-scale bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">KELUAR</span>
         </button>
-        <div class="hidden sm:flex items-center gap-2 bg-brand-card px-3.5 py-2 rounded-xl border border-brand-border">
-          <i class="fa-regular fa-calendar-days text-brand-green"></i>
-          <span class="text-xs font-semibold text-gray-300" id="current-date-el">...</span>
-        </div>
       </div>
     </div>
   </header>
@@ -385,8 +379,8 @@
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <h3 class="text-base font-bold text-white">Log Ritase Transaksi</h3>
           <div class="flex gap-2">
-            <button onclick="exportToCSV()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2"><i class="fa-solid fa-file-excel text-brand-green"></i> Excel</button>
-            <button onclick="exportToPDF()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
+            <button onclick="exportToCSV()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-brand-green"></i> Excel</button>
+            <button onclick="exportToPDF()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
           </div>
         </div>
         <div class="overflow-x-auto rounded-xl border border-brand-border"><table class="w-full text-left text-xs min-w-[900px]"><thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border"><tr><th class="p-3.5">Waktu</th><th class="p-3.5">Driver</th><th class="p-3.5">Rute</th><th class="p-3.5">Muatan</th><th class="p-3.5 text-right">Nominal</th><th class="p-3.5 text-center">Metode</th><th class="p-3.5 text-center">Status</th><th class="p-3.5 text-center">Bukti</th><th class="p-3.5 text-right">Aksi</th></tr></thead><tbody id="rekap-table-body"></tbody></table></div>
@@ -396,8 +390,8 @@
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <h3 class="text-base font-bold text-white">Log Pengeluaran Kas</h3>
           <div class="flex gap-2">
-            <button onclick="exportExpensesToCSV()" class="bg-brand-border border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2"><i class="fa-solid fa-file-excel text-amber-500"></i> Excel</button>
-            <button onclick="exportExpensesToPDF()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
+            <button onclick="exportExpensesToCSV()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-amber-500"></i> Excel</button>
+            <button onclick="exportExpensesToPDF()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
           </div>
         </div>
         <div class="overflow-x-auto rounded-xl border border-brand-border"><table class="w-full text-left text-xs min-w-[800px]"><thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border"><tr><th class="p-3.5">Waktu</th><th class="p-3.5">Sumber Dana</th><th class="p-3.5">Kategori</th><th class="p-3.5">Penerima/Alokasi</th><th class="p-3.5 text-right">Nominal Keluar</th><th class="p-3.5 text-center">Bukti</th><th class="p-3.5 text-right">Aksi</th></tr></thead><tbody id="expense-table-body"></tbody></table></div>
@@ -407,8 +401,8 @@
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <h3 class="text-base font-bold text-white">Monitoring Panjar</h3>
           <div class="flex gap-2">
-            <button onclick="exportPanjarToCSV()" class="bg-brand-border border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2"><i class="fa-solid fa-file-excel text-sky-400"></i> Excel</button>
-            <button onclick="exportPanjarToPDF()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
+            <button onclick="exportPanjarToCSV()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-sky-400"></i> Excel</button>
+            <button onclick="exportPanjarToPDF()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
           </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="panjar-driver-summary-cards"></div>
@@ -483,7 +477,7 @@
     <div class="flex-grow"><p id="toast-title" class="text-xs font-bold text-white">Notif</p><p id="toast-desc" class="text-[10px] text-gray-400">Deskripsi</p></div>
   </div>
 
-  <!-- CUSTOM DIALOG MODAL (Aman & mendukung Callback Hapus) -->
+  <!-- CUSTOM DIALOG MODAL -->
   <div id="custom-dialog-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
     <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl">
       <div class="p-6 text-center space-y-4">
@@ -577,7 +571,7 @@
       }
     });
 
-    // Custom Dialog Logic dengan Callback Hapus
+    // Custom Dialog Logic
     let pendingConfirmAction = null;
     function showCustomDialog({ title, message, type='info', onConfirm }) {
       document.getElementById('dialog-title').innerText = title;
@@ -596,11 +590,9 @@
 
       const cancelBtn = document.getElementById('dialog-cancel-btn');
       if (onConfirm) {
-        cancelBtn.classList.remove('hidden');
-        pendingConfirmAction = onConfirm;
+        cancelBtn.classList.remove('hidden'); pendingConfirmAction = onConfirm;
       } else {
-        cancelBtn.classList.add('hidden');
-        pendingConfirmAction = null;
+        cancelBtn.classList.add('hidden'); pendingConfirmAction = null;
       }
       document.getElementById('custom-dialog-modal').classList.remove('hidden');
     }
@@ -610,12 +602,11 @@
       closeCustomDialog();
       if(pendingConfirmAction) pendingConfirmAction();
     });
-
     function closeCustomDialog() { document.getElementById('custom-dialog-modal').classList.add('hidden'); }
 
 
     // =====================================================================
-    // 3. FUNGSI GAMBAR, KOMPRESI & SUPABASE DATABASE CORE
+    // 3. FUNGSI GAMBAR & SUPABASE DATABASE CORE
     // =====================================================================
     function resizeImage(file, callback) {
       const reader = new FileReader();
@@ -663,7 +654,7 @@
     }
     async function updateDB(table, id, updates) { await supabaseClient.from(table).update(updates).eq('id', id); }
     
-    // FUNGSI HAPUS DATA KE DATABASE
+    // HAPUS DATA
     async function deleteRecord(id, tableType) {
       showCustomDialog({
         title: 'Hapus Data Permanen?',
@@ -677,8 +668,7 @@
           if (error) {
             showToast('Gagal Menghapus', error.message, 'error');
           } else {
-            appState[tableType] = appState[tableType].filter(x => x.id !== id);
-            refreshAllUI();
+            appState[tableType] = appState[tableType].filter(x => x.id !== id); refreshAllUI();
             showToast('Berhasil Dihapus', 'Data telah dihapus dari sistem.', 'success');
           }
         }
@@ -751,10 +741,8 @@
       e.preventDefault();
       const name = document.getElementById('absensi-driver-select').value;
       const condition = document.querySelector('input[name="absensi_tipe"]:checked')?.value;
-
       if (!name || !condition) return showToast('Error', 'Pilih Driver & Status', 'error');
 
-      // 100% SESUAI SUPABASE: Tidak ada field uang jalan
       const newAbsen = {
         id: "abs-" + Date.now(), timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
         name: name, tipe: condition, status: "Active"
@@ -766,7 +754,7 @@
 
       if (isSuccess) {
         appState.absensi.unshift(newAbsen); refreshAllUI(); document.getElementById('attendance-form').reset();
-        showToast('Absensi Tersimpan', `Status Kehadiran ${name} telah diupdate ke server.`, 'success');
+        showToast('Absensi Tersimpan', `Status Kehadiran ${name} diupdate.`, 'success');
       }
     }
 
@@ -823,7 +811,6 @@
       });
     }
 
-    // RENDER: RITASE (DENGAN TOMBOL HAPUS)
     function renderRekapTable() {
       const b = document.getElementById('rekap-table-body'); b.innerHTML = "";
       appState.ritase.forEach(i => {
@@ -831,25 +818,19 @@
         let btn = (i.status === "Belum Disetor" && i.payment === "Cash") ? `<button onclick="approveDeposit('${i.id}')" class="bg-brand-green/20 text-brand-green px-2 py-1 rounded text-[10px] font-bold">Terima Setoran</button>` : `<span class="text-[10px] text-gray-500">Selesai</span>`;
         if(i.status === "Piutang" || i.nominal === 0) btn = `<button onclick="settlePriceAndPay('${i.id}')" class="bg-brand-blue/20 text-brand-blue px-2 py-1 rounded text-[10px] font-bold">Atur Lunas</button>`;
         
-        // TOMBOL HAPUS DITAMBAHKAN
         let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="deleteRecord('${i.id}', 'ritase')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Data"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
-        
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${i.timestamp}</td><td class="p-3 font-bold">${i.driver}</td><td class="p-3">${i.rute}</td><td class="p-3">${i.muatan}</td><td class="p-3 text-right font-bold text-white">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center">${i.payment}</td><td class="p-3 text-center ${badgeColor} font-bold text-[10px]">${i.status}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${i.photo}')"><i class="fa-solid fa-image"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
 
-    // RENDER: PENGELUARAN KAS (DENGAN TOMBOL HAPUS)
     function renderExpenseTable() {
       const b = document.getElementById('expense-table-body'); b.innerHTML = "";
       appState.pengeluaran.forEach(e => {
-        // TOMBOL HAPUS DITAMBAHKAN
         let actionCell = `<div class="flex justify-end"><button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Transaksi"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
-        
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${e.timestamp}</td><td class="p-3 font-bold text-amber-500">${e.source}</td><td class="p-3">${e.category}</td><td class="p-3">${e.recipient}</td><td class="p-3 text-right font-bold text-rose-500">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${e.photo}')"><i class="fa-solid fa-receipt"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
 
-    // RENDER: REKAP PANJAR (DENGAN TOMBOL HAPUS)
     function renderPanjarRecap() {
       const cards = document.getElementById('panjar-driver-summary-cards'); cards.innerHTML = "";
       ["IKKI", "FAUZI", "ASO"].forEach(name => {
@@ -862,10 +843,7 @@
       appState.pengeluaran.filter(e => e.category === "Panjar Driver").forEach(e => {
         let status = (e.status === undefined || e.status === "Active") ? "Aktif" : "Selesai";
         let btn = status === "Aktif" ? `<button onclick="settleSinglePanjar('${e.id}')" class="bg-sky-500/20 text-sky-400 px-2 py-1 rounded text-[10px] font-bold">Potong Panjar</button>` : `<span class="text-gray-500 text-[10px]">Settled</span>`;
-        
-        // TOMBOL HAPUS DITAMBAHKAN
         let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Panjar"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
-
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3">${e.timestamp}</td><td class="p-3 font-bold">${e.source}</td><td class="p-3 text-sky-400 font-bold">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center text-[10px] font-bold">${status}</td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
@@ -874,24 +852,65 @@
       const b = document.getElementById('driver-status-list'); b.innerHTML = "";
       ["IKKI", "FAUZI", "ASO"].forEach(name => {
         const cashHand = getDriverCashInHand(name);
-        b.innerHTML += `<div class="p-3 border border-brand-border rounded-xl bg-brand-black mb-2 flex justify-between items-center"><div class="font-bold text-sm text-white">${name} <span class="block text-[9px] text-brand-green">Aktif Radar</span></div> <div class="text-right"><span class="text-[9px] text-gray-400 block">Uang Kas Fisik</span><span class="text-amber-500 font-bold text-sm animate-pulse">Rp ${cashHand.toLocaleString('id-ID')}</span></div></div>`;
+        
+        // TOMBOL TERIMA SETORAN KAS SELURUHNYA (Muncul hanya jika ada kas & login sebagai Admin)
+        let setoranBtnHTML = (cashHand > 0 && currentRole === 'ADMIN') 
+          ? `<button onclick="settleAllDriverCash('${name}')" class="mt-2 active-scale bg-brand-green/20 hover:bg-brand-green/30 text-brand-green border border-brand-green/30 px-3 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1.5"><i class="fa-solid fa-hand-holding-dollar"></i> Terima Setoran Kas</button>` 
+          : '';
+
+        b.innerHTML += `<div class="p-3 border border-brand-border rounded-xl bg-brand-black mb-2 flex justify-between items-start">
+          <div>
+            <div class="font-bold text-sm text-white">${name} <span class="text-[9px] text-brand-green ml-1 border border-brand-green/20 px-1.5 rounded bg-brand-green/10">Aktif</span></div>
+            ${setoranBtnHTML}
+          </div> 
+          <div class="text-right">
+            <span class="text-[9px] text-gray-400 block">Uang Kas Fisik</span>
+            <span class="text-amber-500 font-bold text-sm animate-pulse">Rp ${cashHand.toLocaleString('id-ID')}</span>
+          </div>
+        </div>`;
       });
     }
 
-    // RENDER: ABSENSI (DENGAN TOMBOL HAPUS)
     function renderAbsensi() {
-      const b = document.getElementById('absensi-table-body');
-      if(!b) return;
-      b.innerHTML = "";
+      const b = document.getElementById('absensi-table-body'); if(!b) return; b.innerHTML = "";
       appState.absensi.forEach(i => {
-        // TOMBOL HAPUS DITAMBAHKAN
         let actionCell = `<div class="flex justify-end"><button onclick="deleteRecord('${i.id}', 'absensi')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Absensi"><i class="fa-solid fa-trash text-[10px]"></i></button></div>`;
-        
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card/30"><td class="p-3 text-[11px]">${i.timestamp}</td><td class="p-3 font-bold text-white">${i.name}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-brand-border">${i.tipe}</span></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
 
-    // Aksi Setoran & Potongan Panjar (Admin)
+    // =====================================================================
+    // 6. AKSI ADMIN (TERIMA SETORAN, LUNAS, DLL)
+    // =====================================================================
+    async function settleAllDriverCash(driverName) {
+      const totalCash = getDriverCashInHand(driverName);
+      if (totalCash <= 0) return showToast('Info', 'Tidak ada sisa kas fisik di driver ini.', 'error');
+
+      showCustomDialog({
+        title: `Terima Setoran ${driverName}?`,
+        message: `Driver ${driverName} akan menyetor kas fisik sebesar Rp ${totalCash.toLocaleString('id-ID')} ke Admin.\n\nTindakan ini akan otomatis melunaskan (menyelesaikan) semua riwayat ritase tunai & pengeluaran yang menggantung di driver ini. Lanjutkan?`,
+        type: 'info',
+        onConfirm: async () => {
+          showLoader(true);
+          
+          // 1. Update Ritase yg belum disetor
+          const pendingRitase = appState.ritase.filter(i => i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor");
+          for (let r of pendingRitase) {
+            r.status = "Sudah Disetor"; await updateDB('ritase', r.id, { status: "Sudah Disetor" });
+          }
+
+          // 2. Update Pengeluaran yg statusnya masih Active yg memotong kas dia
+          const pendingExp = appState.pengeluaran.filter(e => (e.status === undefined || e.status === "Active") && (e.source === driverName || (e.category === "Transfer Kas" && e.recipient === driverName)));
+          for (let e of pendingExp) {
+            e.status = "Settled"; await updateDB('pengeluaran', e.id, { status: "Settled" });
+          }
+
+          showLoader(false); refreshAllUI();
+          showToast('Setoran Diterima', `Seluruh setoran kas dari ${driverName} berhasil dibukukan.`, 'success');
+        }
+      });
+    }
+
     async function approveDeposit(id) {
       const item = appState.ritase.find(x => x.id === id); if(!item) return;
       item.status = "Sudah Disetor"; refreshAllUI();
@@ -916,7 +935,69 @@
       showToast('Potongan Berhasil', `Panjar ${item.source} telah dipotong.`, 'success');
     }
 
-    // Modal, Export & UX Tools
+    // =====================================================================
+    // 7. SHARE & DOWNLOAD (PENGGANTI DIRECT DOWNLOAD UNTUK HP)
+    // =====================================================================
+    async function shareOrDownloadFile(blob, filename) {
+      const file = new File([blob], filename, { type: blob.type });
+      
+      // Jika HP mendukung fitur Share File ke aplikasi lain (WA/Drive)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: 'Download ' + filename, text: 'File dokumen laporan dari sistem Sansam Fleet.' });
+          showToast('Sukses', 'Silakan pilih aplikasi tujuan.', 'success');
+        } catch (err) { console.log('Share dibatalkan pengguna'); }
+      } else {
+        // Mode Fallback untuk Laptop / HP Lama
+        const url = URL.createObjectURL(blob); const link = document.createElement("a");
+        link.href = url; link.download = filename; document.body.appendChild(link); link.click();
+        setTimeout(() => { document.body.removeChild(link); URL.revokeObjectURL(url); }, 100);
+        showToast('Info', 'Download dimulai...', 'success');
+      }
+    }
+
+    function exportToCSV() {
+      let csv = "ID,Waktu,Driver,Rute,Muatan,Nominal,Metode,Status\n";
+      appState.ritase.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.driver}","${i.rute}","${i.muatan}",${i.nominal},"${i.payment}","${i.status}"\n`);
+      shareOrDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Rekap_Ritase.csv");
+    }
+    function exportExpensesToCSV() {
+      let csv = "ID,Waktu,Sumber,Kategori,Penerima,Nominal\n";
+      appState.pengeluaran.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}","${i.category}","${i.recipient}",${i.nominal}\n`);
+      shareOrDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Rekap_Pengeluaran.csv");
+    }
+    function exportPanjarToCSV() {
+      let csv = "ID,Waktu,Sumber,Nominal,Status\n";
+      appState.pengeluaran.filter(e => e.category === "Panjar Driver").forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}",${i.nominal},"${i.status || 'Active'}"\n`);
+      shareOrDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Rekap_Panjar.csv");
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf; const doc = new jsPDF('l');
+      doc.text("Laporan Ritase Penjualan CV SANSAM", 14, 15);
+      const rows = appState.ritase.map(i => [i.timestamp, i.driver, i.rute, i.muatan, i.nominal, i.payment, i.status]);
+      doc.autoTable({ head: [['Waktu', 'Driver', 'Rute', 'Muatan', 'Nominal', 'Metode', 'Status']], body: rows, startY: 20 });
+      shareOrDownloadFile(doc.output('blob'), "Ritase_CV_SANSAM.pdf");
+    }
+    function exportExpensesToPDF() {
+      const { jsPDF } = window.jspdf; const doc = new jsPDF('p');
+      doc.text("Laporan Pengeluaran & Transfer CV SANSAM", 14, 15);
+      const rows = appState.pengeluaran.map(i => [i.timestamp, i.source, i.category, i.recipient, i.nominal]);
+      doc.autoTable({ head: [['Waktu', 'Sumber', 'Kategori', 'Penerima', 'Nominal']], body: rows, startY: 20 });
+      shareOrDownloadFile(doc.output('blob'), "Pengeluaran_CV_SANSAM.pdf");
+    }
+    function exportPanjarToPDF() {
+      const { jsPDF } = window.jspdf; const doc = new jsPDF('p');
+      doc.text("Laporan Panjar Driver CV SANSAM", 14, 15);
+      const rows = appState.pengeluaran.filter(e=>e.category==="Panjar Driver").map(i => [i.timestamp, i.source, i.nominal, i.status || 'Active']);
+      doc.autoTable({ head: [['Waktu', 'Nama Driver', 'Nominal Panjar', 'Status']], body: rows, startY: 20 });
+      shareOrDownloadFile(doc.output('blob'), "Panjar_CV_SANSAM.pdf");
+    }
+
+
+    // =====================================================================
+    // 8. TABS, UI HELPERS & INIT
+    // =====================================================================
     function showToast(title, desc, type='success') {
       document.getElementById('toast-title').innerText = title; document.getElementById('toast-desc').innerText = desc;
       const icon = document.getElementById('toast-icon');
@@ -925,14 +1006,11 @@
       t.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
       setTimeout(() => t.classList.add('translate-y-[-100px]', 'opacity-0', 'pointer-events-none'), 3000);
     }
-
     function viewPhoto(src) {
       if(!src || src === "") return showToast('Info', 'Tidak ada foto dilampirkan pada laporan ini', 'error');
-      document.getElementById('modal-image').src = src;
-      document.getElementById('photo-modal').classList.remove('hidden');
+      document.getElementById('modal-image').src = src; document.getElementById('photo-modal').classList.remove('hidden');
     }
     function closePhotoModal() { document.getElementById('photo-modal').classList.add('hidden'); }
-
     function switchTab(t) {
       document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
       document.getElementById(`tab-content-${t}`).classList.remove('hidden');
@@ -947,77 +1025,23 @@
       document.getElementById('sub-tab-rekap-pengeluaran').classList.toggle('hidden', s !== 'pengeluaran');
       document.getElementById('sub-tab-rekap-panjar').classList.toggle('hidden', s !== 'panjar');
     }
-
     function handleCategoryChange() {
       const cat = document.getElementById('exp-category').value;
       if (cat === "Transfer Kas") {
-        document.getElementById('recipient-text-wrapper').classList.add('hidden');
-        document.getElementById('recipient-driver-wrapper').classList.remove('hidden');
+        document.getElementById('recipient-text-wrapper').classList.add('hidden'); document.getElementById('recipient-driver-wrapper').classList.remove('hidden');
       } else {
-        document.getElementById('recipient-text-wrapper').classList.remove('hidden');
-        document.getElementById('recipient-driver-wrapper').classList.add('hidden');
+        document.getElementById('recipient-text-wrapper').classList.remove('hidden'); document.getElementById('recipient-driver-wrapper').classList.add('hidden');
       }
     }
-
     function setDirectPayment(m) {
-      directSelectedPayment = m;
-      document.getElementById('direct-selected-payment').value = m;
+      directSelectedPayment = m; document.getElementById('direct-selected-payment').value = m;
       const inp = document.getElementById('direct-nominal');
       if(m !== 'Cash' && currentRole === 'DRIVER') { inp.value = 0; inp.disabled = true; } 
       else { inp.disabled = false; if(m === 'Cash') inp.setAttribute('required', 'true'); }
     }
-
     function quickFillMuatan(v) { document.getElementById('direct-muatan').value = v; }
     function quickFillRute(v) { document.getElementById('direct-rute').value = v; }
 
-    // DOWNLOADS CSV
-    function exportToCSV() {
-      let csv = "ID,Waktu,Driver,Rute,Muatan,Nominal,Metode,Status\n";
-      appState.ritase.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.driver}","${i.rute}","${i.muatan}",${i.nominal},"${i.payment}","${i.status}"\n`);
-      triggerDownload(csv, "Rekap_Ritase.csv");
-    }
-    function exportExpensesToCSV() {
-      let csv = "ID,Waktu,Sumber,Kategori,Penerima,Nominal\n";
-      appState.pengeluaran.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}","${i.category}","${i.recipient}",${i.nominal}\n`);
-      triggerDownload(csv, "Rekap_Pengeluaran.csv");
-    }
-    function exportPanjarToCSV() {
-      let csv = "ID,Waktu,Sumber,Nominal,Status\n";
-      appState.pengeluaran.filter(e => e.category === "Panjar Driver").forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}",${i.nominal},"${i.status || 'Active'}"\n`);
-      triggerDownload(csv, "Rekap_Panjar.csv");
-    }
-    function triggerDownload(content, filename) {
-      const link = document.createElement("a");
-      link.href = encodeURI("data:text/csv;charset=utf-8," + content);
-      link.download = filename; document.body.appendChild(link); link.click();
-    }
-
-    // DOWNLOADS PDF
-    function exportToPDF() {
-      const { jsPDF } = window.jspdf; const doc = new jsPDF('l');
-      doc.text("Laporan Ritase Penjualan CV SANSAM", 14, 15);
-      const rows = appState.ritase.map(i => [i.timestamp, i.driver, i.rute, i.muatan, i.nominal, i.payment, i.status]);
-      doc.autoTable({ head: [['Waktu', 'Driver', 'Rute', 'Muatan', 'Nominal', 'Metode', 'Status']], body: rows, startY: 20 });
-      doc.save("Ritase_CV_SANSAM.pdf");
-    }
-    function exportExpensesToPDF() {
-      const { jsPDF } = window.jspdf; const doc = new jsPDF('p');
-      doc.text("Laporan Pengeluaran & Transfer CV SANSAM", 14, 15);
-      const rows = appState.pengeluaran.map(i => [i.timestamp, i.source, i.category, i.recipient, i.nominal]);
-      doc.autoTable({ head: [['Waktu', 'Sumber', 'Kategori', 'Penerima', 'Nominal']], body: rows, startY: 20 });
-      doc.save("Pengeluaran_CV_SANSAM.pdf");
-    }
-    function exportPanjarToPDF() {
-      const { jsPDF } = window.jspdf; const doc = new jsPDF('p');
-      doc.text("Laporan Panjar Driver CV SANSAM", 14, 15);
-      const rows = appState.pengeluaran.filter(e=>e.category==="Panjar Driver").map(i => [i.timestamp, i.source, i.nominal, i.status || 'Active']);
-      doc.autoTable({ head: [['Waktu', 'Nama Driver', 'Nominal Panjar', 'Status']], body: rows, startY: 20 });
-      doc.save("Panjar_CV_SANSAM.pdf");
-    }
-
-    // =====================================================================
-    // 6. INITIALIZATION & REALTIME SYNC
-    // =====================================================================
     async function loadSupabaseData() {
       try {
         const [rRes, eRes, aRes] = await Promise.all([
@@ -1039,8 +1063,7 @@
     window.onload = function() {
       setTimeout(() => { document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none'); }, 1000);
       document.getElementById('current-date-el').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      if (!currentRole) document.getElementById('login-modal').classList.remove('hidden');
-      else applyRoleUI();
+      if (!currentRole) document.getElementById('login-modal').classList.remove('hidden'); else applyRoleUI();
       
       const ctx = document.getElementById('driverChart')?.getContext('2d');
       if (ctx) {
@@ -1055,14 +1078,13 @@
       if(driverDistributionChart) {
         let counts = { IKKI:0, FAUZI:0, ASO:0 };
         appState.ritase.forEach(i => { if(counts[i.driver] !== undefined) counts[i.driver]++ });
-        driverDistributionChart.data.datasets[0].data = [counts.IKKI, counts.FAUZI, counts.ASO];
-        driverDistributionChart.update();
+        driverDistributionChart.data.datasets[0].data = [counts.IKKI, counts.FAUZI, counts.ASO]; driverDistributionChart.update();
       }
     }
     function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
     function togglePinInput() { document.getElementById('pin-container').classList.toggle('hidden'); }
-    function loginAsDriver() { currentRole = 'DRIVER'; localStorage.setItem('sansam_role','DRIVER'); applyRoleUI(); }
-    function loginAsAdmin() { if(document.getElementById('admin-pin').value === '240302') { currentRole = 'ADMIN'; localStorage.setItem('sansam_role','ADMIN'); applyRoleUI(); } else document.getElementById('pin-error').classList.remove('hidden'); }
+    function loginAsDriver() { currentRole = 'DRIVER'; localStorage.setItem('sansam_role','DRIVER'); applyRoleUI(); refreshAllUI(); }
+    function loginAsAdmin() { if(document.getElementById('admin-pin').value === '240302') { currentRole = 'ADMIN'; localStorage.setItem('sansam_role','ADMIN'); applyRoleUI(); refreshAllUI(); } else document.getElementById('pin-error').classList.remove('hidden'); }
     function logoutAccount() { localStorage.removeItem('sansam_role'); location.reload(); }
     function applyRoleUI() {
       document.getElementById('login-modal').classList.add('hidden');
