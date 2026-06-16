@@ -155,7 +155,7 @@
         <h3 class="text-base sm:text-2xl font-black mt-1 text-white leading-tight" id="metric-total-omzet">Rp 0</h3>
       </div>
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cash Sisa (Di Driver)</p>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cash Fisik (Di Driver)</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-amber-500 leading-tight" id="metric-cash-driver">Rp 0</h3>
       </div>
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
@@ -254,7 +254,6 @@
             </div>
             <input type="text" id="direct-muatan" required placeholder="Tulis / pilih muatan..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
           </div>
-          
           <div>
             <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Rute/Tujuan</label>
             <div class="flex flex-wrap gap-1.5 mb-2">
@@ -763,11 +762,20 @@
     // =====================================================================
     function getDriverCashInHand(driverName) {
       let cash = 0;
-      appState.ritase.forEach(i => { if (i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor") cash += i.nominal; });
+      
+      // Hitung pemasukan ritase Cash yang belum disetor
+      appState.ritase.forEach(i => { 
+        if (i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor") cash += i.nominal; 
+      });
+      
+      // Hitung pengeluaran operasional (KECUALI PANJAR)
       appState.pengeluaran.forEach(e => {
         const isActive = (e.status === undefined || e.status === "Active");
-        if (e.source === driverName && isActive) cash -= e.nominal;
-        if (e.category === "Transfer Kas" && e.recipient === driverName && isActive) cash += e.nominal;
+        // PERHATIAN: Panjar Driver TIDAK ikut menambah/mengurangi Kas Fisik Harian
+        if (isActive && e.category !== "Panjar Driver") {
+          if (e.source === driverName) cash -= e.nominal;
+          if (e.category === "Transfer Kas" && e.recipient === driverName) cash += e.nominal;
+        }
       });
       return cash;
     }
@@ -853,7 +861,7 @@
       ["IKKI", "FAUZI", "ASO"].forEach(name => {
         const cashHand = getDriverCashInHand(name);
         
-        // TOMBOL TERIMA SETORAN KAS SELURUHNYA (Muncul hanya jika ada kas & login sebagai Admin)
+        // TOMBOL TERIMA SETORAN KAS (Hanya Admin)
         let setoranBtnHTML = (cashHand > 0 && currentRole === 'ADMIN') 
           ? `<button onclick="settleAllDriverCash('${name}')" class="mt-2 w-full active-scale bg-brand-green/20 hover:bg-brand-green/30 text-brand-green border border-brand-green/30 px-3 py-2 rounded-xl text-[10px] font-bold transition flex items-center justify-center gap-1.5"><i class="fa-solid fa-hand-holding-dollar text-sm"></i> Terima Rp ${cashHand.toLocaleString('id-ID')}</button>` 
           : '';
@@ -888,7 +896,7 @@
 
       showCustomDialog({
         title: `Terima Setoran ${driverName}?`,
-        message: `Driver ${driverName} akan menyetor kas fisik sebesar Rp ${totalCash.toLocaleString('id-ID')} ke Admin.\n\nTindakan ini otomatis melunaskan (menyelesaikan) semua riwayat ritase tunai & pengeluaran yang menggantung di driver ini. Lanjutkan?`,
+        message: `Driver ${driverName} akan menyetor kas fisik sebesar Rp ${totalCash.toLocaleString('id-ID')} ke Admin.\n\nTindakan ini otomatis melunaskan riwayat ritase tunai & pengeluaran operasional (KECUALI PANJAR DRIVER) yang menggantung di driver ini. Lanjutkan?`,
         type: 'info',
         onConfirm: async () => {
           showLoader(true);
@@ -900,8 +908,13 @@
             r.status = "Sudah Disetor"; 
           }
 
-          // 2. Update Pengeluaran yg statusnya masih Active yg memotong kas dia
-          const pendingExp = appState.pengeluaran.filter(e => (e.status === undefined || e.status === "Active") && (e.source === driverName || (e.category === "Transfer Kas" && e.recipient === driverName)));
+          // 2. Update Pengeluaran operasional (KECUALI PANJAR DRIVER)
+          const pendingExp = appState.pengeluaran.filter(e => 
+            (e.status === undefined || e.status === "Active") && 
+            e.category !== "Panjar Driver" && // PENTING: Mencegah Panjar ikut lunas otomatis
+            (e.source === driverName || (e.category === "Transfer Kas" && e.recipient === driverName))
+          );
+          
           for (let e of pendingExp) {
             await updateDB('pengeluaran', e.id, { status: "Settled" });
             e.status = "Settled"; 
@@ -909,7 +922,7 @@
 
           refreshAllUI();
           showLoader(false);
-          showToast('Setoran Diterima', `Seluruh setoran kas dari ${driverName} berhasil dibukukan.`, 'success');
+          showToast('Setoran Diterima', `Seluruh setoran kas dari ${driverName} berhasil dibukukan. Panjar tidak terpengaruh.`, 'success');
         }
       });
     }
@@ -944,14 +957,12 @@
     async function shareOrDownloadFile(blob, filename) {
       const file = new File([blob], filename, { type: blob.type || 'application/octet-stream' });
       
-      // Jika HP mendukung fitur Share File ke aplikasi lain (WA/Drive)
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({ files: [file], title: 'Download ' + filename, text: 'File dokumen laporan dari sistem Sansam Fleet.' });
           showToast('Sukses', 'Silakan pilih aplikasi tujuan.', 'success');
         } catch (err) { console.log('Share dibatalkan pengguna'); }
       } else {
-        // Mode Fallback untuk Laptop / HP Lama
         const url = URL.createObjectURL(blob); const link = document.createElement("a");
         link.href = url; link.download = filename; document.body.appendChild(link); link.click();
         setTimeout(() => { document.body.removeChild(link); URL.revokeObjectURL(url); }, 100);
@@ -1086,11 +1097,14 @@
         driverDistributionChart.data.datasets[0].data = [counts.IKKI, counts.FAUZI, counts.ASO]; driverDistributionChart.update();
       }
     }
+    
     function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
     function togglePinInput() { document.getElementById('pin-container').classList.toggle('hidden'); }
+    
     function loginAsDriver() { currentRole = 'DRIVER'; localStorage.setItem('sansam_role','DRIVER'); applyRoleUI(); refreshAllUI(); }
     function loginAsAdmin() { if(document.getElementById('admin-pin').value === '240302') { currentRole = 'ADMIN'; localStorage.setItem('sansam_role','ADMIN'); applyRoleUI(); refreshAllUI(); } else document.getElementById('pin-error').classList.remove('hidden'); }
     
+    // Fitur Logout
     function logoutAccount() { 
       localStorage.removeItem('sansam_role'); 
       currentRole = null;
