@@ -155,7 +155,7 @@
         <h3 class="text-base sm:text-2xl font-black mt-1 text-white leading-tight" id="metric-total-omzet">Rp 0</h3>
       </div>
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cash Fisik (Di Driver)</p>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cash Sisa (Di Driver)</p>
         <h3 class="text-base sm:text-2xl font-black mt-1 text-amber-500 leading-tight" id="metric-cash-driver">Rp 0</h3>
       </div>
       <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden">
@@ -416,7 +416,7 @@
         
         <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
           <h3 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-id-card text-brand-green mr-2"></i> Mesin Absensi</h3>
-          <p class="text-xs text-gray-400 mb-4">Catat kehadiran / kesiapan armada. (Uang jalan/kas dicatat lewat fitur Transfer Kas di Tab Input).</p>
+          <p class="text-xs text-gray-400 mb-4">Catat kehadiran armada. (Uang jalan dicatat lewat Transfer Kas di Tab Input).</p>
           <form id="attendance-form" onsubmit="handleAttendanceSubmit(event)" class="space-y-4">
             <div>
               <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Pilih Driver</label>
@@ -494,6 +494,48 @@
     </div>
   </div>
 
+  <!-- EDIT MODAL PINTAR -->
+  <div id="edit-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl">
+      <form id="edit-form" onsubmit="saveEdit(event)" class="p-6 space-y-4">
+        <div class="flex justify-between items-center mb-2 border-b border-brand-border pb-3">
+          <h3 class="text-base font-bold text-white"><i class="fa-solid fa-pen-to-square text-brand-blue mr-2"></i>Koreksi Data</h3>
+          <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        
+        <!-- Dinamis: Untuk Ritase -->
+        <div id="edit-ritase-fields" class="hidden space-y-3">
+          <div><label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Rute</label><input type="text" id="edit-rute" class="w-full bg-brand-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:border-brand-blue outline-none"></div>
+          <div><label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Muatan</label><input type="text" id="edit-muatan" class="w-full bg-brand-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:border-brand-blue outline-none"></div>
+          <div><label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Nominal (Rp)</label><input type="number" id="edit-ritase-nominal" class="w-full bg-brand-black border border-brand-border rounded-xl p-2.5 text-xs font-bold text-white focus:border-brand-blue outline-none"></div>
+        </div>
+
+        <!-- Dinamis: Untuk Pengeluaran/Panjar -->
+        <div id="edit-pengeluaran-fields" class="hidden space-y-3">
+          <div><label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Penerima / Keterangan</label><input type="text" id="edit-recipient" class="w-full bg-brand-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:border-brand-blue outline-none"></div>
+          <div><label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Nominal (Rp)</label><input type="number" id="edit-pengeluaran-nominal" class="w-full bg-brand-black border border-brand-border rounded-xl p-2.5 text-xs font-bold text-white focus:border-brand-blue outline-none"></div>
+        </div>
+
+        <!-- Dinamis: Untuk Absensi -->
+        <div id="edit-absensi-fields" class="hidden space-y-3">
+           <div>
+              <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Ubah Status</label>
+              <select id="edit-absensi-tipe" class="w-full bg-brand-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:border-brand-blue outline-none">
+                <option value="Jalan">Jalan (Aktif)</option>
+                <option value="Istirahat">Istirahat</option>
+                <option value="Sakit">Sakit</option>
+                <option value="Izin">Izin / Off</option>
+              </select>
+           </div>
+        </div>
+
+        <button type="submit" class="w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-bold py-3 rounded-xl text-xs transition mt-2 shadow-lg shadow-brand-blue/20">
+          <i class="fa-solid fa-check mr-1.5"></i> Simpan Perubahan
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- PHOTO MODAL -->
   <div id="photo-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
     <div class="bg-brand-card border border-brand-border w-full max-w-lg rounded-2xl overflow-hidden relative shadow-2xl">
@@ -525,7 +567,6 @@
     // 2. PWA INSTALL LOGIC 
     // =====================================================================
     let deferredPrompt;
-
     const manifestData = {
       "name": "CV SANSAM GROUP", "short_name": "SansamFleet", "start_url": ".", "display": "standalone",
       "background_color": "#07080B", "theme_color": "#07080B",
@@ -589,23 +630,19 @@
       }
 
       const cancelBtn = document.getElementById('dialog-cancel-btn');
-      if (onConfirm) {
-        cancelBtn.classList.remove('hidden'); pendingConfirmAction = onConfirm;
-      } else {
-        cancelBtn.classList.add('hidden'); pendingConfirmAction = null;
-      }
+      if (onConfirm) { cancelBtn.classList.remove('hidden'); pendingConfirmAction = onConfirm; } 
+      else { cancelBtn.classList.add('hidden'); pendingConfirmAction = null; }
       document.getElementById('custom-dialog-modal').classList.remove('hidden');
     }
 
     document.getElementById('dialog-cancel-btn').addEventListener('click', closeCustomDialog);
     document.getElementById('dialog-confirm-btn').addEventListener('click', () => {
-      closeCustomDialog();
-      if(pendingConfirmAction) pendingConfirmAction();
+      closeCustomDialog(); if(pendingConfirmAction) pendingConfirmAction();
     });
     function closeCustomDialog() { document.getElementById('custom-dialog-modal').classList.add('hidden'); }
 
     // =====================================================================
-    // 3. FUNGSI GAMBAR & SUPABASE DATABASE CORE
+    // 3. FUNGSI GAMBAR, DB CORE, HAPUS
     // =====================================================================
     function resizeImage(file, callback) {
       const reader = new FileReader();
@@ -652,8 +689,7 @@
       } catch (err) { showToast('Koneksi Gagal', 'Tidak terhubung server.', 'error'); return false; }
     }
     async function updateDB(table, id, updates) { await supabaseClient.from(table).update(updates).eq('id', id); }
-    
-    // HAPUS DATA
+
     async function deleteRecord(id, tableType) {
       showCustomDialog({
         title: 'Hapus Data Permanen?',
@@ -664,9 +700,8 @@
           const { error } = await supabaseClient.from(tableType).delete().eq('id', id);
           showLoader(false);
 
-          if (error) {
-            showToast('Gagal Menghapus', error.message, 'error');
-          } else {
+          if (error) { showToast('Gagal Menghapus', error.message, 'error'); } 
+          else {
             appState[tableType] = appState[tableType].filter(x => x.id !== id); refreshAllUI();
             showToast('Berhasil Dihapus', 'Data telah dihapus dari sistem.', 'success');
           }
@@ -686,7 +721,6 @@
       const rute = document.getElementById('direct-rute').value;
       const muatan = document.getElementById('direct-muatan').value;
       let nominal = parseFloat(document.getElementById('direct-nominal').value) || 0;
-
       let defaultStatus = directSelectedPayment === "Transfer" ? "Sudah Disetor" : (directSelectedPayment === "Bon" ? "Piutang" : "Belum Disetor");
 
       const newRecord = {
@@ -695,9 +729,7 @@
         payment: directSelectedPayment, status: defaultStatus, photo: base64Photo || ""
       };
 
-      showLoader(true);
-      const isSuccess = await insertToDB('ritase', newRecord);
-      showLoader(false);
+      showLoader(true); const isSuccess = await insertToDB('ritase', newRecord); showLoader(false);
 
       if (isSuccess) {
         appState.ritase.unshift(newRecord); refreshAllUI(); document.getElementById('direct-ritase-form').reset();
@@ -725,9 +757,7 @@
         source: source, category: category, recipient: recipient, nominal: nominal, note: "", status: "Active", photo: base64ExpensePhoto || ""
       };
 
-      showLoader(true);
-      const isSuccess = await insertToDB('pengeluaran', newExp);
-      showLoader(false);
+      showLoader(true); const isSuccess = await insertToDB('pengeluaran', newExp); showLoader(false);
 
       if (isSuccess) {
         appState.pengeluaran.unshift(newExp); refreshAllUI(); document.getElementById('driver-expense-form').reset();
@@ -747,9 +777,7 @@
         name: name, tipe: condition, status: "Active"
       };
 
-      showLoader(true);
-      const isSuccess = await insertToDB('absensi', newAbsen);
-      showLoader(false);
+      showLoader(true); const isSuccess = await insertToDB('absensi', newAbsen); showLoader(false);
 
       if (isSuccess) {
         appState.absensi.unshift(newAbsen); refreshAllUI(); document.getElementById('attendance-form').reset();
@@ -758,21 +786,18 @@
     }
 
     // =====================================================================
-    // 5. RENDERING, KAS LOGIC & UI HELPER 
+    // 5. RENDERING & KAS LOGIC 
     // =====================================================================
     function getDriverCashInHand(driverName) {
-      let cash = 0;
-      let timeline = [];
-
-      // Kumpulkan semua histori pemasukan ritase cash
+      let cash = 0; let timeline = [];
+      // Ritase cash in
       appState.ritase.forEach(i => { 
         if (i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor") {
           let timeMs = parseInt(i.id.split('-')[1]) || 0;
           timeline.push({ type: 'in', nominal: i.nominal, time: timeMs });
         }
       });
-      
-      // Kumpulkan histori pengeluaran & transfer kas
+      // Expense out & Transfer in
       appState.pengeluaran.forEach(e => {
         const isActive = (e.status === undefined || e.status === "Active");
         if (isActive) {
@@ -781,20 +806,12 @@
           if (e.category === "Transfer Kas" && e.recipient === driverName) timeline.push({ type: 'in', nominal: e.nominal, time: timeMs });
         }
       });
-      
-      // Urutkan transaksi berdasarkan waktu secara kronologis (dari awal ke akhir)
+      // Sort kronologis & kalkulasi
       timeline.sort((a, b) => a.time - b.time);
-
-      // Kalkulasi kas berjalan, tidak boleh tembus di bawah 0 (mines)
       timeline.forEach(t => {
-        if (t.type === 'in') {
-          cash += t.nominal;
-        } else if (t.type === 'out') {
-          cash -= t.nominal;
-          if (cash < 0) cash = 0; // Reset ke 0 jika minus, sehingga cash baru tidak terpotong pengeluaran/panjar masa lalu
-        }
+        if (t.type === 'in') cash += t.nominal;
+        else if (t.type === 'out') { cash -= t.nominal; if (cash < 0) cash = 0; }
       });
-
       return cash;
     }
     
@@ -844,7 +861,7 @@
         let btn = (i.status === "Belum Disetor" && i.payment === "Cash") ? `<button onclick="approveDeposit('${i.id}')" class="bg-brand-green/20 text-brand-green px-2 py-1 rounded text-[10px] font-bold">Terima Setoran</button>` : `<span class="text-[10px] text-gray-500">Selesai</span>`;
         if(i.status === "Piutang" || i.nominal === 0) btn = `<button onclick="settlePriceAndPay('${i.id}')" class="bg-brand-blue/20 text-brand-blue px-2 py-1 rounded text-[10px] font-bold">Atur Lunas</button>`;
         
-        let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="deleteRecord('${i.id}', 'ritase')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Data"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
+        let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="openEditModal('${i.id}', 'ritase')" class="text-sky-400 hover:text-sky-300 bg-sky-400/10 p-1.5 rounded" title="Edit Data"><i class="fa-solid fa-pen text-xs"></i></button> <button onclick="deleteRecord('${i.id}', 'ritase')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Data"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${i.timestamp}</td><td class="p-3 font-bold">${i.driver}</td><td class="p-3">${i.rute}</td><td class="p-3">${i.muatan}</td><td class="p-3 text-right font-bold text-white">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center">${i.payment}</td><td class="p-3 text-center ${badgeColor} font-bold text-[10px]">${i.status}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${i.photo}')"><i class="fa-solid fa-image"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
@@ -852,7 +869,7 @@
     function renderExpenseTable() {
       const b = document.getElementById('expense-table-body'); b.innerHTML = "";
       appState.pengeluaran.forEach(e => {
-        let actionCell = `<div class="flex justify-end"><button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Transaksi"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
+        let actionCell = `<div class="flex items-center justify-end gap-1.5"><button onclick="openEditModal('${e.id}', 'pengeluaran')" class="text-sky-400 hover:text-sky-300 bg-sky-400/10 p-1.5 rounded" title="Edit Transaksi"><i class="fa-solid fa-pen text-xs"></i></button> <button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Transaksi"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${e.timestamp}</td><td class="p-3 font-bold text-amber-500">${e.source}</td><td class="p-3">${e.category}</td><td class="p-3">${e.recipient}</td><td class="p-3 text-right font-bold text-rose-500">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${e.photo}')"><i class="fa-solid fa-receipt"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
@@ -869,7 +886,7 @@
       appState.pengeluaran.filter(e => e.category === "Panjar Driver").forEach(e => {
         let status = (e.status === undefined || e.status === "Active") ? "Aktif" : "Selesai";
         let btn = status === "Aktif" ? `<button onclick="settleSinglePanjar('${e.id}')" class="bg-sky-500/20 text-sky-400 px-2 py-1 rounded text-[10px] font-bold">Potong Panjar</button>` : `<span class="text-gray-500 text-[10px]">Settled</span>`;
-        let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Panjar"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
+        let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="openEditModal('${e.id}', 'pengeluaran')" class="text-sky-400 hover:text-sky-300 bg-sky-400/10 p-1.5 rounded" title="Edit Panjar"><i class="fa-solid fa-pen text-xs"></i></button> <button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Panjar"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3">${e.timestamp}</td><td class="p-3 font-bold">${e.source}</td><td class="p-3 text-sky-400 font-bold">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center text-[10px] font-bold">${status}</td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
@@ -878,65 +895,96 @@
       const b = document.getElementById('driver-status-list'); b.innerHTML = "";
       ["IKKI", "FAUZI", "ASO"].forEach(name => {
         const cashHand = getDriverCashInHand(name);
-        
-        // TOMBOL TERIMA SETORAN KAS (Hanya Admin)
-        let setoranBtnHTML = (cashHand > 0 && currentRole === 'ADMIN') 
-          ? `<button onclick="settleAllDriverCash('${name}')" class="mt-2 w-full active-scale bg-brand-green/20 hover:bg-brand-green/30 text-brand-green border border-brand-green/30 px-3 py-2 rounded-xl text-[10px] font-bold transition flex items-center justify-center gap-1.5"><i class="fa-solid fa-hand-holding-dollar text-sm"></i> Terima Rp ${cashHand.toLocaleString('id-ID')}</button>` 
-          : '';
+        let setoranBtnHTML = (cashHand > 0 && currentRole === 'ADMIN') ? `<button onclick="settleAllDriverCash('${name}')" class="mt-2 active-scale bg-brand-green/20 hover:bg-brand-green/30 text-brand-green border border-brand-green/30 px-3 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1.5"><i class="fa-solid fa-hand-holding-dollar"></i> Terima Setoran Kas</button>` : '';
 
-        b.innerHTML += `<div class="p-3 border border-brand-border rounded-xl bg-brand-black mb-2 flex flex-col justify-between items-start">
-          <div class="flex justify-between w-full mb-1">
-            <div class="font-bold text-sm text-white">${name} <span class="text-[9px] text-brand-green ml-1 border border-brand-green/20 px-1.5 rounded bg-brand-green/10">Aktif</span></div>
-            <div class="text-right">
-              <span class="text-[9px] text-gray-400 block">Uang Kas Fisik</span>
-              <span class="text-amber-500 font-bold text-sm animate-pulse">Rp ${cashHand.toLocaleString('id-ID')}</span>
-            </div>
-          </div>
-          ${setoranBtnHTML}
-        </div>`;
+        b.innerHTML += `<div class="p-3 border border-brand-border rounded-xl bg-brand-black mb-2 flex justify-between items-start"><div><div class="font-bold text-sm text-white">${name} <span class="text-[9px] text-brand-green ml-1 border border-brand-green/20 px-1.5 rounded bg-brand-green/10">Aktif</span></div>${setoranBtnHTML}</div><div class="text-right"><span class="text-[9px] text-gray-400 block">Uang Kas Fisik</span><span class="text-amber-500 font-bold text-sm animate-pulse">Rp ${cashHand.toLocaleString('id-ID')}</span></div></div>`;
       });
     }
 
     function renderAbsensi() {
       const b = document.getElementById('absensi-table-body'); if(!b) return; b.innerHTML = "";
       appState.absensi.forEach(i => {
-        let actionCell = `<div class="flex justify-end"><button onclick="deleteRecord('${i.id}', 'absensi')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Absensi"><i class="fa-solid fa-trash text-[10px]"></i></button></div>`;
+        let actionCell = `<div class="flex items-center justify-end gap-1.5"><button onclick="openEditModal('${i.id}', 'absensi')" class="text-sky-400 hover:text-sky-300 bg-sky-400/10 p-1.5 rounded" title="Edit Absensi"><i class="fa-solid fa-pen text-[10px]"></i></button> <button onclick="deleteRecord('${i.id}', 'absensi')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Absensi"><i class="fa-solid fa-trash text-[10px]"></i></button></div>`;
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card/30"><td class="p-3 text-[11px]">${i.timestamp}</td><td class="p-3 font-bold text-white">${i.name}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-brand-border">${i.tipe}</span></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
     }
 
     // =====================================================================
-    // 6. AKSI ADMIN (TERIMA SETORAN, LUNAS, DLL)
+    // 6. AKSI ADMIN (TERIMA SETORAN, LUNAS, EDIT DATA, DLL)
     // =====================================================================
+    let currentEditId = null;
+    let currentEditType = null;
+
+    function openEditModal(id, type) {
+      currentEditId = id; currentEditType = type;
+      const item = appState[type].find(x => x.id === id);
+      if(!item) return;
+
+      document.getElementById('edit-ritase-fields').classList.add('hidden');
+      document.getElementById('edit-pengeluaran-fields').classList.add('hidden');
+      document.getElementById('edit-absensi-fields').classList.add('hidden');
+
+      if (type === 'ritase') {
+        document.getElementById('edit-ritase-fields').classList.remove('hidden');
+        document.getElementById('edit-rute').value = item.rute;
+        document.getElementById('edit-muatan').value = item.muatan;
+        document.getElementById('edit-ritase-nominal').value = item.nominal;
+      } else if (type === 'pengeluaran') {
+        document.getElementById('edit-pengeluaran-fields').classList.remove('hidden');
+        document.getElementById('edit-recipient').value = item.recipient;
+        document.getElementById('edit-pengeluaran-nominal').value = item.nominal;
+      } else if (type === 'absensi') {
+        document.getElementById('edit-absensi-fields').classList.remove('hidden');
+        document.getElementById('edit-absensi-tipe').value = item.tipe;
+      }
+      document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); currentEditId = null; currentEditType = null; }
+
+    async function saveEdit(e) {
+      e.preventDefault();
+      if(!currentEditId || !currentEditType) return;
+
+      let updates = {};
+      const item = appState[currentEditType].find(x => x.id === currentEditId);
+      if(!item) return;
+
+      if (currentEditType === 'ritase') {
+        updates.rute = document.getElementById('edit-rute').value;
+        updates.muatan = document.getElementById('edit-muatan').value;
+        updates.nominal = parseFloat(document.getElementById('edit-ritase-nominal').value) || 0;
+        item.rute = updates.rute; item.muatan = updates.muatan; item.nominal = updates.nominal;
+      } else if (currentEditType === 'pengeluaran') {
+        updates.recipient = document.getElementById('edit-recipient').value;
+        updates.nominal = parseFloat(document.getElementById('edit-pengeluaran-nominal').value) || 0;
+        item.recipient = updates.recipient; item.nominal = updates.nominal;
+      } else if (currentEditType === 'absensi') {
+        updates.tipe = document.getElementById('edit-absensi-tipe').value;
+        item.tipe = updates.tipe;
+      }
+
+      showLoader(true); await updateDB(currentEditType, currentEditId, updates); showLoader(false);
+      closeEditModal(); refreshAllUI(); showToast('Koreksi Berhasil', 'Data telah diperbarui secara permanen.', 'success');
+    }
+
     async function settleAllDriverCash(driverName) {
       const totalCash = getDriverCashInHand(driverName);
       if (totalCash <= 0) return showToast('Info', 'Tidak ada sisa kas fisik di driver ini.', 'error');
 
       showCustomDialog({
         title: `Terima Setoran ${driverName}?`,
-        message: `Driver ${driverName} akan menyetor kas fisik sebesar Rp ${totalCash.toLocaleString('id-ID')} ke Admin.\n\nTindakan ini akan otomatis melunaskan riwayat ritase tunai & pengeluaran operasional yang menggantung (KECUALI PANJAR). Lanjutkan?`,
+        message: `Driver ${driverName} akan menyetor kas fisik sebesar Rp ${totalCash.toLocaleString('id-ID')} ke Admin.\n\nTindakan ini otomatis melunaskan riwayat ritase tunai & pengeluaran operasional di driver ini (Panjar tidak terpengaruh). Lanjutkan?`,
         type: 'info',
         onConfirm: async () => {
           showLoader(true);
-          
-          // 1. Update Ritase yg belum disetor
           const pendingRitase = appState.ritase.filter(i => i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor");
-          for (let r of pendingRitase) {
-            r.status = "Sudah Disetor"; await updateDB('ritase', r.id, { status: "Sudah Disetor" });
-          }
+          for (let r of pendingRitase) { r.status = "Sudah Disetor"; await updateDB('ritase', r.id, { status: "Sudah Disetor" }); }
+          
+          const pendingExp = appState.pengeluaran.filter(e => (e.status === undefined || e.status === "Active") && e.category !== "Panjar Driver" && (e.source === driverName || (e.category === "Transfer Kas" && e.recipient === driverName)));
+          for (let e of pendingExp) { e.status = "Settled"; await updateDB('pengeluaran', e.id, { status: "Settled" }); }
 
-          // 2. Update Pengeluaran yg statusnya masih Active yg memotong kas dia (KECUALI PANJAR)
-          const pendingExp = appState.pengeluaran.filter(e => 
-            (e.status === undefined || e.status === "Active") && 
-            e.category !== "Panjar Driver" && // JANGAN SETTLE PANJAR SECARA OTOMATIS
-            (e.source === driverName || (e.category === "Transfer Kas" && e.recipient === driverName))
-          );
-          for (let e of pendingExp) {
-            e.status = "Settled"; await updateDB('pengeluaran', e.id, { status: "Settled" });
-          }
-
-          showLoader(false); refreshAllUI();
-          showToast('Setoran Diterima', `Seluruh setoran kas dari ${driverName} berhasil dibukukan. Panjar tidak terpengaruh.`, 'success');
+          showLoader(false); refreshAllUI(); showToast('Setoran Diterima', `Kas dari ${driverName} berhasil dibukukan.`, 'success');
         }
       });
     }
@@ -944,8 +992,7 @@
     async function approveDeposit(id) {
       const item = appState.ritase.find(x => x.id === id); if(!item) return;
       item.status = "Sudah Disetor"; refreshAllUI();
-      await updateDB('ritase', id, {status: "Sudah Disetor"});
-      showToast('Setoran Sukses', 'Kas fisik telah diterima oleh admin/kasir', 'success');
+      await updateDB('ritase', id, {status: "Sudah Disetor"}); showToast('Setoran Sukses', 'Kas fisik telah diterima oleh admin/kasir', 'success');
     }
 
     async function settlePriceAndPay(id) {
@@ -953,34 +1000,27 @@
       let newNominal = prompt("Masukkan Nominal Harga Lunas (Rp):", item.nominal);
       if(newNominal && !isNaN(newNominal)) {
         item.nominal = parseFloat(newNominal); item.status = "Sudah Disetor"; refreshAllUI();
-        await updateDB('ritase', id, {nominal: item.nominal, status: "Sudah Disetor"});
-        showToast('Sukses', 'Harga diatur dan dilunasi', 'success');
+        await updateDB('ritase', id, {nominal: item.nominal, status: "Sudah Disetor"}); showToast('Sukses', 'Harga diatur dan dilunasi', 'success');
       }
     }
 
     async function settleSinglePanjar(id) {
       const item = appState.pengeluaran.find(x => x.id === id); if(!item) return;
       item.status = "Settled"; refreshAllUI();
-      await updateDB('pengeluaran', id, {status: "Settled"});
-      showToast('Potongan Berhasil', `Panjar ${item.source} telah dipotong.`, 'success');
+      await updateDB('pengeluaran', id, {status: "Settled"}); showToast('Potongan Berhasil', `Panjar ${item.source} telah dipotong.`, 'success');
     }
 
     // =====================================================================
     // 7. SHARE & DOWNLOAD (PENGGANTI DIRECT DOWNLOAD UNTUK HP)
     // =====================================================================
     async function shareOrDownloadFile(blob, filename) {
-      const file = new File([blob], filename, { type: blob.type || 'application/octet-stream' });
-      
+      const file = new File([blob], filename, { type: blob.type });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: 'Download ' + filename, text: 'File dokumen laporan dari sistem Sansam Fleet.' });
-          showToast('Sukses', 'Silakan pilih aplikasi tujuan.', 'success');
-        } catch (err) { console.log('Share dibatalkan pengguna'); }
+        try { await navigator.share({ files: [file], title: 'Download ' + filename, text: 'File laporan dari Sansam Fleet.' }); showToast('Sukses', 'Pilih aplikasi tujuan.', 'success'); } 
+        catch (err) { console.log('Share dibatalkan'); }
       } else {
-        const url = URL.createObjectURL(blob); const link = document.createElement("a");
-        link.href = url; link.download = filename; document.body.appendChild(link); link.click();
-        setTimeout(() => { document.body.removeChild(link); URL.revokeObjectURL(url); }, 100);
-        showToast('Info', 'Download dimulai...', 'success');
+        const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = filename; document.body.appendChild(link); link.click();
+        setTimeout(() => { document.body.removeChild(link); URL.revokeObjectURL(url); }, 100); showToast('Info', 'Download dimulai...', 'success');
       }
     }
 
@@ -1001,22 +1041,19 @@
     }
 
     function exportToPDF() {
-      const { jsPDF } = window.jspdf; const doc = new jsPDF('l');
-      doc.text("Laporan Ritase Penjualan CV SANSAM", 14, 15);
+      const { jsPDF } = window.jspdf; const doc = new jsPDF('l'); doc.text("Laporan Ritase Penjualan CV SANSAM", 14, 15);
       const rows = appState.ritase.map(i => [i.timestamp, i.driver, i.rute, i.muatan, i.nominal, i.payment, i.status]);
       doc.autoTable({ head: [['Waktu', 'Driver', 'Rute', 'Muatan', 'Nominal', 'Metode', 'Status']], body: rows, startY: 20 });
       shareOrDownloadFile(doc.output('blob'), "Ritase_CV_SANSAM.pdf");
     }
     function exportExpensesToPDF() {
-      const { jsPDF } = window.jspdf; const doc = new jsPDF('p');
-      doc.text("Laporan Pengeluaran & Transfer CV SANSAM", 14, 15);
+      const { jsPDF } = window.jspdf; const doc = new jsPDF('p'); doc.text("Laporan Pengeluaran & Transfer CV SANSAM", 14, 15);
       const rows = appState.pengeluaran.map(i => [i.timestamp, i.source, i.category, i.recipient, i.nominal]);
       doc.autoTable({ head: [['Waktu', 'Sumber', 'Kategori', 'Penerima', 'Nominal']], body: rows, startY: 20 });
       shareOrDownloadFile(doc.output('blob'), "Pengeluaran_CV_SANSAM.pdf");
     }
     function exportPanjarToPDF() {
-      const { jsPDF } = window.jspdf; const doc = new jsPDF('p');
-      doc.text("Laporan Panjar Driver CV SANSAM", 14, 15);
+      const { jsPDF } = window.jspdf; const doc = new jsPDF('p'); doc.text("Laporan Panjar Driver CV SANSAM", 14, 15);
       const rows = appState.pengeluaran.filter(e=>e.category==="Panjar Driver").map(i => [i.timestamp, i.source, i.nominal, i.status || 'Active']);
       doc.autoTable({ head: [['Waktu', 'Nama Driver', 'Nominal Panjar', 'Status']], body: rows, startY: 20 });
       shareOrDownloadFile(doc.output('blob'), "Panjar_CV_SANSAM.pdf");
@@ -1027,14 +1064,12 @@
     // =====================================================================
     function showToast(title, desc, type='success') {
       document.getElementById('toast-title').innerText = title; document.getElementById('toast-desc').innerText = desc;
-      const icon = document.getElementById('toast-icon');
-      icon.className = type === 'error' ? "fa-solid fa-xmark text-rose-500" : "fa-solid fa-check text-brand-green";
-      const t = document.getElementById('custom-toast');
-      t.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+      const icon = document.getElementById('toast-icon'); icon.className = type === 'error' ? "fa-solid fa-xmark text-rose-500" : "fa-solid fa-check text-brand-green";
+      const t = document.getElementById('custom-toast'); t.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
       setTimeout(() => t.classList.add('translate-y-[-100px]', 'opacity-0', 'pointer-events-none'), 3000);
     }
     function viewPhoto(src) {
-      if(!src || src === "") return showToast('Info', 'Tidak ada foto dilampirkan pada laporan ini', 'error');
+      if(!src || src === "") return showToast('Info', 'Tidak ada foto dilampirkan', 'error');
       document.getElementById('modal-image').src = src; document.getElementById('photo-modal').classList.remove('hidden');
     }
     function closePhotoModal() { document.getElementById('photo-modal').classList.add('hidden'); }
@@ -1054,11 +1089,8 @@
     }
     function handleCategoryChange() {
       const cat = document.getElementById('exp-category').value;
-      if (cat === "Transfer Kas") {
-        document.getElementById('recipient-text-wrapper').classList.add('hidden'); document.getElementById('recipient-driver-wrapper').classList.remove('hidden');
-      } else {
-        document.getElementById('recipient-text-wrapper').classList.remove('hidden'); document.getElementById('recipient-driver-wrapper').classList.add('hidden');
-      }
+      if (cat === "Transfer Kas") { document.getElementById('recipient-text-wrapper').classList.add('hidden'); document.getElementById('recipient-driver-wrapper').classList.remove('hidden'); } 
+      else { document.getElementById('recipient-text-wrapper').classList.remove('hidden'); document.getElementById('recipient-driver-wrapper').classList.add('hidden'); }
     }
     function setDirectPayment(m) {
       directSelectedPayment = m; document.getElementById('direct-selected-payment').value = m;
@@ -1089,46 +1121,27 @@
 
     window.onload = function() {
       setTimeout(() => { document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none'); }, 1000);
-      
-      const dateEl = document.getElementById('current-date-el');
-      if (dateEl) { dateEl.innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); }
-      
+      document.getElementById('current-date-el').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
       if (!currentRole) document.getElementById('login-modal').classList.remove('hidden'); else applyRoleUI();
       
       const ctx = document.getElementById('driverChart')?.getContext('2d');
-      if (ctx) {
-        driverDistributionChart = new Chart(ctx, { type: 'bar', data: { labels: ['IKKI', 'FAUZI', 'ASO'], datasets: [{ label: 'Ritase', data: [0,0,0], backgroundColor: ['#005CFF', '#00CC44', '#EF4444'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1D2230' } } } } });
-      }
+      if (ctx) { driverDistributionChart = new Chart(ctx, { type: 'bar', data: { labels: ['IKKI', 'FAUZI', 'ASO'], datasets: [{ label: 'Ritase', data: [0,0,0], backgroundColor: ['#005CFF', '#00CC44', '#EF4444'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1D2230' } } } } }); }
 
-      loadSupabaseData();
-      supabaseClient.channel('public-changes').on('postgres_changes', { event: '*', schema: 'public' }, () => { loadSupabaseData(); }).subscribe();
+      loadSupabaseData(); supabaseClient.channel('public-changes').on('postgres_changes', { event: '*', schema: 'public' }, () => { loadSupabaseData(); }).subscribe();
     };
 
     function updateCharts() {
       if(driverDistributionChart) {
-        let counts = { IKKI:0, FAUZI:0, ASO:0 };
-        appState.ritase.forEach(i => { if(counts[i.driver] !== undefined) counts[i.driver]++ });
+        let counts = { IKKI:0, FAUZI:0, ASO:0 }; appState.ritase.forEach(i => { if(counts[i.driver] !== undefined) counts[i.driver]++ });
         driverDistributionChart.data.datasets[0].data = [counts.IKKI, counts.FAUZI, counts.ASO]; driverDistributionChart.update();
       }
     }
-    
     function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
     function togglePinInput() { document.getElementById('pin-container').classList.toggle('hidden'); }
-    
     function loginAsDriver() { currentRole = 'DRIVER'; localStorage.setItem('sansam_role','DRIVER'); applyRoleUI(); refreshAllUI(); }
     function loginAsAdmin() { if(document.getElementById('admin-pin').value === '240302') { currentRole = 'ADMIN'; localStorage.setItem('sansam_role','ADMIN'); applyRoleUI(); refreshAllUI(); } else document.getElementById('pin-error').classList.remove('hidden'); }
-    
-    // Fitur Logout
-    function logoutAccount() { 
-      localStorage.removeItem('sansam_role'); 
-      currentRole = null;
-      location.reload(); 
-    }
-    
-    function applyRoleUI() {
-      document.getElementById('login-modal').classList.add('hidden');
-      document.querySelectorAll('.admin-only-tab, .admin-only-metric').forEach(el => el.classList.toggle('hidden', currentRole === 'DRIVER'));
-    }
+    function logoutAccount() { localStorage.removeItem('sansam_role'); location.reload(); }
+    function applyRoleUI() { document.getElementById('login-modal').classList.add('hidden'); document.querySelectorAll('.admin-only-tab, .admin-only-metric').forEach(el => el.classList.toggle('hidden', currentRole === 'DRIVER')); }
   </script>
 </body>
 </html>
