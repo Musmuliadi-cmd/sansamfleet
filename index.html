@@ -145,7 +145,6 @@
     </div>
   </header>
 
-  <!-- MAIN APP CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 py-6">
 
     <!-- METRICS GRID -->
@@ -198,6 +197,7 @@
           <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
             <i class="fa-solid fa-users text-brand-blue"></i> Radar Keaktifan
           </h4>
+          <!-- Data driver list akan masuk kesini secara dinamis -->
           <div class="space-y-3" id="driver-status-list"></div>
         </div>
         <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
@@ -796,7 +796,7 @@
 
       if (isSuccess) {
         appState.absensi.unshift(newAbsen); refreshAllUI(); document.getElementById('attendance-form').reset();
-        showToast('Absensi Tersimpan', `Status Kehadiran ${name} diupdate.`, 'success');
+        showToast('Absensi Tersimpan', `Status Kehadiran ${name} diupdate.`, 'success'); switchTab('dashboard');
       }
     }
 
@@ -807,7 +807,7 @@
       let cash = 0;
       let timeline = [];
 
-      // Histori ritase cash (Uang Masuk)
+      // Kumpulkan semua histori pemasukan ritase cash
       appState.ritase.forEach(i => { 
         if (i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor") {
           let timeMs = parseInt(i.id.split('-')[1]) || 0;
@@ -815,7 +815,7 @@
         }
       });
       
-      // Histori pengeluaran & transfer (Uang Keluar / Masuk tambahan)
+      // Kumpulkan histori pengeluaran & transfer kas
       appState.pengeluaran.forEach(e => {
         const isActive = (e.status === undefined || e.status === "Active");
         if (isActive) {
@@ -825,16 +825,16 @@
         }
       });
       
-      // Urutkan kronologis
+      // Urutkan transaksi berdasarkan waktu secara kronologis (dari awal ke akhir)
       timeline.sort((a, b) => a.time - b.time);
 
-      // Kalkulasi berjalan (anti minus)
+      // Kalkulasi kas berjalan, tidak boleh tembus di bawah 0 (mines)
       timeline.forEach(t => {
         if (t.type === 'in') {
           cash += t.nominal;
         } else if (t.type === 'out') {
           cash -= t.nominal;
-          if (cash < 0) cash = 0; // Tidak boleh minus
+          if (cash < 0) cash = 0; // Reset ke 0 jika minus
         }
       });
 
@@ -887,7 +887,6 @@
         let btn = (i.status === "Belum Disetor" && i.payment === "Cash") ? `<button onclick="approveDeposit('${i.id}')" class="bg-brand-green/20 text-brand-green px-2 py-1 rounded text-[10px] font-bold">Terima Setoran</button>` : `<span class="text-[10px] text-gray-500">Selesai</span>`;
         if(i.status === "Piutang" || i.nominal === 0) btn = `<button onclick="settlePriceAndPay('${i.id}')" class="bg-brand-blue/20 text-brand-blue px-2 py-1 rounded text-[10px] font-bold">Atur Lunas</button>`;
         
-        // Tambahan Tombol Edit (Pena Biru)
         let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="openEditModal('${i.id}', 'ritase')" class="text-sky-400 hover:text-sky-300 bg-sky-400/10 p-1.5 rounded" title="Edit Data"><i class="fa-solid fa-pen text-xs"></i></button> <button onclick="deleteRecord('${i.id}', 'ritase')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Data"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${i.timestamp}</td><td class="p-3 font-bold">${i.driver}</td><td class="p-3">${i.rute}</td><td class="p-3">${i.muatan}</td><td class="p-3 text-right font-bold text-white">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center">${i.payment}</td><td class="p-3 text-center ${badgeColor} font-bold text-[10px]">${i.status}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${i.photo}')"><i class="fa-solid fa-image"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
@@ -896,7 +895,6 @@
     function renderExpenseTable() {
       const b = document.getElementById('expense-table-body'); b.innerHTML = "";
       appState.pengeluaran.forEach(e => {
-        // Tambahan Tombol Edit
         let actionCell = `<div class="flex items-center justify-end gap-1.5"><button onclick="openEditModal('${e.id}', 'pengeluaran')" class="text-sky-400 hover:text-sky-300 bg-sky-400/10 p-1.5 rounded" title="Edit Transaksi"><i class="fa-solid fa-pen text-xs"></i></button> <button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Transaksi"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${e.timestamp}</td><td class="p-3 font-bold text-amber-500">${e.source}</td><td class="p-3">${e.category}</td><td class="p-3">${e.recipient}</td><td class="p-3 text-right font-bold text-rose-500">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${e.photo}')"><i class="fa-solid fa-receipt"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
@@ -914,7 +912,6 @@
       appState.pengeluaran.filter(e => e.category === "Panjar Driver").forEach(e => {
         let status = (e.status === undefined || e.status === "Active") ? "Aktif" : "Selesai";
         let btn = status === "Aktif" ? `<button onclick="settleSinglePanjar('${e.id}')" class="bg-sky-500/20 text-sky-400 px-2 py-1 rounded text-[10px] font-bold">Potong Panjar</button>` : `<span class="text-gray-500 text-[10px]">Settled</span>`;
-        // Tambahan Tombol Edit
         let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="openEditModal('${e.id}', 'pengeluaran')" class="text-sky-400 hover:text-sky-300 bg-sky-400/10 p-1.5 rounded" title="Edit Panjar"><i class="fa-solid fa-pen text-xs"></i></button> <button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Panjar"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3">${e.timestamp}</td><td class="p-3 font-bold">${e.source}</td><td class="p-3 text-sky-400 font-bold">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center text-[10px] font-bold">${status}</td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
@@ -924,6 +921,21 @@
       const b = document.getElementById('driver-status-list'); b.innerHTML = "";
       ["IKKI", "FAUZI", "ASO"].forEach(name => {
         const cashHand = getDriverCashInHand(name);
+
+        // Cari status absensi terbaru dari data
+        const latestAbsen = appState.absensi.find(a => a.name === name);
+        let statusText = "Jalan (Aktif)";
+        let statusBadge = "text-brand-green border-brand-green/20 bg-brand-green/10";
+
+        if (latestAbsen) {
+            if (latestAbsen.tipe === "Istirahat") {
+                statusText = "Istirahat"; statusBadge = "text-amber-500 border-amber-500/20 bg-amber-500/10";
+            } else if (latestAbsen.tipe === "Sakit") {
+                statusText = "Sakit"; statusBadge = "text-rose-500 border-rose-500/20 bg-rose-500/10";
+            } else if (latestAbsen.tipe === "Izin") {
+                statusText = "Izin / Off"; statusBadge = "text-orange-500 border-orange-500/20 bg-orange-500/10";
+            }
+        }
         
         // TOMBOL TERIMA SETORAN KAS SELURUHNYA (Muncul hanya jika ada kas & login sebagai Admin)
         let setoranBtnHTML = (cashHand > 0 && currentRole === 'ADMIN') 
@@ -932,12 +944,12 @@
 
         b.innerHTML += `<div class="p-3 border border-brand-border rounded-xl bg-brand-black mb-2 flex justify-between items-start">
           <div>
-            <div class="font-bold text-sm text-white">${name} <span class="text-[9px] text-brand-green ml-1 border border-brand-green/20 px-1.5 rounded bg-brand-green/10">Aktif</span></div>
+            <div class="font-bold text-sm text-white">${name} <span class="text-[9px] ml-1 border px-1.5 py-0.5 rounded ${statusBadge}">${statusText}</span></div>
             ${setoranBtnHTML}
           </div> 
           <div class="text-right">
             <span class="text-[9px] text-gray-400 block">Uang Kas Fisik</span>
-            <span class="text-amber-500 font-bold text-sm animate-pulse">Rp ${cashHand.toLocaleString('id-ID')}</span>
+            <span class="text-amber-500 font-bold text-sm">Rp ${cashHand.toLocaleString('id-ID')}</span>
           </div>
         </div>`;
       });
@@ -946,7 +958,6 @@
     function renderAbsensi() {
       const b = document.getElementById('absensi-table-body'); if(!b) return; b.innerHTML = "";
       appState.absensi.forEach(i => {
-        // Tambahan Tombol Edit
         let actionCell = `<div class="flex items-center justify-end gap-1.5"><button onclick="openEditModal('${i.id}', 'absensi')" class="text-sky-400 hover:text-sky-300 bg-sky-400/10 p-1.5 rounded" title="Edit Absensi"><i class="fa-solid fa-pen text-[10px]"></i></button> <button onclick="deleteRecord('${i.id}', 'absensi')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Absensi"><i class="fa-solid fa-trash text-[10px]"></i></button></div>`;
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card/30"><td class="p-3 text-[11px]">${i.timestamp}</td><td class="p-3 font-bold text-white">${i.name}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-brand-border">${i.tipe}</span></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
@@ -955,8 +966,6 @@
     // =====================================================================
     // 6. AKSI ADMIN (EDIT DATA, TERIMA SETORAN, LUNAS, DLL)
     // =====================================================================
-    
-    // SISTEM EDIT DATA
     let currentEditId = null;
     let currentEditType = null;
 
@@ -1019,19 +1028,19 @@
 
       showCustomDialog({
         title: `Terima Setoran ${driverName}?`,
-        message: `Driver ${driverName} akan menyetor kas fisik sebesar Rp ${totalCash.toLocaleString('id-ID')} ke Admin.\n\nTindakan ini otomatis melunaskan riwayat ritase tunai & pengeluaran operasional di driver ini (Panjar tidak terpengaruh). Lanjutkan?`,
+        message: `Driver ${driverName} akan menyetor kas fisik sebesar Rp ${totalCash.toLocaleString('id-ID')} ke Admin.\n\nTindakan ini akan otomatis melunaskan (menyelesaikan) semua riwayat ritase tunai & pengeluaran yang menggantung di driver ini. Lanjutkan?`,
         type: 'info',
         onConfirm: async () => {
           showLoader(true);
           
-          // 1. Update Ritase yg belum disetor
+          // Update Ritase yg belum disetor
           const pendingRitase = appState.ritase.filter(i => i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor");
           for (let r of pendingRitase) {
             r.status = "Sudah Disetor"; await updateDB('ritase', r.id, { status: "Sudah Disetor" });
           }
 
-          // 2. Update Pengeluaran yg statusnya masih Active yg memotong kas dia (KECUALI PANJAR)
-          const pendingExp = appState.pengeluaran.filter(e => (e.status === undefined || e.status === "Active") && e.category !== "Panjar Driver" && (e.source === driverName || (e.category === "Transfer Kas" && e.recipient === driverName)));
+          // Update Pengeluaran yg statusnya masih Active yg memotong kas dia
+          const pendingExp = appState.pengeluaran.filter(e => (e.status === undefined || e.status === "Active") && (e.source === driverName || (e.category === "Transfer Kas" && e.recipient === driverName)));
           for (let e of pendingExp) {
             e.status = "Settled"; await updateDB('pengeluaran', e.id, { status: "Settled" });
           }
@@ -1072,14 +1081,12 @@
     async function shareOrDownloadFile(blob, filename) {
       const file = new File([blob], filename, { type: blob.type });
       
-      // Jika HP mendukung fitur Share File ke aplikasi lain (WA/Drive)
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({ files: [file], title: 'Download ' + filename, text: 'File dokumen laporan dari sistem Sansam Fleet.' });
           showToast('Sukses', 'Silakan pilih aplikasi tujuan.', 'success');
         } catch (err) { console.log('Share dibatalkan pengguna'); }
       } else {
-        // Mode Fallback untuk Laptop / HP Lama
         const url = URL.createObjectURL(blob); const link = document.createElement("a");
         link.href = url; link.download = filename; document.body.appendChild(link); link.click();
         setTimeout(() => { document.body.removeChild(link); URL.revokeObjectURL(url); }, 100);
@@ -1124,6 +1131,7 @@
       doc.autoTable({ head: [['Waktu', 'Nama Driver', 'Nominal Panjar', 'Status']], body: rows, startY: 20 });
       shareOrDownloadFile(doc.output('blob'), "Panjar_CV_SANSAM.pdf");
     }
+
 
     // =====================================================================
     // 8. TABS, UI HELPERS & INIT
