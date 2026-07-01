@@ -257,7 +257,7 @@
         <button type="button" onclick="switchInputSubTab('operator-checkin')" id="sub-input-btn-operator-checkin" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale operator-only-section hidden"><i class="fa-solid fa-helmet-safety mr-1.5"></i> Check-In Operator</button>
       </div>
 
-      <!-- FORM RITASE / CHECK-OUT CONTAINER (DINAMIS BERDASARKAN STATUS CHECK-IN) -->
+      <!-- FORM RITASE / CHECK-OUT CONTAINER -->
       <div id="sub-tab-ritase" class="block max-w-2xl mx-auto bg-brand-card border border-brand-border p-5 rounded-2xl">
         <!-- Konten diisi dinamis oleh JavaScript: renderDriverRitaseForm() -->
       </div>
@@ -366,7 +366,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: REKAP TRANSAKSI (ADMIN ONLY) -->
+    <!-- TAB 3: REKAP TRANSAKSI (ADMIN ONLY) + SISTEM FILTER CANGGIH -->
     <div id="tab-content-rekap" class="tab-pane hidden space-y-4 admin-only-tab">
       <div class="flex bg-brand-black p-1.5 rounded-2xl border border-brand-border mb-4 max-w-lg overflow-x-auto custom-scrollbar">
         <button type="button" onclick="switchRekapSubTab('ritase')" id="sub-rekap-btn-ritase" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale"><i class="fa-solid fa-file-invoice mr-1.5"></i> Log Ritase</button>
@@ -374,12 +374,31 @@
         <button type="button" onclick="switchRekapSubTab('panjar')" id="sub-rekap-btn-panjar" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale"><i class="fa-solid fa-hand-holding-dollar mr-1.5"></i> Berkas Panjar</button>
       </div>
 
+      <!-- FILTER UI (GLOBAL UNTUK SEMUA REKAP) -->
+      <div class="bg-brand-black border border-brand-border p-3.5 rounded-2xl flex flex-col md:flex-row gap-2.5 items-center">
+        <div class="w-full md:w-auto text-[10px] text-gray-400 font-bold uppercase tracking-wider md:mr-2"><i class="fa-solid fa-filter text-brand-blue mr-1"></i> Filter Data:</div>
+        <input type="date" id="filter-date-start" title="Tanggal Mulai" class="w-full md:w-auto bg-brand-card border border-brand-border p-2.5 rounded-xl text-xs text-white focus:border-brand-blue outline-none" onchange="refreshAllUI()">
+        <span class="hidden md:inline text-gray-500">-</span>
+        <input type="date" id="filter-date-end" title="Tanggal Akhir" class="w-full md:w-auto bg-brand-card border border-brand-border p-2.5 rounded-xl text-xs text-white focus:border-brand-blue outline-none" onchange="refreshAllUI()">
+        <select id="filter-driver-select" class="w-full md:w-auto bg-brand-card border border-brand-border p-2.5 rounded-xl text-xs text-white focus:border-brand-blue outline-none" onchange="refreshAllUI()">
+          <option value="">Semua Driver</option>
+          <option value="IKKI">IKKI</option>
+          <option value="FAUZI">FAUZI</option>
+          <option value="ASO">ASO</option>
+        </select>
+        <div class="relative w-full md:w-auto flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+          <input type="text" id="filter-search-text" placeholder="Ketik rute / muatan / keterangan..." class="w-full bg-brand-card border border-brand-border p-2.5 pl-8 rounded-xl text-xs text-white focus:border-brand-blue outline-none" onkeyup="refreshAllUI()">
+        </div>
+        <button onclick="resetFilters()" class="w-full md:w-auto bg-zinc-800 hover:bg-zinc-700 text-gray-300 px-4 py-2.5 rounded-xl text-xs font-bold transition">Reset</button>
+      </div>
+
       <div id="sub-tab-rekap-ritase" class="block bg-brand-card border border-brand-border p-5 rounded-2xl space-y-4">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <h3 class="text-base font-bold text-white">Log Manifes Ritase Transaksi</h3>
           <div class="flex gap-2">
-            <button onclick="exportToCSV()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-brand-green"></i> Excel</button>
-            <button onclick="exportToPDF()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
+            <button onclick="exportToCSV('ritase')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-brand-green"></i> Unduh Excel</button>
+            <button onclick="exportToPDF('ritase')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> Unduh PDF</button>
           </div>
         </div>
         <div class="overflow-x-auto rounded-xl border border-brand-border"><table class="w-full text-left text-xs min-w-[950px]"><thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border"><tr><th class="p-3.5">Waktu</th><th class="p-3.5">Driver</th><th class="p-3.5">Rute</th><th class="p-3.5">Muatan</th><th class="p-3.5 text-right">Nominal</th><th class="p-3.5 text-center">Metode</th><th class="p-3.5 text-center">Status</th><th class="p-3.5 text-center">Bukti</th><th class="p-3.5 text-right">Aksi</th></tr></thead><tbody id="rekap-table-body"></tbody></table></div>
@@ -389,8 +408,8 @@
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <h3 class="text-base font-bold text-white">Log Pengeluaran Kas Operasional</h3>
           <div class="flex gap-2">
-            <button onclick="exportExpensesToCSV()" class="bg-brand-border border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-amber-500"></i> Excel</button>
-            <button onclick="exportExpensesToPDF()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
+            <button onclick="exportToCSV('pengeluaran')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-amber-500"></i> Unduh Excel</button>
+            <button onclick="exportToPDF('pengeluaran')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> Unduh PDF</button>
           </div>
         </div>
         <div class="overflow-x-auto rounded-xl border border-brand-border"><table class="w-full text-left text-xs min-w-[800px]"><thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border"><tr><th class="p-3.5">Waktu</th><th class="p-3.5">Sumber Dana</th><th class="p-3.5">Kategori</th><th class="p-3.5">Penerima/Alokasi</th><th class="p-3.5 text-right">Nominal Keluar</th><th class="p-3.5 text-center">Bukti</th><th class="p-3.5 text-right">Aksi</th></tr></thead><tbody id="expense-table-body"></tbody></table></div>
@@ -400,8 +419,8 @@
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <h3 class="text-base font-bold text-white">Monitoring Pinjaman Panjar Driver</h3>
           <div class="flex gap-2">
-            <button onclick="exportPanjarToCSV()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-sky-400"></i> Excel</button>
-            <button onclick="exportPanjarToPDF()" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> PDF</button>
+            <button onclick="exportToCSV('panjar')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-sky-400"></i> Unduh Excel</button>
+            <button onclick="exportToPDF('panjar')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> Unduh PDF</button>
           </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="panjar-driver-summary-cards"></div>
@@ -530,7 +549,7 @@
     let base64Photo = ""; let base64ExpensePhoto = "";
     let currentRole = localStorage.getItem('sansam_role') || null;
     let driverDistributionChart = null;
-    let driverManualOverrideMode = false; // Flag jika driver terpaksa menginput ritase secara manual
+    let driverManualOverrideMode = false;
 
     // =====================================================================
     // 2. NATIVE PWA AUTOMATION SETUP
@@ -580,7 +599,6 @@
       }
     });
 
-    // Custom Alert Dialog Logic
     let pendingConfirmAction = null;
     function showCustomDialog({ title, message, type='info', onConfirm }) {
       document.getElementById('dialog-title').innerText = title;
@@ -602,7 +620,6 @@
       else { cancelBtn.classList.add('hidden'); pendingConfirmAction = null; }
       document.getElementById('custom-dialog-modal').classList.remove('hidden');
     }
-
     document.getElementById('dialog-cancel-btn').addEventListener('click', closeCustomDialog);
     document.getElementById('dialog-confirm-btn').addEventListener('click', () => {
       closeCustomDialog(); if(pendingConfirmAction) pendingConfirmAction();
@@ -679,17 +696,13 @@
     // =====================================================================
     // 4. SUBMIT FORM & REAL-TIME ALUR (CHECK-IN / CHECK-OUT)
     // =====================================================================
-    
-    // OPERATOR: KIRIM DATA CHECK-IN MUATAN
     async function handleCheckInSubmit(e) {
       e.preventDefault();
       const driverStr = document.getElementById('op-driver-select').value;
       const muatan = document.getElementById('op-muatan').value;
-
       if(!driverStr || !muatan) return showToast('Error', 'Lengkapi data muatan kendaraan!', 'error');
       const [name, plate] = driverStr.split('|');
 
-      // Proteksi: Cek apakah kendaraan ini sudah di-check-in sebelumnya dan belum check-out
       const isAlreadyRunning = appState.ritase.some(x => x.driver === name && x.status === "Dalam Perjalanan");
       if(isAlreadyRunning) return showToast('Error', `Driver ${name} sedang berada dalam perjalanan mengantar muatan sebelumnya!`, 'error');
 
@@ -712,18 +725,17 @@
       }
     }
 
-    // DRIVER: KIRIM DATA CHECK-OUT (SELESAI ANTAR)
     async function handleCheckOutSubmit(e, recordId, muatanName) {
       e.preventDefault();
       const rute = document.getElementById('direct-rute').value;
       const nominal = parseFloat(document.getElementById('direct-nominal').value) || 0;
       let defaultStatus = directSelectedPayment === "Transfer" ? "Sudah Disetor" : (directSelectedPayment === "Bon" ? "Piutang" : "Belum Disetor");
 
-      if(!rute || nominal <= 0) return showToast('Error', 'Lengkapi rute dan nominal harga!', 'error');
+      if(!rute || (directSelectedPayment === 'Cash' && nominal <= 0)) return showToast('Error', 'Lengkapi rute dan nominal harga!', 'error');
 
       showLoader(true);
       const updates = {
-        timestamp: new Date().toLocaleString('id-ID', { hour12: false }), // perbarui ke waktu bongkar
+        timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
         rute: rute, nominal: nominal, payment: directSelectedPayment, status: defaultStatus, photo: base64Photo || ""
       };
       
@@ -731,18 +743,14 @@
       showLoader(false);
 
       if(!error) {
-        // Update local state
         const item = appState.ritase.find(x => x.id === recordId);
         if(item) { Object.assign(item, updates); }
         driverManualOverrideMode = false; base64Photo = ""; refreshAllUI();
         showToast('Check-Out Sukses', 'Muatan selesai diantar, manifes ritase berhasil dibukukan!', 'success');
         switchTab('dashboard');
-      } else {
-        showToast('Gagal', error.message, 'error');
-      }
+      } else { showToast('Gagal', error.message, 'error'); }
     }
 
-    // ADMIN / DRIVER OVERRIDE: INPUT RITASE MANUAL (TANPA ALUR OPERATOR)
     async function handleManualRitaseSubmit(e) {
       e.preventDefault();
       let name = "", plate = "";
@@ -785,7 +793,11 @@
       if (category === "Transfer Kas") {
         recipient = document.getElementById('exp-recipient-driver').value;
         if(source === recipient) return showToast('Error','Sumber dana & Penerima Kas tidak boleh sama!','error');
-      } else { recipient = document.getElementById('exp-recipient').value; }
+      } else if (category === "Panjar Driver") {
+        recipient = "Panjar";
+      } else {
+        recipient = document.getElementById('exp-recipient').value;
+      }
 
       if(!source || !category || !recipient || nominal <= 0) return showToast('Error','Lengkapi isian form pengeluaran!','error');
 
@@ -827,31 +839,72 @@
     }
 
     // =====================================================================
-    // 5. DOMPET KAS KRONOLOGIS & INTEGRASI RADAR STATUS
+    // 5. FILTER ENGINE & DATA PROCESSING
+    // =====================================================================
+    function parseDateString(dateStr) {
+       if(!dateStr) return 0;
+       const parts = dateStr.split(' ')[0].split('/');
+       if(parts.length === 3) return new Date(`${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}T00:00:00`).getTime();
+       return new Date(dateStr).getTime();
+    }
+
+    function getFilteredData(type) {
+      const startStr = document.getElementById('filter-date-start')?.value;
+      const endStr = document.getElementById('filter-date-end')?.value;
+      const driver = document.getElementById('filter-driver-select')?.value;
+      const search = document.getElementById('filter-search-text')?.value.toLowerCase();
+
+      const startMs = startStr ? new Date(startStr + "T00:00:00").getTime() : 0;
+      const endMs = endStr ? new Date(endStr + "T23:59:59").getTime() : Infinity;
+
+      let dataSource = type === 'ritase' ? appState.ritase : appState.pengeluaran;
+
+      return dataSource.filter(i => {
+         let recordTime = parseDateString(i.timestamp);
+         if (startMs && recordTime < startMs) return false;
+         if (endMs && recordTime > endMs) return false;
+         
+         if(type === 'ritase') {
+             if (driver && i.driver !== driver) return false;
+             if (search && !i.rute.toLowerCase().includes(search) && !i.muatan.toLowerCase().includes(search) && !i.driver.toLowerCase().includes(search)) return false;
+         } else {
+             if (driver && i.source !== driver) return false;
+             if (search && !i.category.toLowerCase().includes(search) && !i.recipient.toLowerCase().includes(search) && !i.source.toLowerCase().includes(search)) return false;
+         }
+         return true;
+      });
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-date-start').value = "";
+      document.getElementById('filter-date-end').value = "";
+      document.getElementById('filter-driver-select').value = "";
+      document.getElementById('filter-search-text').value = "";
+      refreshAllUI();
+    }
+
+    // =====================================================================
+    // 6. DOMPET KAS KRONOLOGIS & INTEGRASI RADAR STATUS
     // =====================================================================
     function getDriverCashInHand(driverName) {
       let cash = 0; let timeline = [];
-      // 1. Ambil Ritase Cash
       appState.ritase.forEach(i => { 
         if (i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor") {
-          let timeMs = parseInt(i.id.split('-')[1]) || 0;
-          timeline.push({ type: 'in', nominal: i.nominal, time: timeMs });
+          timeline.push({ type: 'in', nominal: i.nominal, time: parseDateString(i.timestamp) });
         }
       });
-      // 2. Ambil Pengeluaran Kas
       appState.pengeluaran.forEach(e => {
         const isActive = (e.status === undefined || e.status === "Active");
         if (isActive) {
-          let timeMs = parseInt(e.id.split('-')[1]) || 0;
+          let timeMs = parseDateString(e.timestamp);
           if (e.source === driverName) timeline.push({ type: 'out', nominal: e.nominal, time: timeMs });
           if (e.category === "Transfer Kas" && e.recipient === driverName) timeline.push({ type: 'in', nominal: e.nominal, time: timeMs });
         }
       });
-      // Urutkan kronologis agar menyerupai dompet fisik nyata berjalan
       timeline.sort((a, b) => a.time - b.time);
       timeline.forEach(t => {
         if (t.type === 'in') { cash += t.nominal; } 
-        else if (t.type === 'out') { cash -= t.nominal; if (cash < 0) cash = 0; } // Batas minimum 0 (Anti-Minus)
+        else if (t.type === 'out') { cash -= t.nominal; if (cash < 0) cash = 0; } 
       });
       return cash;
     }
@@ -905,10 +958,7 @@
       const b = document.getElementById('driver-status-list'); if(!b) return; b.innerHTML = "";
       ["IKKI", "FAUZI", "ASO"].forEach(name => {
         const cashHand = getDriverCashInHand(name);
-        
-        // 1. Cek status absensi terakhir
         const lastAbsen = appState.absensi.find(x => x.name === name);
-        // 2. Cek apakah ada muatan berjalan yang sedang di check-in operator
         const isRunning = appState.ritase.some(x => x.driver === name && x.status === "Dalam Perjalanan");
 
         let statusText = "Standby (Siap)"; let statusColor = "bg-brand-green text-brand-green"; let dotClass = "pulsing-green-dot";
@@ -946,7 +996,7 @@
     }
 
     // =====================================================================
-    // 6. DYNAMIC DRIVER SCREEN RENDERING (ALUR INTEGRASI CHECK-IN / CHECK-OUT)
+    // 7. DYNAMIC DRIVER SCREEN RENDERING (ALUR INTEGRASI CHECK-IN / CHECK-OUT)
     // =====================================================================
     function renderDriverRitaseForm() {
       const container = document.getElementById('sub-tab-ritase'); if (!container) return;
@@ -954,18 +1004,12 @@
         container.innerHTML = `<div class="p-6 text-center text-gray-400 text-xs font-semibold">Akses Anda Terbatas Untuk Check-In Muatan Kuari. Gunakan Sub-Tab Di Atas.</div>`;
         return;
       }
+      if (currentRole === 'ADMIN') { renderManualFormHTML(container, true); return; }
 
-      // 1. MODE ADMIN: Full Bebas Isi Form Apa Saja Manual
-      if (currentRole === 'ADMIN') {
-        renderManualFormHTML(container, true); return;
-      }
-
-      // 2. MODE DRIVER ARMADA: Cek apakah ada muatan aktif ter-Check-In dari operator
       const driverName = localStorage.getItem('sansam_driver_name');
       const activeTrip = appState.ritase.find(x => x.driver === driverName && x.status === "Dalam Perjalanan");
 
       if (activeTrip && !driverManualOverrideMode) {
-        // DRIVER MENGHADAPI FORM CHECK-OUT
         container.innerHTML = `
           <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl mb-4 text-left flex items-start gap-3">
             <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center flex-shrink-0 animate-pulse"><i class="fa-solid fa-truck-ramp-box text-sm"></i></div>
@@ -995,7 +1039,7 @@
               </div>
               <input type="hidden" id="direct-selected-payment" required value="Cash">
             </div>
-            <div><label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal Harga Pembayaran (Rp)</label><input type="number" id="direct-nominal" required placeholder="Cth: 550000" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs font-bold text-white focus:border-brand-blue"></div>
+            <div><label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal Harga Pembayaran (Rp)</label><input type="number" id="direct-nominal" placeholder="Cth: 550000" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs font-bold text-white focus:border-brand-blue"></div>
             <div>
               <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Foto Nota Bongkar / Geotag</label>
               <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-4 bg-brand-black hover:border-brand-green/40 transition">
@@ -1009,7 +1053,6 @@
         `;
         setDirectPayment('Cash');
       } else {
-        // JIKA TIDAK ADA MUATAN AKTIF DARI OPERATOR
         if (driverManualOverrideMode) { renderManualFormHTML(container, false); } 
         else {
           container.innerHTML = `
@@ -1041,8 +1084,7 @@
             </div>
           </div>`;
       } else {
-        driverSelectorHTML = `
-          <div class="mb-3 text-left"><button onclick="deactivateManualOverride()" class="text-[10px] bg-zinc-800 text-gray-400 border border-brand-border px-2.5 py-1 rounded-lg font-bold"><i class="fa-solid fa-arrow-left"></i> Kembali Ke Monitor Check-In</button></div>`;
+        driverSelectorHTML = `<div class="mb-3 text-left"><button onclick="deactivateManualOverride()" class="text-[10px] bg-zinc-800 text-gray-400 border border-brand-border px-2.5 py-1 rounded-lg font-bold"><i class="fa-solid fa-arrow-left"></i> Kembali Ke Monitor Check-In</button></div>`;
       }
 
       container.innerHTML = `
@@ -1075,7 +1117,7 @@
             </div>
             <input type="hidden" id="direct-selected-payment" required value="Cash">
           </div>
-          <div><label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal (Rp)</label><input type="number" id="direct-nominal" required placeholder="550000" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs font-bold text-white focus:border-brand-blue"></div>
+          <div><label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal (Rp)</label><input type="number" id="direct-nominal" placeholder="550000" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs font-bold text-white focus:border-brand-blue"></div>
           <div>
             <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Laporan Foto</label>
             <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-4 bg-brand-black">
@@ -1094,11 +1136,13 @@
     function deactivateManualOverride() { driverManualOverrideMode = false; renderDriverRitaseForm(); }
 
     // =====================================================================
-    // 7. RENDER TABEL & LOGS REKAPAN (LENGKAP DENGAN EDIT + HAPUS)
+    // 8. RENDER TABEL & LOGS REKAPAN (MENGGUNAKAN FILTER TERPUSAT)
     // =====================================================================
     function renderRekapTable() {
       const b = document.getElementById('rekap-table-body'); if(!b) return; b.innerHTML = "";
-      appState.ritase.forEach(i => {
+      const filteredData = getFilteredData('ritase');
+
+      filteredData.forEach(i => {
         let badgeColor = i.status === "Sudah Disetor" ? "text-brand-green" : (i.status === "Piutang" ? "text-rose-500" : (i.status === "Dalam Perjalanan" ? "text-amber-500 animate-pulse" : "text-amber-400"));
         let btn = "";
         
@@ -1114,7 +1158,6 @@
            btn = `<button onclick="settlePriceAndPay('${i.id}')" class="bg-brand-blue/20 text-brand-blue px-2 py-1 rounded text-[10px] font-bold">Atur Lunas</button>`;
         }
         
-        // AKSI EDIT DAN HAPUS TERSEDIA UTUH
         let actionCell = `<div class="flex items-center justify-end gap-1.5">
           ${btn} 
           <button onclick="openEditModal('${i.id}', 'ritase')" class="text-brand-blue hover:text-blue-400 bg-brand-blue/10 p-1.5 rounded" title="Edit Koreksi"><i class="fa-solid fa-pen text-[11px]"></i></button>
@@ -1127,7 +1170,9 @@
 
     function renderExpenseTable() {
       const b = document.getElementById('expense-table-body'); if(!b) return; b.innerHTML = "";
-      appState.pengeluaran.forEach(e => {
+      const filteredData = getFilteredData('pengeluaran');
+
+      filteredData.forEach(e => {
         let actionCell = `<div class="flex justify-end gap-1"><button onclick="openEditModal('${e.id}', 'pengeluaran')" class="text-brand-blue bg-brand-blue/10 p-1.5 rounded"><i class="fa-solid fa-pen text-[10px]"></i></button><button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 bg-rose-500/10 p-1.5 rounded"><i class="fa-solid fa-trash text-[10px]"></i></button></div>`;
         b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${e.timestamp}</td><td class="p-3 font-bold text-amber-500">${e.source}</td><td class="p-3">${e.category}</td><td class="p-3">${e.recipient}</td><td class="p-3 text-right font-bold text-rose-500">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${e.photo}')"><i class="fa-solid fa-receipt"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
       });
@@ -1142,7 +1187,9 @@
       });
 
       const b = document.getElementById('panjar-table-body'); if(!b) return; b.innerHTML = "";
-      appState.pengeluaran.filter(e => e.category === "Panjar Driver").forEach(e => {
+      const filteredData = getFilteredData('pengeluaran').filter(e => e.category === "Panjar Driver");
+
+      filteredData.forEach(e => {
         let status = (e.status === undefined || e.status === "Active") ? "Aktif" : "Selesai";
         let btn = status === "Aktif" ? `<button onclick="settleSinglePanjar('${e.id}')" class="bg-sky-500/20 text-sky-400 px-2 py-1 rounded text-[10px] font-bold">Potong Panjar</button>` : `<span class="text-gray-500 text-[10px]">Settled</span>`;
         let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="openEditModal('${e.id}', 'pengeluaran')" class="text-brand-blue bg-brand-blue/10 p-1.5 rounded"><i class="fa-solid fa-pen text-[10px]"></i></button> <button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 bg-rose-500/10 p-1.5 rounded"><i class="fa-solid fa-trash text-[10px]"></i></button></div>`;
@@ -1159,7 +1206,7 @@
     }
 
     // =====================================================================
-    // 8. FUNGSI EDIT KOREKSI DATA (JENDELA POP-UP DINAMIS)
+    // 9. FUNGSI EDIT KOREKSI DATA (JENDELA POP-UP DINAMIS)
     // =====================================================================
     function openEditModal(id, type) {
       document.getElementById('edit-item-id').value = id;
@@ -1226,7 +1273,7 @@
     }
 
     // =====================================================================
-    // 9. AKSI ADMIN (SETORAN GLOBAL & POTONG PANJAR)
+    // 10. AKSI ADMIN (SETORAN GLOBAL & POTONG PANJAR)
     // =====================================================================
     async function settleAllDriverCash(driverName) {
       const totalCash = getDriverCashInHand(driverName);
@@ -1277,63 +1324,70 @@
     }
 
     // =====================================================================
-    // 10. ADVANCED PWA EXPORT / SHARE API SYSTEM (ANTI BLOKIR HP)
+    // 11. DOWNLOAD DIRECT SAVE (ANTI BLOKIR PWA / BROWSER)
     // =====================================================================
-    async function shareOrDownloadFile(blob, filename) {
-      const file = new File([blob], filename, { type: blob.type });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: 'Simpan ' + filename, text: 'Unduhan dokumen data Sansam Fleet.' });
-          showToast('Berhasil', 'Dokumen siap dibagikan/disimpan.', 'success');
-        } catch (err) { console.log('Share dibatalkan'); }
-      } else {
-        const url = URL.createObjectURL(blob); const link = document.createElement("a");
-        link.href = url; link.download = filename; document.body.appendChild(link); link.click();
-        setTimeout(() => { document.body.removeChild(link); URL.revokeObjectURL(url); }, 100);
-        showToast('Info', 'Download dimulai...', 'success');
+    function forceDownloadFile(blob, filename) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 100);
+        showToast('Download Selesai', 'File laporan berhasil diunduh.', 'success');
+    }
+
+    function exportToCSV(type) {
+      const filteredData = getFilteredData(type);
+      let csv = "\\uFEFF"; // BOM for Excel UTF-8 support
+
+      if(type === 'ritase') {
+          csv += "ID,Waktu,Driver,Rute,Muatan,Nominal,Metode,Status\\n";
+          filteredData.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.driver}","${i.rute}","${i.muatan}",${i.nominal},"${i.payment}","${i.status}"\\n`);
+          forceDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Laporan_Ritase_Sansam.csv");
+      } else if (type === 'pengeluaran') {
+          csv += "ID,Waktu,Sumber,Kategori,Penerima,Nominal\\n";
+          filteredData.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}","${i.category}","${i.recipient}",${i.nominal}\\n`);
+          forceDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Laporan_Pengeluaran_Sansam.csv");
+      } else if (type === 'panjar') {
+          csv += "ID,Waktu,Driver,Nominal,Status\\n";
+          filteredData.filter(e => e.category === "Panjar Driver").forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}",${i.nominal},"${i.status || 'Active'}"\\n`);
+          forceDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Laporan_Panjar_Sansam.csv");
       }
     }
 
-    function exportToCSV() {
-      let csv = "ID,Waktu,Driver,Rute,Muatan,Nominal,Metode,Status\n";
-      appState.ritase.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.driver}","${i.rute}","${i.muatan}",${i.nominal},"${i.payment}","${i.status}"\n`);
-      shareOrDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Rekap_Ritase.csv");
-    }
-    function exportExpensesToCSV() {
-      let csv = "ID,Waktu,Sumber,Kategori,Penerima,Nominal\n";
-      appState.pengeluaran.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}","${i.category}","${i.recipient}",${i.nominal}\n`);
-      shareOrDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Rekap_Pengeluaran.csv");
-    }
-    function exportPanjarToCSV() {
-      let csv = "ID,Waktu,Sumber,Nominal,Status\n";
-      appState.pengeluaran.filter(e => e.category === "Panjar Driver").forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}",${i.nominal},"${i.status || 'Active'}"\n`);
-      shareOrDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Rekap_Panjar.csv");
-    }
+    function exportToPDF(type) {
+      const { jsPDF } = window.jspdf; 
+      const filteredData = getFilteredData(type);
 
-    function exportToPDF() {
-      const { jsPDF } = window.jspdf; const doc = new jsPDF('l');
-      doc.text("Laporan Manifes Ritase CV SANSAM GROUP", 14, 15);
-      const rows = appState.ritase.map(i => [i.timestamp, i.driver, i.rute, i.muatan, i.nominal, i.payment, i.status]);
-      doc.autoTable({ head: [['Waktu', 'Driver', 'Rute', 'Muatan', 'Nominal', 'Metode', 'Status']], body: rows, startY: 20 });
-      shareOrDownloadFile(doc.output('blob'), "Ritase_CV_SANSAM.pdf");
-    }
-    function exportExpensesToPDF() {
-      const { jsPDF } = window.jspdf; const doc = new jsPDF('p');
-      doc.text("Laporan Kas Operasional CV SANSAM GROUP", 14, 15);
-      const rows = appState.pengeluaran.map(i => [i.timestamp, i.source, i.category, i.recipient, i.nominal]);
-      doc.autoTable({ head: [['Waktu', 'Sumber', 'Kategori', 'Penerima', 'Nominal']], body: rows, startY: 20 });
-      shareOrDownloadFile(doc.output('blob'), "Pengeluaran_CV_SANSAM.pdf");
-    }
-    function exportPanjarToPDF() {
-      const { jsPDF } = window.jspdf; const doc = new jsPDF('p');
-      doc.text("Laporan Pinjaman Panjar CV SANSAM GROUP", 14, 15);
-      const rows = appState.pengeluaran.filter(e=>e.category==="Panjar Driver").map(i => [i.timestamp, i.source, i.nominal, i.status || 'Active']);
-      doc.autoTable({ head: [['Waktu', 'Driver', 'Nominal Panjar', 'Status']], body: rows, startY: 20 });
-      shareOrDownloadFile(doc.output('blob'), "Panjar_CV_SANSAM.pdf");
+      if (type === 'ritase') {
+          const doc = new jsPDF('l');
+          doc.text("Laporan Manifes Ritase CV SANSAM GROUP", 14, 15);
+          const rows = filteredData.map(i => [i.timestamp, i.driver, i.rute, i.muatan, i.nominal, i.payment, i.status]);
+          doc.autoTable({ head: [['Waktu', 'Driver', 'Rute', 'Muatan', 'Nominal', 'Metode', 'Status']], body: rows, startY: 20 });
+          doc.save("Ritase_CV_SANSAM.pdf");
+      } else if (type === 'pengeluaran') {
+          const doc = new jsPDF('p');
+          doc.text("Laporan Kas Operasional CV SANSAM GROUP", 14, 15);
+          const rows = filteredData.map(i => [i.timestamp, i.source, i.category, i.recipient, i.nominal]);
+          doc.autoTable({ head: [['Waktu', 'Sumber', 'Kategori', 'Penerima', 'Nominal']], body: rows, startY: 20 });
+          doc.save("Pengeluaran_CV_SANSAM.pdf");
+      } else if (type === 'panjar') {
+          const doc = new jsPDF('p');
+          doc.text("Laporan Pinjaman Panjar CV SANSAM GROUP", 14, 15);
+          const rows = filteredData.filter(e=>e.category==="Panjar Driver").map(i => [i.timestamp, i.source, i.nominal, i.status || 'Active']);
+          doc.autoTable({ head: [['Waktu', 'Driver', 'Nominal Panjar', 'Status']], body: rows, startY: 20 });
+          doc.save("Panjar_CV_SANSAM.pdf");
+      }
+      showToast('Download Selesai', 'Laporan PDF berhasil diunduh.', 'success');
     }
 
     // =====================================================================
-    // 11. TAB & LOGIN INTERACTION MANAGEMENT
+    // 12. TAB & LOGIN INTERACTION MANAGEMENT
     // =====================================================================
     function toggleLoginSection(boxId) {
       const box = document.getElementById(boxId);
@@ -1369,7 +1423,6 @@
       document.getElementById('login-modal').classList.add('hidden');
       const dName = localStorage.getItem('sansam_driver_name') || '';
 
-      // Reset semua visibilitas class
       document.querySelectorAll('.admin-only-tab, .admin-only-metric, .app-stats-metric, .operator-only-section, .driver-or-admin-section').forEach(el => el.classList.remove('hidden'));
 
       if (currentRole === 'ADMIN') {
@@ -1413,6 +1466,8 @@
       const cat = document.getElementById('exp-category').value;
       if (cat === "Transfer Kas") {
         document.getElementById('recipient-text-wrapper').classList.add('hidden'); document.getElementById('recipient-driver-wrapper').classList.remove('hidden');
+      } else if (cat === "Panjar Driver") {
+        document.getElementById('recipient-text-wrapper').classList.add('hidden'); document.getElementById('recipient-driver-wrapper').classList.add('hidden');
       } else {
         document.getElementById('recipient-text-wrapper').classList.remove('hidden'); document.getElementById('recipient-driver-wrapper').classList.add('hidden');
       }
@@ -1483,4 +1538,4 @@
     }
   </script>
 </body>
-</html>
+</html>"""
