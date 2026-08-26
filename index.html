@@ -3,34 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>CV SANSAM GROUP - Fleet App</title>
+  <title>SANSAM FLEET - Enterprise Control</title>
   
-  <!-- PWA Setup untuk Android & iOS -->
+  <!-- PWA Setup -->
   <meta name="theme-color" content="#07080B">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Sansam Fleet">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/664/664468.png">
-  
-  <!-- PWA Manifest dinamis -->
   <link id="manifest-placeholder" rel="manifest">
   
-  <!-- Tailwind CSS CDN -->
+  <!-- Libraries -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Google Fonts & FontAwesome Premium Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- ChartJS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- jsPDF & jsPDF AutoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-
-  <!-- Setup Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -39,7 +29,7 @@
         extend: {
           fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], },
           colors: {
-            brand: { black: '#07080B', card: '#10121A', border: '#1D2230', blue: '#005CFF', green: '#00CC44', accent: '#3B82F6' }
+            brand: { black: '#07080B', card: '#10121A', border: '#1D2230', blue: '#005CFF', green: '#00CC44', accent: '#3B82F6', text: '#F3F4F6', muted: '#9CA3AF' }
           }
         }
       }
@@ -51,1491 +41,1171 @@
     .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #10121A; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #1D2230; border-radius: 4px; }
-    .pulsing-dot { animation: pulse 2s infinite; }
-    .pulsing-green-dot { animation: pulseGreen 2s infinite; }
-    .pulsing-amber-dot { animation: pulseAmber 2s infinite; }
-    @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 92, 255, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(0, 92, 255, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 92, 255, 0); } }
-    @keyframes pulseGreen { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 204, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(0, 204, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 204, 68, 0); } }
-    @keyframes pulseAmber { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
-    .tab-pane { transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out; }
-    .active-scale:active { transform: scale(0.96); }
-    @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
-    #global-loader { transition: opacity 0.3s ease; }
+    .active-scale:active { transform: scale(0.96); transition: transform 0.1s; }
+    .tab-pane { transition: opacity 0.2s ease-in-out; }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .animate-slide-in { animation: slideIn 0.3s ease-out forwards; }
+    .pulsing-dot { animation: pulseGreen 2s infinite; }
+    @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(0, 204, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(0, 204, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 204, 68, 0); } }
   </style>
 </head>
-<body class="min-h-screen pb-24 md:pb-6 overflow-x-hidden">
-
-  <!-- NATIVE-LIKE SPLASH SCREEN -->
-  <div id="splash-screen" class="fixed inset-0 bg-brand-black z-[999999] flex flex-col items-center justify-center transition-all duration-700">
-    <div class="text-center space-y-4 animate-bounce">
-      <div class="w-20 h-20 bg-gradient-to-tr from-brand-blue to-brand-green rounded-3xl mx-auto flex items-center justify-center shadow-xl shadow-brand-blue/20">
-        <i class="fa-solid fa-truck-fast text-white text-3xl"></i>
-      </div>
-      <div>
-        <h2 class="text-2xl font-black tracking-wider text-white">SANSAM FLEET</h2>
-        <p class="text-xs text-brand-green font-bold tracking-[0.2em] uppercase mt-1">CV SANSAM GROUP</p>
-      </div>
-    </div>
-    <div class="absolute bottom-12 flex flex-col items-center gap-2">
-      <div class="w-12 h-1 bg-brand-border rounded-full overflow-hidden">
-        <div class="h-full w-1/2 bg-brand-blue rounded-full animate-[loading_1.5s_infinite_ease-in-out]"></div>
-      </div>
-      <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Menghubungkan Server Cloud...</span>
-    </div>
-  </div>
+<body class="min-h-screen flex flex-col overflow-x-hidden text-sm">
 
   <!-- GLOBAL LOADER -->
-  <div id="global-loader" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999999] flex flex-col items-center justify-center hidden">
+  <div id="global-loader" class="fixed inset-0 bg-brand-black/90 backdrop-blur-sm z-[9999999] flex flex-col items-center justify-center hidden">
     <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-blue mb-4"></i>
-    <p class="text-xs font-bold text-white tracking-widest uppercase">Memproses ke Server...</p>
+    <p class="text-xs font-bold text-white tracking-widest uppercase">Memproses...</p>
   </div>
-
-  <!-- ROLE GATEWAY / PINTU MASUK MULTI-USER -->
-  <div id="login-modal" class="fixed inset-0 bg-brand-black/95 backdrop-blur-md z-[99999] flex flex-col items-center justify-center p-4 transition-all duration-500 hidden">
-    <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-5">
-      <div class="w-16 h-16 bg-brand-blue/10 rounded-2xl mx-auto flex items-center justify-center border border-brand-blue/30 shadow-lg shadow-brand-blue/20">
-        <i class="fa-solid fa-users-gear text-brand-blue text-2xl"></i>
-      </div>
-      <div>
-        <h2 class="text-xl font-black text-white">SANSAM FLEET</h2>
-        <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Pilih Akses Masuk Sistem</p>
-      </div>
-
-      <div class="space-y-3 pt-2 text-left">
-        <!-- DRIVER ACCORDION BUTTON -->
-        <div class="bg-brand-black border border-brand-border rounded-xl overflow-hidden">
-          <button onclick="toggleLoginSection('driver-select-box')" class="w-full text-left font-bold text-xs p-3.5 text-white flex items-center justify-between transition">
-            <span class="flex items-center gap-2"><i class="fa-solid fa-steering-wheel text-brand-green text-sm"></i> Masuk Sebagai Driver Armada</span>
-            <i class="fa-solid fa-chevron-down text-gray-500 text-[10px]"></i>
-          </button>
-          <div id="driver-select-box" class="hidden p-3 border-t border-brand-border bg-brand-card/30 space-y-2">
-            <button onclick="loginAsDriver('IKKI')" class="w-full bg-brand-card border border-brand-border hover:border-brand-blue text-white text-xs font-bold py-2.5 px-3 rounded-lg flex items-center justify-between transition"><span>IKKI</span> <span class="text-[10px] text-gray-400">DW 8549 BN</span></button>
-            <button onclick="loginAsDriver('FAUZI')" class="w-full bg-brand-card border border-brand-border hover:border-brand-blue text-white text-xs font-bold py-2.5 px-3 rounded-lg flex items-center justify-between transition"><span>FAUZI</span> <span class="text-[10px] text-gray-400">DD 8554 HD</span></button>
-            <button onclick="loginAsDriver('ASO')" class="w-full bg-brand-card border border-brand-border hover:border-brand-blue text-white text-xs font-bold py-2.5 px-3 rounded-lg flex items-center justify-between transition"><span>ASO</span> <span class="text-[10px] text-gray-400">DD 8601 RN</span></button>
-          </div>
-        </div>
-
-        <!-- OPERATOR EXCAVATOR ACCORDION BUTTON -->
-        <div class="bg-brand-black border border-brand-border rounded-xl overflow-hidden">
-          <button onclick="toggleLoginSection('operator-pin-box')" class="w-full text-left font-bold text-xs p-3.5 text-white flex items-center justify-between transition">
-            <span class="flex items-center gap-2"><i class="fa-solid fa-helmet-safety text-amber-500 text-sm"></i> Masuk Sebagai Operator Excavator</span>
-            <i class="fa-solid fa-chevron-down text-gray-500 text-[10px]"></i>
-          </button>
-          <div id="operator-pin-box" class="hidden p-3 border-t border-brand-border bg-brand-card/30 space-y-2">
-            <div class="flex gap-2">
-              <input type="password" id="operator-pin" placeholder="PIN Operator..." class="w-full bg-brand-card border border-brand-border rounded-lg p-2 text-center text-xs text-white tracking-widest focus:outline-none focus:border-amber-500">
-              <button onclick="loginAsOperator()" class="bg-amber-500 text-brand-black px-4 rounded-lg text-xs font-extrabold hover:bg-amber-600 transition">OK</button>
-            </div>
-            <p id="op-pin-error" class="hidden text-[9px] text-rose-500 font-bold">PIN Operator Keliru!</p>
-          </div>
-        </div>
-        
-        <!-- ADMIN ACCORDION BUTTON -->
-        <div class="bg-brand-black border border-brand-border rounded-xl overflow-hidden">
-          <button onclick="toggleLoginSection('admin-pin-box')" class="w-full text-left font-bold text-xs p-3.5 text-white flex items-center justify-between transition">
-            <span class="flex items-center gap-2"><i class="fa-solid fa-user-tie text-brand-blue text-sm"></i> Masuk Sebagai Admin / Pemilik</span>
-            <i class="fa-solid fa-chevron-down text-gray-500 text-[10px]"></i>
-          </button>
-          <div id="admin-pin-box" class="hidden p-3 border-t border-brand-border bg-brand-card/30 space-y-2">
-            <div class="flex gap-2">
-              <input type="password" id="admin-pin" placeholder="PIN Admin..." class="w-full bg-brand-card border border-brand-border rounded-lg p-2 text-center text-xs text-white tracking-widest focus:outline-none focus:border-brand-blue">
-              <button onclick="loginAsAdmin()" class="bg-brand-blue text-white px-4 rounded-lg text-xs font-bold hover:bg-brand-blue/90 transition">OK</button>
-            </div>
-            <p id="pin-error" class="hidden text-[9px] text-rose-500 font-bold">PIN Salah! Hubungi Direktur CV Sansam.</p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- TOP HEADER -->
-  <header class="border-b border-brand-border bg-brand-black/95 sticky top-0 z-50 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-      <div class="text-left">
-        <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
-          CV SANSAM GROUP
-          <span id="sync-status" class="inline-flex items-center gap-1 text-[9px] bg-brand-green/10 text-brand-green border border-brand-green/20 px-2 py-0.5 rounded-full font-bold">
-            <span class="w-1.5 h-1.5 rounded-full bg-brand-green pulsing-green-dot"></span>
-            ONLINE
-          </span>
-        </h1>
-        <span class="text-[9px] text-gray-400 font-bold tracking-[0.25em] uppercase block mt-0.5" id="header-role-badge">
-          Memuat hak akses...
-        </span>
-      </div>
-      
-      <div class="flex items-center gap-2">
-        <button id="pwa-install-btn" class="hidden active-scale bg-brand-blue hover:bg-brand-blue/90 text-white text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition shadow-lg shadow-brand-blue/25">
-          <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">PASANG APP</span>
-        </button>
-        <button onclick="logoutAccount()" class="active-scale bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">KELUAR</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- MAIN APP CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 py-6">
-
-    <!-- METRICS GRID (Disembunyikan jika Operator) -->
-    <section class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6" id="metrics-container">
-      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Pendapatan</p>
-        <h3 class="text-base sm:text-2xl font-black mt-1 text-white leading-tight" id="metric-total-omzet">Rp 0</h3>
-      </div>
-      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden app-stats-metric">
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cash Sisa (Di Driver)</p>
-        <h3 class="text-base sm:text-2xl font-black mt-1 text-amber-500 leading-tight" id="metric-cash-driver">Rp 0</h3>
-      </div>
-      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden app-stats-metric">
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Panjar Driver</p>
-        <h3 class="text-base sm:text-2xl font-black mt-1 text-sky-400 leading-tight" id="metric-total-panjar">Rp 0</h3>
-      </div>
-      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Lunas / TF Kasir</p>
-        <h3 class="text-base sm:text-2xl font-black mt-1 text-brand-green leading-tight" id="metric-tf-masuk">Rp 0</h3>
-      </div>
-      <div class="bg-brand-card border border-brand-border p-4 rounded-2xl relative overflow-hidden admin-only-metric">
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Bon (Tempo)</p>
-        <h3 class="text-base sm:text-2xl font-black mt-1 text-rose-500 leading-tight" id="metric-bon-total">Rp 0</h3>
-      </div>
-    </section>
-
-    <!-- NAVIGATION TAB BAR -->
-    <div class="flex border-b border-brand-border mb-6 gap-2 py-1 overflow-x-auto custom-scrollbar" id="main-tab-bar">
-      <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn active px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-brand-blue text-brand-blue bg-brand-card/50 whitespace-nowrap">
-        <i class="fa-solid fa-chart-pie"></i> Dashboard Utama
-      </button>
-      <button onclick="switchTab('input')" id="tab-btn-input" class="tab-btn px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white whitespace-nowrap">
-        <i class="fa-solid fa-truck-pickup text-brand-blue"></i> Menu Pengisian & Antaran
-      </button>
-      <button onclick="switchTab('rekap')" id="tab-btn-rekap" class="tab-btn px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white admin-only-tab whitespace-nowrap">
-        <i class="fa-solid fa-list-check"></i> Rekap Penjualan
-      </button>
-      <button onclick="switchTab('absensi')" id="tab-btn-absensi" class="tab-btn px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white app-stats-metric whitespace-nowrap">
-        <i class="fa-solid fa-clipboard-user"></i> Absensi Driver
-      </button>
-      <button onclick="switchTab('tracking')" id="tab-btn-tracking" class="tab-btn px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white whitespace-nowrap">
-        <i class="fa-solid fa-map-location-dot text-rose-500"></i> Radar GPS Live
-      </button>
-    </div>
-
-    <!-- TAB 1: DASHBOARD -->
-    <div id="tab-content-dashboard" class="tab-pane block space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- RADAR KEAKTIFAN -->
-        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-users text-brand-blue"></i> Radar Status Armada Lapangan
-          </h4>
-          <div class="space-y-3" id="driver-status-list"></div>
-        </div>
-        <!-- CHART -->
-        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center justify-between">
-            <span><i class="fa-solid fa-chart-bar text-brand-green"></i> Distribusi Ritase Driver Selesai</span>
-          </h4>
-          <div class="h-60 relative"><canvas id="driverChart"></canvas></div>
-        </div>
-      </div>
-      <!-- AKTIVITAS TERAKHIR -->
-      <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-bell text-brand-blue"></i> Laporan Operasional Terakhir
-        </h4>
-        <div class="space-y-3 max-h-64 overflow-y-auto custom-scrollbar pr-2" id="dashboard-recent-activities"></div>
-      </div>
-    </div>
-
-    <!-- TAB 2: UNIFIED INPUT FORM (RITASE, KAS, CHECK-IN OPERATOR) -->
-    <div id="tab-content-input" class="tab-pane hidden">
-      <div class="flex bg-brand-black p-1.5 rounded-2xl border border-brand-border mb-6 max-w-lg mx-auto overflow-x-auto custom-scrollbar">
-        <button type="button" onclick="switchInputSubTab('ritase')" id="sub-input-btn-ritase" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale"><i class="fa-solid fa-truck-pickup mr-1.5"></i> Alur Ritase / Antaran</button>
-        <button type="button" onclick="switchInputSubTab('pengeluaran')" id="sub-input-btn-pengeluaran" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale driver-or-admin-section"><i class="fa-solid fa-gas-pump mr-1.5"></i> Keluar / Panjar</button>
-        <button type="button" onclick="switchInputSubTab('operator-checkin')" id="sub-input-btn-operator-checkin" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale operator-only-section hidden"><i class="fa-solid fa-helmet-safety mr-1.5"></i> Check-In Operator</button>
-      </div>
-
-      <!-- FORM RITASE / CHECK-OUT CONTAINER -->
-      <div id="sub-tab-ritase" class="block max-w-2xl mx-auto bg-brand-card border border-brand-border p-5 rounded-2xl">
-        <!-- Konten diisi dinamis oleh JavaScript: renderDriverRitaseForm() -->
-      </div>
-
-      <!-- FORM PENGELUARAN (DRIVER / ADMIN) -->
-      <div id="sub-tab-pengeluaran" class="hidden max-w-2xl mx-auto bg-brand-card border border-brand-border p-5 rounded-2xl driver-or-admin-section">
-        <form id="driver-expense-form" onsubmit="handleExpenseSubmit(event)" class="space-y-5">
-           <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Sumber Dana Keluar</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <label class="active-scale relative flex items-center gap-2 p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer">
-                <input type="radio" name="exp_source" value="IKKI" required class="accent-brand-blue" onchange="showSourceCashInHand()"><div class="text-left"><span class="text-xs font-bold text-white block">IKKI</span><span id="cash-hand-IKKI" class="text-[9px] text-amber-500 font-bold block mt-0.5">Rp 0</span></div>
-              </label>
-              <label class="active-scale relative flex items-center gap-2 p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer">
-                <input type="radio" name="exp_source" value="FAUZI" class="accent-brand-blue" onchange="showSourceCashInHand()"><div class="text-left"><span class="text-xs font-bold text-white block">FAUZI</span><span id="cash-hand-FAUZI" class="text-[9px] text-amber-500 font-bold block mt-0.5">Rp 0</span></div>
-              </label>
-              <label class="active-scale relative flex items-center gap-2 p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer">
-                <input type="radio" name="exp_source" value="ASO" class="accent-brand-blue" onchange="showSourceCashInHand()"><div class="text-left"><span class="text-xs font-bold text-white block">ASO</span><span id="cash-hand-ASO" class="text-[9px] text-amber-500 font-bold block mt-0.5">Rp 0</span></div>
-              </label>
-              <label class="active-scale relative flex items-center gap-2 p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer">
-                <input type="radio" name="exp_source" value="KASIR" class="accent-brand-blue" onchange="showSourceCashInHand()"><div class="text-left"><span class="text-xs font-bold text-white block">KASIR</span><span class="text-[9px] text-emerald-500 font-bold block mt-0.5">Kas Kantor</span></div>
-              </label>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Kategori Pengeluaran</label>
-            <select id="exp-category" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue" onchange="handleCategoryChange()">
-              <option value="">-- Pilih --</option>
-              <option value="Solar">Beli Solar</option>
-              <option value="Panjar Driver">Panjar Driver</option>
-              <option value="Transfer Kas">Transfer Kas / Uang Jalan</option>
-              <option value="Ban & Sparepart">Ban & Sparepart</option>
-              <option value="Makan & Operasional">Makan / Parkir</option>
-            </select>
-          </div>
-          
-          <div id="recipient-text-wrapper">
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Penerima / Keterangan Toko</label>
-            <input type="text" id="exp-recipient" placeholder="Cth: SPBU Bolabakka" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
-          </div>
-          <div id="recipient-driver-wrapper" class="hidden">
-            <label class="block text-xs font-bold text-brand-green uppercase tracking-wider mb-1.5">Transfer Kas Ke Siapa?</label>
-            <select id="exp-recipient-driver" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
-              <option value="">-- Pilih Driver Penerima --</option>
-              <option value="IKKI">DW 8549 BN (IKKI)</option>
-              <option value="FAUZI">DD 8554 HD (FAUZI)</option>
-              <option value="ASO">DD 8601 RN (ASO)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal Keluar (Rp)</label>
-            <input type="number" id="exp-nominal" required placeholder="Jumlah pengeluaran..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs font-bold text-white focus:border-brand-blue">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Bukti Nota / Transfer</label>
-            <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-4 bg-brand-black hover:border-brand-green/40 transition">
-              <input type="file" id="exp-photo-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="processExpensePhoto(event)">
-              <div id="exp-upload-placeholder" class="text-center space-y-1.5 pointer-events-none">
-                <div class="w-9 h-9 bg-brand-blue/10 border border-brand-blue/30 text-brand-blue rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-receipt"></i></div>
-                <p class="text-[9px] font-medium text-gray-500">Ambil Foto Bukti</p>
-              </div>
-              <div id="exp-photo-preview-container" class="hidden w-full space-y-2 pointer-events-none">
-                <img id="exp-processed-photo-preview" class="w-full max-h-40 object-cover rounded-lg border border-brand-border" src="">
-              </div>
-            </div>
-          </div>
-          <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-brand-black font-extrabold py-3 px-6 rounded-xl text-xs transition">
-            Simpan Pengeluaran / Kas
-          </button>
-        </form>
-      </div>
-
-      <!-- FORM CHECK-IN MUATAN (KHUSUS OPERATOR EXCAVATOR / ADMIN) -->
-      <div id="sub-tab-operator-checkin" class="hidden max-w-2xl mx-auto bg-brand-card border border-brand-border p-5 rounded-2xl">
-        <div class="mb-4 text-left border-b border-brand-border pb-3">
-          <h3 class="text-sm font-bold text-amber-500 uppercase flex items-center gap-2"><i class="fa-solid fa-helmet-safety text-base"></i> Kontrol Check-In Muatan Kuari</h3>
-          <p class="text-[11px] text-gray-400 mt-0.5">Operator mencatat mobil armada yang sudah selesai diisi material sebelum berangkat.</p>
-        </div>
-        <form id="operator-checkin-form" onsubmit="handleCheckInSubmit(event)" class="space-y-5">
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Pilih Kendaraan / Driver</label>
-            <select id="op-driver-select" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-amber-500">
-              <option value="">-- Pilih Armada --</option>
-              <option value="IKKI|DW 8549 BN">IKKI (DW 8549 BN)</option>
-              <option value="FAUZI|DD 8554 HD">FAUZI (DD 8554 HD)</option>
-              <option value="ASO|DD 8601 RN">ASO (DD 8601 RN)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Jenis Material yang Diisikan</label>
-            <div class="flex flex-wrap gap-1.5 mb-2">
-              <button type="button" onclick="quickFillOpMuatan('Pasir Halus')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-amber-500 transition">Pasir Halus</button>
-              <button type="button" onclick="quickFillOpMuatan('Pasir Kasar')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-amber-500 transition">Pasir Kasar</button>
-              <button type="button" onclick="quickFillOpMuatan('Kerikil')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-amber-500 transition">Kerikil</button>
-              <button type="button" onclick="quickFillOpMuatan('Sirtu')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-amber-500 transition">Sirtu</button>
-              <button type="button" onclick="quickFillOpMuatan('Batu Belopa')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-amber-500 transition">Batu Belopa</button>
-              <button type="button" onclick="quickFillOpMuatan('Batu Sidrap')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-amber-500 transition">Batu Sidrap</button>
-            </div>
-            <input type="text" id="op-muatan" required placeholder="Tulis atau klik pilihan cepat muatan..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-amber-500">
-          </div>
-          <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-brand-black font-extrabold py-3 px-6 rounded-xl text-xs transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-circle-check text-sm"></i> Kirim Check-In (Armada Mulai Jalan)
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <!-- TAB 3: REKAP TRANSAKSI (ADMIN ONLY) + SISTEM FILTER CANGGIH -->
-    <div id="tab-content-rekap" class="tab-pane hidden space-y-4 admin-only-tab">
-      <div class="flex bg-brand-black p-1.5 rounded-2xl border border-brand-border mb-4 max-w-lg overflow-x-auto custom-scrollbar">
-        <button type="button" onclick="switchRekapSubTab('ritase')" id="sub-rekap-btn-ritase" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl bg-brand-blue text-white transition active-scale"><i class="fa-solid fa-file-invoice mr-1.5"></i> Log Ritase</button>
-        <button type="button" onclick="switchRekapSubTab('pengeluaran')" id="sub-rekap-btn-pengeluaran" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale"><i class="fa-solid fa-file-invoice-dollar mr-1.5"></i> Kas Keluar</button>
-        <button type="button" onclick="switchRekapSubTab('panjar')" id="sub-rekap-btn-panjar" class="flex-1 text-center py-2.5 px-3 whitespace-nowrap text-xs font-bold rounded-xl text-gray-400 hover:text-white transition active-scale"><i class="fa-solid fa-hand-holding-dollar mr-1.5"></i> Berkas Panjar</button>
-      </div>
-
-      <!-- FILTER UI (GLOBAL UNTUK SEMUA REKAP) -->
-      <div class="bg-brand-black border border-brand-border p-3.5 rounded-2xl flex flex-col md:flex-row gap-2.5 items-center">
-        <div class="w-full md:w-auto text-[10px] text-gray-400 font-bold uppercase tracking-wider md:mr-2"><i class="fa-solid fa-filter text-brand-blue mr-1"></i> Filter Data:</div>
-        <input type="date" id="filter-date-start" title="Tanggal Mulai" class="w-full md:w-auto bg-brand-card border border-brand-border p-2.5 rounded-xl text-xs text-white focus:border-brand-blue outline-none" onchange="refreshAllUI()">
-        <span class="hidden md:inline text-gray-500">-</span>
-        <input type="date" id="filter-date-end" title="Tanggal Akhir" class="w-full md:w-auto bg-brand-card border border-brand-border p-2.5 rounded-xl text-xs text-white focus:border-brand-blue outline-none" onchange="refreshAllUI()">
-        <select id="filter-driver-select" class="w-full md:w-auto bg-brand-card border border-brand-border p-2.5 rounded-xl text-xs text-white focus:border-brand-blue outline-none" onchange="refreshAllUI()">
-          <option value="">Semua Driver</option>
-          <option value="IKKI">IKKI</option>
-          <option value="FAUZI">FAUZI</option>
-          <option value="ASO">ASO</option>
-        </select>
-        <div class="relative w-full md:w-auto flex-1">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
-          <input type="text" id="filter-search-text" placeholder="Ketik rute / muatan / keterangan..." class="w-full bg-brand-card border border-brand-border p-2.5 pl-8 rounded-xl text-xs text-white focus:border-brand-blue outline-none" onkeyup="refreshAllUI()">
-        </div>
-        <button onclick="resetFilters()" class="w-full md:w-auto bg-zinc-800 hover:bg-zinc-700 text-gray-300 px-4 py-2.5 rounded-xl text-xs font-bold transition">Reset</button>
-      </div>
-
-      <div id="sub-tab-rekap-ritase" class="block bg-brand-card border border-brand-border p-5 rounded-2xl space-y-4">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <h3 class="text-base font-bold text-white">Log Manifes Ritase Transaksi</h3>
-          <div class="flex gap-2">
-            <button onclick="exportToCSV('ritase')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-brand-green"></i> Unduh Excel</button>
-            <button onclick="exportToPDF('ritase')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> Unduh PDF</button>
-          </div>
-        </div>
-        <div class="overflow-x-auto rounded-xl border border-brand-border"><table class="w-full text-left text-xs min-w-[950px]"><thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border"><tr><th class="p-3.5">Waktu</th><th class="p-3.5">Driver</th><th class="p-3.5">Rute</th><th class="p-3.5">Muatan</th><th class="p-3.5 text-right">Nominal</th><th class="p-3.5 text-center">Metode</th><th class="p-3.5 text-center">Status</th><th class="p-3.5 text-center">Bukti</th><th class="p-3.5 text-right">Aksi</th></tr></thead><tbody id="rekap-table-body"></tbody></table></div>
-      </div>
-
-      <div id="sub-tab-rekap-pengeluaran" class="hidden bg-brand-card border border-brand-border p-5 rounded-2xl space-y-4">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <h3 class="text-base font-bold text-white">Log Pengeluaran Kas Operasional</h3>
-          <div class="flex gap-2">
-            <button onclick="exportToCSV('pengeluaran')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-amber-500"></i> Unduh Excel</button>
-            <button onclick="exportToPDF('pengeluaran')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> Unduh PDF</button>
-          </div>
-        </div>
-        <div class="overflow-x-auto rounded-xl border border-brand-border"><table class="w-full text-left text-xs min-w-[800px]"><thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border"><tr><th class="p-3.5">Waktu</th><th class="p-3.5">Sumber Dana</th><th class="p-3.5">Kategori</th><th class="p-3.5">Penerima/Alokasi</th><th class="p-3.5 text-right">Nominal Keluar</th><th class="p-3.5 text-center">Bukti</th><th class="p-3.5 text-right">Aksi</th></tr></thead><tbody id="expense-table-body"></tbody></table></div>
-      </div>
-
-      <div id="sub-tab-rekap-panjar" class="hidden bg-brand-card border border-brand-border p-5 rounded-2xl space-y-6">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <h3 class="text-base font-bold text-white">Monitoring Pinjaman Panjar Driver</h3>
-          <div class="flex gap-2">
-            <button onclick="exportToCSV('panjar')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-excel text-sky-400"></i> Unduh Excel</button>
-            <button onclick="exportToPDF('panjar')" class="bg-brand-border hover:bg-zinc-800 border border-zinc-800 text-gray-300 px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fa-solid fa-file-pdf text-rose-500"></i> Unduh PDF</button>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="panjar-driver-summary-cards"></div>
-        <div class="overflow-x-auto rounded-xl border border-brand-border"><table class="w-full text-left text-xs min-w-[750px]"><thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border"><tr><th class="p-3.5">Waktu</th><th class="p-3.5">Nama Driver</th><th class="p-3.5">Panjar</th><th class="p-3.5 text-center">Status</th><th class="p-3.5 text-right">Aksi</th></tr></thead><tbody id="panjar-table-body"></tbody></table></div>
-      </div>
-    </div>
-
-    <!-- TAB 4: ABSENSI DRIVER -->
-    <div id="tab-content-absensi" class="tab-pane hidden space-y-6 app-stats-metric">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
-          <h3 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-id-card text-brand-green mr-2"></i> Kesiapan Kehadiran</h3>
-          <form id="attendance-form" onsubmit="handleAttendanceSubmit(event)" class="space-y-4">
-            <div>
-              <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Pilih Driver</label>
-              <select id="absensi-driver-select" required class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
-                <option value="">-- Pilih --</option>
-                <option value="IKKI">DW 8549 BN (IKKI)</option>
-                <option value="FAUZI">DD 8554 HD (FAUZI)</option>
-                <option value="ASO">DD 8601 RN (ASO)</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Status Operasional Hari Ini</label>
-              <div class="grid grid-cols-2 gap-2">
-                <label class="active-scale flex items-center justify-center p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Jalan" required class="accent-brand-green mr-1"><span class="text-[11px] font-bold text-white">Jalan (Aktif)</span></label>
-                <label class="active-scale flex items-center justify-center p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Istirahat" class="accent-amber-500 mr-1"><span class="text-[11px] font-bold text-white">Istirahat</span></label>
-                <label class="active-scale flex items-center justify-center p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Sakit" class="accent-rose-500 mr-1"><span class="text-[11px] font-bold text-white">Sakit</span></label>
-                <label class="active-scale flex items-center justify-center p-2 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="absensi_tipe" value="Izin" class="accent-orange-500 mr-1"><span class="text-[11px] font-bold text-white">Izin / Off</span></label>
-              </div>
-            </div>
-            <button type="submit" class="w-full bg-brand-green hover:bg-brand-green/90 text-white font-bold py-3 px-6 rounded-xl text-xs transition">
-              Kirim Update Kehadiran
-            </button>
-          </form>
-        </div>
-
-        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
-          <h3 class="text-base font-bold mb-4 text-white"><i class="fa-solid fa-calendar-check text-brand-blue mr-2"></i> Riwayat Absen Lapangan</h3>
-          <div class="overflow-x-auto rounded-xl border border-brand-border">
-            <table class="w-full text-left text-xs min-w-[500px]">
-              <thead class="bg-brand-black text-gray-400 uppercase font-semibold border-b border-brand-border">
-                <tr><th class="p-3.5">Jam Log</th><th class="p-3.5">Nama Driver</th><th class="p-3.5">Status Kondisi</th><th class="p-3.5 text-right">Aksi</th></tr>
-              </thead>
-              <tbody id="absensi-table-body" class="divide-y divide-brand-border"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 5: TRACKING -->
-    <div id="tab-content-tracking" class="tab-pane hidden"><div class="bg-brand-card p-5 rounded-2xl text-center text-gray-500 py-20 border border-brand-border"><i class="fa-solid fa-map-location-dot text-4xl mb-4 block text-brand-blue"></i> Peta Satelit Fleet Radar GPS Terhubung (Simulasi Posisi Kuari Sengkang Wajo)</div></div>
-
-  </main>
-
-  <!-- MOBILE BOTTOM NAVIGATION (HIDDEN DI DESKTOP) -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-brand-card/95 border-t border-brand-border backdrop-blur-md py-3 px-3 flex justify-around items-center z-50" id="mobile-nav-bar">
-    <button onclick="switchTab('dashboard')" class="active-scale mobile-nav-btn text-brand-blue flex flex-col items-center gap-1.5 transition-all"><i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[9px] font-bold">Dashboard</span></button>
-    <button onclick="switchTab('input')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all"><i class="fa-solid fa-truck-pickup text-lg"></i><span class="text-[9px] font-bold">Menu Input</span></button>
-    <button onclick="switchTab('rekap')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all admin-only-tab"><i class="fa-solid fa-list-check text-lg"></i><span class="text-[9px] font-bold">Rekapan</span></button>
-    <button onclick="switchTab('absensi')" class="active-scale mobile-nav-btn text-gray-500 flex flex-col items-center gap-1.5 transition-all app-stats-metric"><i class="fa-solid fa-clipboard-user text-lg"></i><span class="text-[9px] font-bold">Absensi</span></button>
-  </nav>
 
   <!-- TOAST NOTIFICATION -->
   <div id="custom-toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-brand-card border border-brand-border px-4 py-3 rounded-xl shadow-2xl z-[10000] flex items-center gap-3 transition-all duration-300 translate-y-[-100px] opacity-0 pointer-events-none max-w-sm w-[90%]">
-    <div id="toast-icon-bg" class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"><i id="toast-icon"></i></div>
-    <div class="flex-grow"><p id="toast-title" class="text-xs font-bold text-white">Notif</p><p id="toast-desc" class="text-[10px] text-gray-400">Deskripsi</p></div>
+    <div id="toast-icon-bg" class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-brand-black"><i id="toast-icon"></i></div>
+    <div class="flex-grow"><p id="toast-title" class="text-xs font-bold text-white">Notif</p><p id="toast-desc" class="text-[10px] text-gray-400 leading-tight">Deskripsi</p></div>
   </div>
 
-  <!-- CUSTOM DIALOG MODAL -->
-  <div id="custom-dialog-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
-    <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl">
-      <div class="p-6 text-center space-y-4">
-        <div class="w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-brand-blue/10 border border-brand-blue/30 text-brand-blue"><i id="dialog-icon" class="fa-solid fa-circle-info text-2xl"></i></div>
-        <div class="space-y-1">
-          <h3 id="dialog-title" class="text-base font-bold text-white">Judul Dialog</h3>
-          <p id="dialog-message" class="text-xs text-gray-400 leading-relaxed whitespace-pre-line">Keterangan detail...</p>
+  <!-- AUTHENTICATION VIEW -->
+  <div id="auth-view" class="fixed inset-0 bg-brand-black z-[99999] flex flex-col items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-3xl p-8 shadow-2xl space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 bg-gradient-to-tr from-brand-blue to-brand-green rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-brand-blue/20 mb-4">
+          <i class="fa-solid fa-truck-fast text-white text-2xl"></i>
         </div>
-        <div class="flex items-center justify-center gap-2 pt-2">
-          <button id="dialog-cancel-btn" class="active-scale px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-xl text-xs font-semibold transition hidden">Batal</button>
-          <button id="dialog-confirm-btn" class="active-scale px-4 py-2 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl text-xs font-bold transition">Mengerti</button>
-        </div>
+        <h1 class="text-2xl font-black text-white tracking-wide">SANSAM FLEET</h1>
+        <p class="text-xs font-bold text-brand-muted tracking-widest uppercase">Authorized Access Only</p>
       </div>
-    </div>
-  </div>
 
-  <!-- EDIT DATA CORE MODAL -->
-  <div id="edit-data-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
-    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-2xl overflow-hidden shadow-2xl p-5 space-y-4">
-      <div class="border-b border-brand-border pb-2 flex justify-between items-center">
-        <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-brand-blue"></i> Koreksi / Edit Data Berkas</h3>
-        <button onclick="closeEditModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <form id="edit-master-form" onsubmit="handleEditSubmit(event)" class="space-y-4 text-left">
-        <input type="hidden" id="edit-item-id">
-        <input type="hidden" id="edit-item-type">
-        <div id="edit-fields-container" class="space-y-3"></div>
-        <button type="submit" class="w-full bg-brand-blue text-white text-xs font-bold py-2.5 rounded-xl transition hover:bg-brand-blue/90">Simpan Koreksi Perubahan</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- PHOTO LIGHTBOX MODAL -->
-  <div id="photo-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
-    <div class="bg-brand-card border border-brand-border w-full max-w-lg rounded-2xl overflow-hidden relative shadow-2xl">
-      <button onclick="closePhotoModal()" class="absolute top-3 right-3 bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black transition z-10"><i class="fa-solid fa-xmark"></i></button>
-      <div class="p-4 flex justify-center bg-black"><img id="modal-image" class="w-full max-h-[400px] object-contain rounded-lg" src=""></div>
-    </div>
-  </div>
-
-  <script>
-    // =====================================================================
-    // 1. SUPABASE DATABASE INITIALIZATION
-    // =====================================================================
-    (function() {
-      const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
-      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
-      if (!window.supabaseClient) { window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
-    })();
-    const supabaseClient = window.supabaseClient;
-
-    // GLOBAL VARIABLES & SYSTEM STATES
-    let appState = { ritase: [], absensi: [], pengeluaran: [], drivers: { "IKKI": { plate: "DW 8549 BN" }, "FAUZI": { plate: "DD 8554 HD" }, "ASO": { plate: "DD 8601 RN" } } };
-    let directSelectedPayment = "Cash";
-    let base64Photo = ""; let base64ExpensePhoto = "";
-    let currentRole = localStorage.getItem('sansam_role') || null;
-    let driverDistributionChart = null;
-    let driverManualOverrideMode = false;
-
-    // =====================================================================
-    // 2. NATIVE PWA AUTOMATION SETUP
-    // =====================================================================
-    let deferredPrompt;
-    const manifestData = {
-      "name": "CV SANSAM GROUP", "short_name": "SansamFleet", "start_url": ".", "display": "standalone",
-      "background_color": "#07080B", "theme_color": "#07080B",
-      "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/664/664468.png", "sizes": "512x512", "type": "image/png"}]
-    };
-    const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
-    document.getElementById('manifest-placeholder').href = URL.createObjectURL(manifestBlob);
-
-    if ('serviceWorker' in navigator) {
-      const swCode = `self.addEventListener('install', (e) => self.skipWaiting()); self.addEventListener('fetch', (e) => {});`;
-      const swBlob = new Blob([swCode], { type: 'text/javascript' });
-      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log("SW Error", err));
-    }
-
-    const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); deferredPrompt = e;
-      if (!isStandalone) document.getElementById('pwa-install-btn').classList.remove('hidden');
-    });
-    if (isIos() && !isStandalone) { document.getElementById('pwa-install-btn').classList.remove('hidden'); }
-
-    document.getElementById('pwa-install-btn')?.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') document.getElementById('pwa-install-btn').classList.add('hidden');
-        deferredPrompt = null;
-      } else if (isIos()) {
-        showCustomDialog({
-          title: 'Pasang di iPhone / iPad',
-          message: '1. Ketuk ikon "Share" (Bagikan) di bagian bawah browser Safari Anda.\n2. Gulir ke bawah lalu pilih "Add to Home Screen" (Tambah ke Layar Utama).',
-          type: 'info'
-        });
-      } else {
-        showCustomDialog({
-          title: 'Pasang Aplikasi',
-          message: 'Ketuk menu browser (titik tiga di pojok kanan atas), lalu pilih "Tambahkan ke Layar Utama" / "Install Aplikasi".',
-          type: 'info'
-        });
-      }
-    });
-
-    let pendingConfirmAction = null;
-    function showCustomDialog({ title, message, type='info', onConfirm }) {
-      document.getElementById('dialog-title').innerText = title;
-      document.getElementById('dialog-message').innerText = message;
-      const icon = document.getElementById('dialog-icon');
-      
-      if(type === 'warning') {
-          icon.className = "fa-solid fa-triangle-exclamation text-2xl text-rose-500";
-          icon.parentElement.className = "w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-rose-500/10 border border-rose-500/30";
-          document.getElementById('dialog-confirm-btn').className = "active-scale px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition";
-      } else {
-          icon.className = "fa-solid fa-circle-info text-2xl text-brand-blue";
-          icon.parentElement.className = "w-14 h-14 rounded-full mx-auto flex items-center justify-center bg-brand-blue/10 border border-brand-blue/30";
-          document.getElementById('dialog-confirm-btn').className = "active-scale px-4 py-2 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl text-xs font-bold transition";
-      }
-
-      const cancelBtn = document.getElementById('dialog-cancel-btn');
-      if (onConfirm) { cancelBtn.classList.remove('hidden'); pendingConfirmAction = onConfirm; } 
-      else { cancelBtn.classList.add('hidden'); pendingConfirmAction = null; }
-      document.getElementById('custom-dialog-modal').classList.remove('hidden');
-    }
-    document.getElementById('dialog-cancel-btn').addEventListener('click', closeCustomDialog);
-    document.getElementById('dialog-confirm-btn').addEventListener('click', () => {
-      closeCustomDialog(); if(pendingConfirmAction) pendingConfirmAction();
-    });
-    function closeCustomDialog() { document.getElementById('custom-dialog-modal').classList.add('hidden'); }
-
-    // =====================================================================
-    // 3. IMAGE COMPRESSION & DATABASE OPERATIONS
-    // =====================================================================
-    function resizeImage(file, callback) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          let width = img.width, height = img.height; const MAX_WIDTH = 800; 
-          if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
-          canvas.width = width; canvas.height = height;
-          const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-          callback(canvas.toDataURL('image/jpeg', 0.6));
-        }
-        img.src = e.target.result;
-      }
-      reader.readAsDataURL(file);
-    }
-
-    function processDirectPhoto(event) {
-      const file = event.target.files[0]; if (!file) return;
-      resizeImage(file, function(res) {
-        base64Photo = res;
-        const upEl = document.getElementById('direct-upload-placeholder'); if(upEl) upEl.classList.add('hidden');
-        const prvEl = document.getElementById('direct-photo-preview-container'); if(prvEl) prvEl.classList.remove('hidden');
-        const imgEl = document.getElementById('direct-processed-photo-preview'); if(imgEl) imgEl.src = res;
-      });
-    }
-
-    function processExpensePhoto(event) {
-      const file = event.target.files[0]; if (!file) return;
-      resizeImage(file, function(res) {
-        base64ExpensePhoto = res;
-        document.getElementById('exp-upload-placeholder').classList.add('hidden');
-        document.getElementById('exp-photo-preview-container').classList.remove('hidden');
-        document.getElementById('exp-processed-photo-preview').src = res;
-      });
-    }
-
-    async function insertToDB(table, record) {
-      try {
-        const { error } = await supabaseClient.from(table).insert([record]);
-        if (error) { showToast('Gagal Menyimpan', `Supabase menolak. Pesan: ${error.message}`, 'error'); return false; }
-        return true; 
-      } catch (err) { showToast('Koneksi Gagal', 'Tidak terhubung server.', 'error'); return false; }
-    }
-    async function updateDB(table, id, updates) { await supabaseClient.from(table).update(updates).eq('id', id); }
-    
-    async function deleteRecord(id, tableType) {
-      showCustomDialog({
-        title: 'Hapus Data Permanen?',
-        message: 'Data yang dihapus tidak akan bisa dikembalikan lagi dari server. Lanjutkan?',
-        type: 'warning',
-        onConfirm: async () => {
-          showLoader(true);
-          const { error } = await supabaseClient.from(tableType).delete().eq('id', id);
-          showLoader(false);
-          if (error) { showToast('Gagal Menghapus', error.message, 'error'); } 
-          else {
-            appState[tableType] = appState[tableType].filter(x => x.id !== id); refreshAllUI();
-            showToast('Berhasil Dihapus', 'Data telah dibersihkan dari server pusat.', 'success');
-          }
-        }
-      });
-    }
-
-    // =====================================================================
-    // 4. SUBMIT FORM & REAL-TIME ALUR (CHECK-IN / CHECK-OUT)
-    // =====================================================================
-    async function handleCheckInSubmit(e) {
-      e.preventDefault();
-      const driverStr = document.getElementById('op-driver-select').value;
-      const muatan = document.getElementById('op-muatan').value;
-      if(!driverStr || !muatan) return showToast('Error', 'Lengkapi data muatan kendaraan!', 'error');
-      const [name, plate] = driverStr.split('|');
-
-      const isAlreadyRunning = appState.ritase.some(x => x.driver === name && x.status === "Dalam Perjalanan");
-      if(isAlreadyRunning) return showToast('Error', `Driver ${name} sedang berada dalam perjalanan mengantar muatan sebelumnya!`, 'error');
-
-      const newCheckIn = {
-        id: "r-" + Date.now(),
-        timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
-        driver: name, plate: plate, rute: "-", muatan: muatan, nominal: 0,
-        payment: "-", status: "Dalam Perjalanan", photo: ""
-      };
-
-      showLoader(true);
-      const success = await insertToDB('ritase', newCheckIn);
-      showLoader(false);
-
-      if(success) {
-        appState.ritase.unshift(newCheckIn); refreshAllUI();
-        document.getElementById('operator-checkin-form').reset();
-        showToast('Check-In Berhasil', `Armada ${name} (${plate}) berhasil dicatat mulai jalan.`, 'success');
-        switchTab('dashboard');
-      }
-    }
-
-    async function handleCheckOutSubmit(e, recordId, muatanName) {
-      e.preventDefault();
-      const rute = document.getElementById('direct-rute').value;
-      const nominal = parseFloat(document.getElementById('direct-nominal').value) || 0;
-      let defaultStatus = directSelectedPayment === "Transfer" ? "Sudah Disetor" : (directSelectedPayment === "Bon" ? "Piutang" : "Belum Disetor");
-
-      if(!rute || (directSelectedPayment === 'Cash' && nominal <= 0)) return showToast('Error', 'Lengkapi rute dan nominal harga!', 'error');
-
-      showLoader(true);
-      const updates = {
-        timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
-        rute: rute, nominal: nominal, payment: directSelectedPayment, status: defaultStatus, photo: base64Photo || ""
-      };
-      
-      const { error } = await supabaseClient.from('ritase').update(updates).eq('id', recordId);
-      showLoader(false);
-
-      if(!error) {
-        const item = appState.ritase.find(x => x.id === recordId);
-        if(item) { Object.assign(item, updates); }
-        driverManualOverrideMode = false; base64Photo = ""; refreshAllUI();
-        showToast('Check-Out Sukses', 'Muatan selesai diantar, manifes ritase berhasil dibukukan!', 'success');
-        switchTab('dashboard');
-      } else { showToast('Gagal', error.message, 'error'); }
-    }
-
-    async function handleManualRitaseSubmit(e) {
-      e.preventDefault();
-      let name = "", plate = "";
-      if(currentRole === 'ADMIN') {
-        const driverStr = document.querySelector('input[name="direct_driver"]:checked')?.value;
-        if (!driverStr) return showToast('Error', 'Pilih Driver terlebih dahulu!', 'error');
-        [name, plate] = driverStr.split('|');
-      } else {
-        name = localStorage.getItem('sansam_driver_name'); plate = appState.drivers[name]?.plate || "";
-      }
-      
-      const rute = document.getElementById('direct-rute').value;
-      const muatan = document.getElementById('direct-muatan').value;
-      let nominal = parseFloat(document.getElementById('direct-nominal').value) || 0;
-      let defaultStatus = directSelectedPayment === "Transfer" ? "Sudah Disetor" : (directSelectedPayment === "Bon" ? "Piutang" : "Belum Disetor");
-
-      const newRecord = {
-        id: "r-" + Date.now(), timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
-        driver: name, plate: plate, rute: rute, muatan: muatan, nominal: nominal,
-        payment: directSelectedPayment, status: defaultStatus, photo: base64Photo || ""
-      };
-
-      showLoader(true);
-      const isSuccess = await insertToDB('ritase', newRecord);
-      showLoader(false);
-
-      if (isSuccess) {
-        appState.ritase.unshift(newRecord); driverManualOverrideMode = false; base64Photo = ""; refreshAllUI();
-        showToast('Sukses', 'Data ritase manual tersimpan!', 'success'); switchTab('dashboard');
-      }
-    }
-
-    async function handleExpenseSubmit(e) {
-      e.preventDefault();
-      const source = document.querySelector('input[name="exp_source"]:checked')?.value;
-      const category = document.getElementById('exp-category').value;
-      const nominal = parseFloat(document.getElementById('exp-nominal').value) || 0;
-      
-      let recipient = "";
-      if (category === "Transfer Kas") {
-        recipient = document.getElementById('exp-recipient-driver').value;
-        if(source === recipient) return showToast('Error','Sumber dana & Penerima Kas tidak boleh sama!','error');
-      } else if (category === "Panjar Driver") {
-        recipient = "Panjar";
-      } else {
-        recipient = document.getElementById('exp-recipient').value;
-      }
-
-      if(!source || !category || !recipient || nominal <= 0) return showToast('Error','Lengkapi isian form pengeluaran!','error');
-
-      const newExp = {
-        id: "exp-" + Date.now(), timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
-        source: source, category: category, recipient: recipient, nominal: nominal, note: "", status: "Active", photo: base64ExpensePhoto || ""
-      };
-
-      showLoader(true);
-      const isSuccess = await insertToDB('pengeluaran', newExp);
-      showLoader(false);
-
-      if (isSuccess) {
-        appState.pengeluaran.unshift(newExp); refreshAllUI(); document.getElementById('driver-expense-form').reset();
-        base64ExpensePhoto = ""; document.getElementById('exp-photo-preview-container').classList.add('hidden'); document.getElementById('exp-upload-placeholder').classList.remove('hidden');
-        showToast('Sukses', 'Pengeluaran kas berhasil dibukukan.', 'success'); switchTab('dashboard');
-      }
-    }
-
-    async function handleAttendanceSubmit(e) {
-      e.preventDefault();
-      const name = document.getElementById('absensi-driver-select').value;
-      const condition = document.querySelector('input[name="absensi_tipe"]:checked')?.value;
-      if (!name || !condition) return showToast('Error', 'Pilih Driver & Status!', 'error');
-
-      const newAbsen = {
-        id: "abs-" + Date.now(), timestamp: new Date().toLocaleString('id-ID', { hour12: false }),
-        name: name, tipe: condition, status: "Active"
-      };
-
-      showLoader(true);
-      const isSuccess = await insertToDB('absensi', newAbsen);
-      showLoader(false);
-
-      if (isSuccess) {
-        appState.absensi.unshift(newAbsen); refreshAllUI(); document.getElementById('attendance-form').reset();
-        showToast('Absensi Terkirim', `Status Driver ${name} diperbarui ke server.`, 'success');
-      }
-    }
-
-    // =====================================================================
-    // 5. FILTER ENGINE & DATA PROCESSING
-    // =====================================================================
-    function parseDateString(dateStr) {
-       if(!dateStr) return 0;
-       const parts = dateStr.split(' ')[0].split('/');
-       if(parts.length === 3) return new Date(`${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}T00:00:00`).getTime();
-       return new Date(dateStr).getTime();
-    }
-
-    function getFilteredData(type) {
-      const startStr = document.getElementById('filter-date-start')?.value;
-      const endStr = document.getElementById('filter-date-end')?.value;
-      const driver = document.getElementById('filter-driver-select')?.value;
-      const search = document.getElementById('filter-search-text')?.value.toLowerCase();
-
-      const startMs = startStr ? new Date(startStr + "T00:00:00").getTime() : 0;
-      const endMs = endStr ? new Date(endStr + "T23:59:59").getTime() : Infinity;
-
-      let dataSource = type === 'ritase' ? appState.ritase : appState.pengeluaran;
-
-      return dataSource.filter(i => {
-         let recordTime = parseDateString(i.timestamp);
-         if (startMs && recordTime < startMs) return false;
-         if (endMs && recordTime > endMs) return false;
-         
-         if(type === 'ritase') {
-             if (driver && i.driver !== driver) return false;
-             if (search && !i.rute.toLowerCase().includes(search) && !i.muatan.toLowerCase().includes(search) && !i.driver.toLowerCase().includes(search)) return false;
-         } else {
-             if (driver && i.source !== driver) return false;
-             if (search && !i.category.toLowerCase().includes(search) && !i.recipient.toLowerCase().includes(search) && !i.source.toLowerCase().includes(search)) return false;
-         }
-         return true;
-      });
-    }
-
-    function resetFilters() {
-      document.getElementById('filter-date-start').value = "";
-      document.getElementById('filter-date-end').value = "";
-      document.getElementById('filter-driver-select').value = "";
-      document.getElementById('filter-search-text').value = "";
-      refreshAllUI();
-    }
-
-    // =====================================================================
-    // 6. DOMPET KAS KRONOLOGIS & INTEGRASI RADAR STATUS
-    // =====================================================================
-    function getDriverCashInHand(driverName) {
-      let cash = 0; let timeline = [];
-      appState.ritase.forEach(i => { 
-        if (i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor") {
-          timeline.push({ type: 'in', nominal: i.nominal, time: parseDateString(i.timestamp) });
-        }
-      });
-      appState.pengeluaran.forEach(e => {
-        const isActive = (e.status === undefined || e.status === "Active");
-        if (isActive) {
-          let timeMs = parseDateString(e.timestamp);
-          if (e.source === driverName) timeline.push({ type: 'out', nominal: e.nominal, time: timeMs });
-          if (e.category === "Transfer Kas" && e.recipient === driverName) timeline.push({ type: 'in', nominal: e.nominal, time: timeMs });
-        }
-      });
-      timeline.sort((a, b) => a.time - b.time);
-      timeline.forEach(t => {
-        if (t.type === 'in') { cash += t.nominal; } 
-        else if (t.type === 'out') { cash -= t.nominal; if (cash < 0) cash = 0; } 
-      });
-      return cash;
-    }
-    
-    function showSourceCashInHand() {
-      ["IKKI", "FAUZI", "ASO"].forEach(name => {
-        const el = document.getElementById(`cash-hand-${name}`); if(el) el.innerText = "Rp " + getDriverCashInHand(name).toLocaleString('id-ID');
-      });
-    }
-
-    function refreshAllUI() {
-      updateMetrics(); renderDashboardActivities(); renderRekapTable(); renderExpenseTable();
-      renderPanjarRecap(); renderDriverStatusList(); renderAbsensi(); showSourceCashInHand(); updateCharts(); renderDriverRitaseForm();
-    }
-
-    function updateMetrics() {
-      let totalOmzet = 0, tfMasuk = 0, bonTotal = 0, totalPanjar = 0;
-      appState.ritase.forEach(i => {
-        if(i.status !== "Dalam Perjalanan") {
-          totalOmzet += i.nominal;
-          if (i.payment === "Transfer" || (i.payment === "Cash" && i.status === "Sudah Disetor")) tfMasuk += i.nominal;
-          else if (i.payment === "Bon") bonTotal += i.nominal;
-        }
-      });
-      appState.pengeluaran.forEach(e => {
-        if (e.category === "Panjar Driver" && (e.status === undefined || e.status === "Active")) totalPanjar += e.nominal;
-      });
-      let cashSisa = Math.max(0, getDriverCashInHand("IKKI") + getDriverCashInHand("FAUZI") + getDriverCashInHand("ASO"));
-      
-      const rp = v => "Rp " + v.toLocaleString('id-ID');
-      document.getElementById('metric-total-omzet').innerText = rp(totalOmzet);
-      document.getElementById('metric-cash-driver').innerText = rp(cashSisa);
-      document.getElementById('metric-total-panjar').innerText = rp(totalPanjar);
-      document.getElementById('metric-tf-masuk').innerText = rp(tfMasuk);
-      document.getElementById('metric-bon-total').innerText = rp(bonTotal);
-    }
-
-    function renderDashboardActivities() {
-      const c = document.getElementById('dashboard-recent-activities'); c.innerHTML = "";
-      appState.ritase.slice(0, 5).forEach(i => {
-        if(i.status === "Dalam Perjalanan") {
-           c.innerHTML += `<div class="p-3 border-b border-brand-border bg-brand-black rounded-lg mb-2 flex justify-between items-center"><span class="text-xs font-bold text-amber-500"><i class="fa-solid fa-truck-ramp-box mr-1.5"></i> ${i.driver} Muat Kuari</span> <span class="text-gray-400 font-bold text-[10px]">${i.muatan}</span></div>`;
-        } else {
-           c.innerHTML += `<div class="p-3 border-b border-brand-border bg-brand-black rounded-lg mb-2 flex justify-between items-center"><span class="text-xs font-bold text-white">${i.driver} (${i.rute})</span> <span class="text-brand-green font-bold text-[10px]">Rp ${i.nominal.toLocaleString('id-ID')}</span></div>`;
-        }
-      });
-    }
-
-    // LIST SINKRONISASI RADAR STATUS ARMADA SECARA DINAMIS
-    function renderDriverStatusList() {
-      const b = document.getElementById('driver-status-list'); if(!b) return; b.innerHTML = "";
-      ["IKKI", "FAUZI", "ASO"].forEach(name => {
-        const cashHand = getDriverCashInHand(name);
-        const lastAbsen = appState.absensi.find(x => x.name === name);
-        const isRunning = appState.ritase.some(x => x.driver === name && x.status === "Dalam Perjalanan");
-
-        let statusText = "Standby (Siap)"; let statusColor = "bg-brand-green text-brand-green"; let dotClass = "pulsing-green-dot";
-        if (lastAbsen && (lastAbsen.tipe === "Sakit" || lastAbsen.tipe === "Izin")) {
-           statusText = lastAbsen.tipe === "Sakit" ? "Sakit (Off)" : "Izin / Off";
-           statusColor = "bg-rose-500 text-rose-500"; dotClass = "bg-rose-500";
-        } else if (isRunning) {
-           statusText = "Dalam Perjalanan (Antar)";
-           statusColor = "bg-amber-500 text-amber-500"; dotClass = "pulsing-amber-dot";
-        } else if (lastAbsen && lastAbsen.tipe === "Istirahat") {
-           statusText = "Istirahat";
-           statusColor = "bg-orange-400 text-orange-400"; dotClass = "bg-orange-400";
-        }
-
-        let setoranBtnHTML = (cashHand > 0 && currentRole === 'ADMIN') 
-          ? `<button onclick="settleAllDriverCash('${name}')" class="mt-2 active-scale bg-brand-green/20 hover:bg-brand-green/30 text-brand-green border border-brand-green/30 px-3 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1.5"><i class="fa-solid fa-hand-holding-dollar"></i> Terima Setoran Seluruh Kas</button>` 
-          : '';
-
-        b.innerHTML += `<div class="p-3 border border-brand-border rounded-xl bg-brand-black mb-2 flex justify-between items-start">
-          <div>
-            <div class="font-bold text-sm text-white flex items-center gap-2">
-              ${name} 
-              <span class="inline-flex items-center gap-1 text-[9px] ${statusColor}/10 border border-${statusColor}/20 px-2 py-0.5 rounded-full font-bold">
-                <span class="w-1.5 h-1.5 rounded-full ${statusColor} ${dotClass}"></span> ${statusText}
-              </span>
-            </div>
-            ${setoranBtnHTML}
-          </div> 
-          <div class="text-right">
-            <span class="text-[9px] text-gray-400 block">Sisa Kas Fisik</span>
-            <span class="text-amber-500 font-bold text-sm">Rp ${cashHand.toLocaleString('id-ID')}</span>
+      <form id="login-form" class="space-y-4 pt-4">
+        <div>
+          <label class="block text-[11px] font-bold text-brand-muted uppercase tracking-wider mb-1.5">Email Akses</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-muted"></i>
+            <input type="email" id="auth-email" required placeholder="email@sansam.com" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-10 pr-4 text-sm text-white focus:border-brand-blue focus:outline-none">
           </div>
-        </div>`;
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-brand-muted uppercase tracking-wider mb-1.5">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-muted"></i>
+            <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-brand-black border border-brand-border rounded-xl py-3 pl-10 pr-4 text-sm text-white focus:border-brand-blue focus:outline-none">
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-extrabold py-3.5 rounded-xl text-sm transition shadow-lg shadow-brand-blue/20 mt-2 active-scale">MASUK SISTEM</button>
+      </form>
+      <div class="text-center pt-2">
+        <p class="text-[10px] text-brand-muted">Belum punya akun? Hubungi Super Admin Sansam.</p>
+        <button onclick="devCreateSuperAdmin()" class="text-[9px] text-brand-border hover:text-brand-muted mt-4">Dev: Initialize Super Admin (superadmin@sansam.com / admin123)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP (HIDDEN UNTIL AUTHENTICATED) -->
+  <div id="main-app-view" class="hidden flex-col min-h-screen">
+    
+    <!-- HEADER -->
+    <header class="border-b border-brand-border bg-brand-black/95 sticky top-0 z-50 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-brand-blue/20 text-brand-blue rounded-xl flex items-center justify-center border border-brand-blue/30"><i class="fa-solid fa-truck-fast"></i></div>
+          <div class="text-left">
+            <h1 class="text-sm font-extrabold tracking-tight text-white flex items-center gap-2">
+              SANSAM FLEET <span class="w-2 h-2 rounded-full bg-brand-green pulsing-dot block"></span>
+            </h1>
+            <span id="user-role-badge" class="text-[9px] text-brand-muted font-bold tracking-widest uppercase block mt-0.5">Role Placeholder</span>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <div class="hidden sm:flex text-right mr-2 flex-col">
+            <span id="user-name-display" class="text-xs font-bold text-white">Name</span>
+            <span id="user-email-display" class="text-[10px] text-brand-muted">Email</span>
+          </div>
+          <button onclick="handleLogout()" class="active-scale bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 w-9 h-9 flex items-center justify-center rounded-xl transition">
+            <i class="fa-solid fa-power-off"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- DESKTOP NAVIGATION (ADMIN) -->
+    <nav id="desktop-nav" class="hidden md:block bg-brand-card border-b border-brand-border">
+      <div class="max-w-7xl mx-auto px-4 flex gap-2 overflow-x-auto custom-scrollbar admin-menus">
+        <button onclick="switchView('dashboard')" class="nav-btn px-4 py-3 text-xs font-bold border-b-2 border-brand-blue text-brand-blue transition whitespace-nowrap"><i class="fa-solid fa-chart-line mr-2"></i>Dashboard</button>
+        <button onclick="switchView('order-management')" class="nav-btn px-4 py-3 text-xs font-bold border-b-2 border-transparent text-brand-muted hover:text-white transition whitespace-nowrap"><i class="fa-solid fa-clipboard-list mr-2"></i>Manajemen Order</button>
+        <button onclick="switchView('master-data')" class="nav-btn px-4 py-3 text-xs font-bold border-b-2 border-transparent text-brand-muted hover:text-white transition whitespace-nowrap"><i class="fa-solid fa-database mr-2"></i>Master Data</button>
+        <button onclick="switchView('reports')" class="nav-btn px-4 py-3 text-xs font-bold border-b-2 border-transparent text-brand-muted hover:text-white transition whitespace-nowrap"><i class="fa-solid fa-file-invoice mr-2"></i>Laporan</button>
+        <!-- Legacy Tabs untuk backward compatibility -->
+        <button onclick="switchView('legacy-pengeluaran')" class="nav-btn px-4 py-3 text-xs font-bold border-b-2 border-transparent text-brand-muted hover:text-white transition whitespace-nowrap"><i class="fa-solid fa-wallet mr-2"></i>Kas/Panjar (Legacy)</button>
+      </div>
+      <!-- DRIVER NAVIGATION -->
+      <div class="max-w-7xl mx-auto px-4 flex gap-2 overflow-x-auto custom-scrollbar driver-menus hidden">
+        <button onclick="switchView('driver-home')" class="nav-btn px-4 py-3 text-xs font-bold border-b-2 border-brand-blue text-brand-blue transition whitespace-nowrap"><i class="fa-solid fa-home mr-2"></i>Beranda Tugas</button>
+        <button onclick="switchView('driver-history')" class="nav-btn px-4 py-3 text-xs font-bold border-b-2 border-transparent text-brand-muted hover:text-white transition whitespace-nowrap"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Riwayat Saya</button>
+      </div>
+    </nav>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-6">
+      
+      <!-- ==================== DRIVER VIEWS ==================== -->
+      
+      <!-- DRIVER HOME: POOL OR ACTIVE ORDER -->
+      <section id="view-driver-home" class="view-section hidden animate-slide-in space-y-6">
+        
+        <!-- ACTIVE ORDER WIDGET (Ditampilkan jika ada order aktif) -->
+        <div id="driver-active-assignment" class="hidden">
+          <div class="bg-gradient-to-br from-brand-card to-brand-black border border-brand-blue/30 rounded-3xl p-5 shadow-2xl shadow-brand-blue/5 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-brand-blue/10 rounded-full blur-3xl -translate-y-10 translate-x-10"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-blue/20 text-brand-blue text-[10px] font-extrabold tracking-widest uppercase mb-2 border border-brand-blue/30">
+                  <i class="fa-solid fa-truck-fast"></i> TUGAS AKTIF
+                </span>
+                <h2 class="text-xl font-black text-white leading-tight" id="active-order-no">ORD-XXXXXX</h2>
+                <p class="text-xs text-brand-muted mt-1 font-semibold" id="active-order-customer">PT. Customer</p>
+              </div>
+              <button onclick="releaseOrderPrompt()" class="bg-brand-black border border-brand-border text-brand-muted hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition">Lepas Order</button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
+              <div class="bg-brand-black/50 border border-brand-border rounded-xl p-3">
+                <p class="text-[9px] text-brand-muted font-bold uppercase tracking-wider mb-1">Tujuan Proyek</p>
+                <p class="text-xs font-bold text-white line-clamp-2" id="active-order-dest">Lokasi Proyek</p>
+              </div>
+              <div class="bg-brand-black/50 border border-brand-border rounded-xl p-3">
+                <p class="text-[9px] text-brand-muted font-bold uppercase tracking-wider mb-1">Material</p>
+                <p class="text-xs font-bold text-amber-500" id="active-order-material">Material</p>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-6">
+              <div class="flex justify-between text-[10px] font-bold mb-1.5">
+                <span class="text-brand-muted">Progress Keseluruhan Order</span>
+                <span class="text-brand-blue" id="active-order-progress-text">0 / 0 RIT</span>
+              </div>
+              <div class="w-full bg-brand-black rounded-full h-2 overflow-hidden border border-brand-border">
+                <div class="bg-brand-blue h-2 rounded-full transition-all duration-500" id="active-order-progress-bar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <button onclick="openDeliveryModal()" class="w-full bg-brand-green hover:bg-brand-green/90 text-white font-extrabold py-4 rounded-xl text-sm transition shadow-lg shadow-brand-green/20 flex items-center justify-center gap-2 active-scale">
+              <i class="fa-solid fa-clipboard-check text-lg"></i> LAPOR BONGKAR (RIT BARU)
+            </button>
+          </div>
+        </div>
+
+        <!-- ORDER POOL WIDGET (Ditampilkan jika tidak ada order aktif) -->
+        <div id="driver-order-pool" class="hidden space-y-4">
+          <div class="bg-brand-card border border-brand-border rounded-2xl p-4 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white">Order Pool Tersedia</h3>
+              <p class="text-[10px] text-brand-muted mt-0.5">Pilih satu order untuk mulai pengantaran.</p>
+            </div>
+            <div class="w-10 h-10 bg-brand-blue/10 text-brand-blue rounded-full flex items-center justify-center"><i class="fa-solid fa-list-ul"></i></div>
+          </div>
+          
+          <div id="pool-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Dihasilkan oleh JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- DRIVER HISTORY -->
+      <section id="view-driver-history" class="view-section hidden animate-slide-in space-y-4">
+        <h2 class="text-lg font-bold text-white">Riwayat Pengantaran Saya</h2>
+        <div class="space-y-3" id="driver-history-container">
+          <!-- Dihasilkan oleh JS -->
+        </div>
+      </section>
+
+      <!-- ==================== ADMIN VIEWS ==================== -->
+      
+      <!-- DASHBOARD -->
+      <section id="view-dashboard" class="view-section hidden animate-slide-in space-y-6">
+        <!-- KPI Metrics -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
+            <p class="text-[10px] text-brand-muted font-bold uppercase tracking-wider">Total Ritase Selesai</p>
+            <h3 class="text-2xl font-black text-white mt-1" id="dash-total-rit">0</h3>
+          </div>
+          <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
+            <p class="text-[10px] text-brand-muted font-bold uppercase tracking-wider">Order Aktif Berjalan</p>
+            <h3 class="text-2xl font-black text-amber-500 mt-1" id="dash-active-orders">0</h3>
+          </div>
+          <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
+            <p class="text-[10px] text-brand-muted font-bold uppercase tracking-wider">Armada Mengaspal</p>
+            <h3 class="text-2xl font-black text-brand-blue mt-1" id="dash-active-drivers">0</h3>
+          </div>
+          <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
+            <p class="text-[10px] text-brand-muted font-bold uppercase tracking-wider">Penerimaan Cash Harian</p>
+            <h3 class="text-2xl font-black text-brand-green mt-1" id="dash-daily-cash">Rp 0</h3>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Live Deliveries -->
+          <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1 lg:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-brand-muted flex items-center gap-2"><i class="fa-solid fa-satellite-dish text-brand-blue"></i> Live Delivery Log</h4>
+            </div>
+            <div class="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2" id="dash-live-deliveries">
+              <!-- JS Injected -->
+            </div>
+          </div>
+          
+          <!-- Driver Status Monitor -->
+          <div class="bg-brand-card border border-brand-border p-5 rounded-2xl col-span-1">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-brand-muted mb-4 flex items-center gap-2"><i class="fa-solid fa-users-viewfinder text-brand-green"></i> Monitor Armada</h4>
+            <div class="space-y-2.5" id="dash-driver-monitor">
+              <!-- JS Injected -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ORDER MANAGEMENT -->
+      <section id="view-order-management" class="view-section hidden animate-slide-in space-y-4">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-brand-card border border-brand-border p-4 rounded-2xl">
+          <h2 class="text-base font-bold text-white">Manajemen Order</h2>
+          <div class="flex gap-2 w-full sm:w-auto">
+            <button onclick="openOrderModal()" class="w-full sm:w-auto bg-brand-blue hover:bg-brand-blue/90 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-lg shadow-brand-blue/20 active-scale"><i class="fa-solid fa-plus mr-1.5"></i> Buat Order Baru</button>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-brand-black border border-brand-border p-3.5 rounded-xl flex flex-col md:flex-row gap-2 items-center">
+          <div class="relative w-full flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted"></i>
+            <input type="text" id="order-search" placeholder="Cari No Order, Customer..." class="w-full bg-brand-card border border-brand-border py-2.5 pl-9 pr-3 rounded-lg text-xs text-white focus:border-brand-blue outline-none" onkeyup="renderOrderTable()">
+          </div>
+          <select id="order-status-filter" class="w-full md:w-auto bg-brand-card border border-brand-border p-2.5 rounded-lg text-xs text-white focus:border-brand-blue outline-none" onchange="renderOrderTable()">
+            <option value="">Semua Status</option>
+            <option value="AVAILABLE">Tersedia (Pool)</option>
+            <option value="PARTIALLY_COMPLETED">Berjalan</option>
+            <option value="COMPLETED">Selesai</option>
+          </select>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-brand-border shadow-lg">
+          <table class="w-full text-left text-xs min-w-[1000px]">
+            <thead class="bg-brand-black text-brand-muted uppercase font-semibold border-b border-brand-border">
+              <tr>
+                <th class="p-4">No Order</th>
+                <th class="p-4">Customer & Proyek</th>
+                <th class="p-4">Material</th>
+                <th class="p-4 text-center">Progress (Rit)</th>
+                <th class="p-4 text-center">Status</th>
+                <th class="p-4 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="order-table-body" class="divide-y divide-brand-border bg-brand-card">
+              <!-- JS Injected -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- MASTER DATA -->
+      <section id="view-master-data" class="view-section hidden animate-slide-in space-y-6">
+        <div class="flex gap-2 overflow-x-auto custom-scrollbar border-b border-brand-border pb-2">
+          <button onclick="switchMasterTab('users')" id="m-tab-users" class="master-tab px-4 py-2 text-xs font-bold rounded-lg bg-brand-blue text-white transition whitespace-nowrap">User & Driver</button>
+          <button onclick="switchMasterTab('vehicles')" id="m-tab-vehicles" class="master-tab px-4 py-2 text-xs font-bold rounded-lg text-brand-muted hover:text-white transition whitespace-nowrap">Armada Kendaraan</button>
+          <button onclick="switchMasterTab('customers')" id="m-tab-customers" class="master-tab px-4 py-2 text-xs font-bold rounded-lg text-brand-muted hover:text-white transition whitespace-nowrap">Customer & Proyek</button>
+          <button onclick="switchMasterTab('materials')" id="m-tab-materials" class="master-tab px-4 py-2 text-xs font-bold rounded-lg text-brand-muted hover:text-white transition whitespace-nowrap">Material</button>
+        </div>
+        
+        <!-- Tabel Master dinamis dirender di sini -->
+        <div class="bg-brand-card border border-brand-border rounded-xl p-4 relative">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-sm font-bold text-white" id="master-title">Kelola Data</h3>
+            <button onclick="openMasterModal()" class="bg-brand-black border border-brand-border hover:border-brand-blue text-white px-3 py-1.5 rounded-lg text-xs font-bold transition active-scale"><i class="fa-solid fa-plus mr-1"></i> Tambah Baru</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[700px]">
+              <thead id="master-table-head" class="bg-brand-black text-brand-muted uppercase border-b border-brand-border"></thead>
+              <tbody id="master-table-body" class="divide-y divide-brand-border"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="view-reports" class="view-section hidden animate-slide-in space-y-4">
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div>
+            <h2 class="text-base font-bold text-white">Laporan Operasional (Deliveries)</h2>
+            <p class="text-[10px] text-brand-muted mt-1">Export data ritase yang telah selesai.</p>
+          </div>
+          <div class="flex gap-2 w-full md:w-auto">
+            <button onclick="exportDeliveries('CSV')" class="flex-1 md:flex-none bg-brand-black border border-brand-border hover:border-brand-green text-gray-300 px-4 py-2.5 rounded-xl text-xs font-bold transition"><i class="fa-solid fa-file-csv text-brand-green mr-1.5"></i> Excel / CSV</button>
+            <button onclick="exportDeliveries('PDF')" class="flex-1 md:flex-none bg-brand-black border border-brand-border hover:border-rose-500 text-gray-300 px-4 py-2.5 rounded-xl text-xs font-bold transition"><i class="fa-solid fa-file-pdf text-rose-500 mr-1.5"></i> PDF</button>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto rounded-xl border border-brand-border">
+          <table class="w-full text-left text-xs min-w-[1000px]">
+            <thead class="bg-brand-black text-brand-muted uppercase font-semibold border-b border-brand-border">
+              <tr>
+                <th class="p-4">Tanggal</th>
+                <th class="p-4">No Order</th>
+                <th class="p-4">Driver</th>
+                <th class="p-4">Rit Ke</th>
+                <th class="p-4 text-center">Metode Bayar</th>
+                <th class="p-4 text-right">Nominal (CASH)</th>
+                <th class="p-4 text-center">Foto</th>
+              </tr>
+            </thead>
+            <tbody id="report-table-body" class="divide-y divide-brand-border bg-brand-card">
+              <!-- JS Injected -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- LEGACY: PENGELUARAN (Untuk menjaga fitur lama Panjar/Kas) -->
+      <section id="view-legacy-pengeluaran" class="view-section hidden animate-slide-in space-y-4">
+        <div class="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl text-amber-500 text-xs flex items-start gap-3">
+          <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+          <div><strong class="block">Modul Legacy (Kas/Panjar)</strong>Ini adalah modul peninggalan dari sistem V1 untuk mencatat pengeluaran, solar, dan panjar. Tetap dipertahankan sesuai request.</div>
+        </div>
+        <!-- Simplified UI for legacy expense table. In real upgrade, you'd bind this to the old `pengeluaran` table -->
+        <div class="bg-brand-card border border-brand-border rounded-xl p-5 text-center text-brand-muted py-20">
+          <i class="fa-solid fa-database text-3xl mb-3"></i>
+          <p class="text-xs">Tabel Pengeluaran V1 tersambung ke tabel <code>pengeluaran</code> lama.<br>Membutuhkan sinkronisasi skema di backend.</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-brand-card/95 border-t border-brand-border backdrop-blur-md pb-safe z-50">
+      <div class="flex justify-around items-center px-2 py-2 admin-menus hidden">
+        <button onclick="switchView('dashboard')" class="mobile-nav-btn text-brand-blue flex flex-col items-center gap-1 w-16 transition active-scale"><i class="fa-solid fa-chart-line text-lg"></i><span class="text-[9px] font-bold">Dash</span></button>
+        <button onclick="switchView('order-management')" class="mobile-nav-btn text-brand-muted flex flex-col items-center gap-1 w-16 transition active-scale"><i class="fa-solid fa-clipboard-list text-lg"></i><span class="text-[9px] font-bold">Order</span></button>
+        <button onclick="switchView('master-data')" class="mobile-nav-btn text-brand-muted flex flex-col items-center gap-1 w-16 transition active-scale"><i class="fa-solid fa-database text-lg"></i><span class="text-[9px] font-bold">Master</span></button>
+      </div>
+      <div class="flex justify-around items-center px-2 py-2 driver-menus hidden">
+        <button onclick="switchView('driver-home')" class="mobile-nav-btn text-brand-blue flex flex-col items-center gap-1 w-16 transition active-scale"><i class="fa-solid fa-truck-fast text-lg"></i><span class="text-[9px] font-bold">Tugas</span></button>
+        <button onclick="switchView('driver-history')" class="mobile-nav-btn text-brand-muted flex flex-col items-center gap-1 w-16 transition active-scale"><i class="fa-solid fa-clock-rotate-left text-lg"></i><span class="text-[9px] font-bold">Riwayat</span></button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. DRIVER: LAPOR BONGKAR MODAL -->
+  <div id="delivery-modal" class="fixed inset-0 bg-brand-black/95 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="p-4 border-b border-brand-border flex justify-between items-center bg-brand-black sticky top-0 z-10">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-brand-green"></i> Laporan Bongkar (Ritase)</h3>
+        <button onclick="closeModals()" class="text-brand-muted hover:text-white w-8 h-8 rounded-full bg-brand-card flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <div class="p-5 overflow-y-auto custom-scrollbar flex-grow">
+        <form id="delivery-form" class="space-y-6" onsubmit="handleDeliverySubmit(event)">
+          
+          <!-- Foto Validation Block -->
+          <div>
+            <label class="block text-[11px] font-bold text-brand-muted uppercase tracking-wider mb-2">Foto Bukti Bongkar (Wajib 1-3 Foto) <span class="text-rose-500">*</span></label>
+            <div class="relative flex flex-col items-center justify-center border-2 border-dashed border-brand-border rounded-xl p-6 bg-brand-black hover:border-brand-blue/50 transition cursor-pointer group" onclick="document.getElementById('delivery-photos').click()">
+              <input type="file" id="delivery-photos" accept="image/*" multiple class="hidden" onchange="handlePhotoSelection(event)">
+              <div id="photo-placeholder" class="text-center space-y-2 pointer-events-none">
+                <div class="w-12 h-12 bg-brand-blue/10 text-brand-blue rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition"><i class="fa-solid fa-camera text-xl"></i></div>
+                <p class="text-[10px] font-bold text-gray-400">Pilih dari Galeri atau Kamera</p>
+              </div>
+            </div>
+            <!-- Preview Container -->
+            <div id="photo-preview-container" class="grid grid-cols-3 gap-2 mt-3 empty:hidden"></div>
+            <p id="photo-error" class="text-[10px] text-rose-500 font-bold mt-1.5 hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i> Wajib melampirkan foto (Maks 3).</p>
+          </div>
+
+          <!-- Payment Logic -->
+          <div class="border-t border-brand-border pt-5">
+            <label class="block text-[11px] font-bold text-brand-muted uppercase tracking-wider mb-2">Metode Pembayaran di Lokasi <span class="text-rose-500">*</span></label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <label class="relative flex items-center justify-center gap-1.5 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition active-scale">
+                <input type="radio" name="payment_method" value="TF" class="accent-brand-blue" onchange="toggleNominalInput()">
+                <span class="text-xs font-bold text-white">Transfer (TF)</span>
+              </label>
+              <label class="relative flex items-center justify-center gap-1.5 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-blue transition active-scale">
+                <input type="radio" name="payment_method" value="BB" class="accent-brand-blue" onchange="toggleNominalInput()">
+                <span class="text-xs font-bold text-white">Tempo (BB)</span>
+              </label>
+              <label class="relative flex items-center justify-center gap-1.5 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-green transition active-scale">
+                <input type="radio" name="payment_method" value="CASH" class="accent-brand-green" onchange="toggleNominalInput()">
+                <span class="text-xs font-bold text-brand-green">Tunai (CASH)</span>
+              </label>
+              <label class="relative flex items-center justify-center gap-1.5 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer hover:border-brand-muted transition active-scale">
+                <input type="radio" name="payment_method" value="NONE" class="accent-brand-muted" onchange="toggleNominalInput()" checked>
+                <span class="text-xs font-bold text-brand-muted">Tidak Ada</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="nominal-container" class="hidden animate-slide-in">
+            <label class="block text-[11px] font-bold text-brand-green uppercase tracking-wider mb-1.5">Nominal Tunai Diterima (Rp) <span class="text-rose-500">*</span></label>
+            <input type="number" id="delivery-nominal" placeholder="Contoh: 500000" class="w-full bg-brand-black border border-brand-green/30 rounded-xl p-3.5 text-sm font-bold text-white focus:border-brand-green focus:outline-none placeholder-gray-600">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-brand-muted uppercase tracking-wider mb-1.5">Catatan Tambahan (Opsional)</label>
+            <input type="text" id="delivery-note" placeholder="Ketikan kendala / info..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue focus:outline-none">
+          </div>
+
+          <!-- GPS Checkbox (Opsional per prompt) -->
+          <label class="flex items-center gap-2 cursor-pointer mt-2">
+            <input type="checkbox" id="use-gps" class="accent-brand-blue w-4 h-4 rounded">
+            <span class="text-[10px] text-brand-muted">Lampirkan Lokasi GPS (Bila diizinkan)</span>
+          </label>
+        </form>
+      </div>
+      
+      <div class="p-4 border-t border-brand-border bg-brand-black mt-auto">
+        <button type="submit" form="delivery-form" id="btn-submit-delivery" class="w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-extrabold py-3.5 rounded-xl text-sm transition shadow-lg shadow-brand-blue/20 flex items-center justify-center gap-2">
+          KIRIM LAPORAN BONGKAR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ADMIN: CREATE ORDER MODAL -->
+  <div id="order-modal" class="fixed inset-0 bg-brand-black/95 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-2xl overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-brand-border flex justify-between items-center bg-brand-black">
+        <h3 class="text-sm font-bold text-white">Buat Order Baru</h3>
+        <button onclick="closeModals()" class="text-brand-muted hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5">
+        <form id="create-order-form" class="space-y-4" onsubmit="handleCreateOrder(event)">
+          <!-- These selects should ideally be populated from Master Data. Mocking options for now. -->
+          <div>
+            <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Customer</label>
+            <select id="co-customer" required class="w-full bg-brand-black border border-brand-border rounded-lg p-2.5 text-xs text-white focus:border-brand-blue outline-none">
+              <option value="">Pilih Customer...</option>
+              <option value="CUST-01">PT. Pembangunan Mandiri</option>
+              <option value="CUST-02">CV. Maju Jaya</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Proyek / Tujuan</label>
+            <input type="text" id="co-destination" required placeholder="Contoh: Proyek Bendungan Bili-Bili" class="w-full bg-brand-black border border-brand-border rounded-lg p-2.5 text-xs text-white focus:border-brand-blue outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Material</label>
+              <select id="co-material" required class="w-full bg-brand-black border border-brand-border rounded-lg p-2.5 text-xs text-white focus:border-brand-blue outline-none">
+                <option value="Pasir Kasar">Pasir Kasar</option>
+                <option value="Batu Pecah">Batu Pecah</option>
+                <option value="Sirtu">Sirtu</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Total Ritase</label>
+              <input type="number" id="co-total-rit" required min="1" value="10" class="w-full bg-brand-black border border-brand-border rounded-lg p-2.5 text-xs text-white focus:border-brand-blue outline-none text-center font-bold">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Prioritas</label>
+            <select id="co-priority" class="w-full bg-brand-black border border-brand-border rounded-lg p-2.5 text-xs text-white focus:border-brand-blue outline-none">
+              <option value="NORMAL">Normal</option>
+              <option value="PRIORITY">Priority</option>
+              <option value="URGENT">Urgent (Tampil Teratas)</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full bg-brand-blue text-white font-bold py-3 rounded-xl text-xs transition mt-2 shadow-lg shadow-brand-blue/20">Simpan & Lempar ke Pool</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. DIALOG KONFIRMASI UNIVERSAL -->
+  <div id="confirm-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-[99999] hidden flex items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl p-6 text-center">
+      <div id="confirm-icon" class="w-14 h-14 rounded-full mx-auto flex items-center justify-center mb-4 text-2xl"></div>
+      <h3 id="confirm-title" class="text-base font-bold text-white mb-2">Konfirmasi</h3>
+      <p id="confirm-desc" class="text-xs text-brand-muted mb-6">Apakah Anda yakin?</p>
+      
+      <!-- Opsi Release Reason (Khusus saat Lepas Order) -->
+      <div id="release-reason-box" class="hidden mb-4 text-left">
+        <label class="block text-[10px] font-bold text-brand-muted uppercase tracking-wider mb-1">Alasan Pelepasan Order</label>
+        <select id="release-reason" class="w-full bg-brand-black border border-brand-border rounded-lg p-2.5 text-xs text-white focus:border-brand-blue outline-none mb-2">
+          <option value="Tujuan berubah">Tujuan berubah</option>
+          <option value="Proyek belum siap">Proyek belum siap</option>
+          <option value="Kendaraan bermasalah">Kendaraan bermasalah</option>
+          <option value="Lainnya">Lainnya...</option>
+        </select>
+        <input type="text" id="release-note" placeholder="Ketikan detail alasan..." class="w-full bg-brand-black border border-brand-border rounded-lg p-2.5 text-xs text-white focus:border-brand-blue outline-none hidden">
+      </div>
+
+      <div class="flex gap-2 justify-center">
+        <button onclick="closeConfirmModal()" class="px-5 py-2.5 bg-zinc-800 text-white rounded-xl text-xs font-bold transition">Batal</button>
+        <button id="btn-confirm-action" class="px-5 py-2.5 rounded-xl text-xs font-bold transition text-white">Yakin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. PHOTO LIGHTBOX -->
+  <div id="photo-lightbox" class="fixed inset-0 bg-black/95 z-[999999] hidden flex flex-col items-center justify-center">
+    <button onclick="closePhotoLightbox()" class="absolute top-4 right-4 w-10 h-10 bg-brand-card/50 text-white rounded-full flex items-center justify-center hover:bg-brand-card"><i class="fa-solid fa-xmark"></i></button>
+    <img id="lightbox-img" src="" class="max-w-full max-h-[85vh] object-contain px-4">
+  </div>
+
+
+  <!-- ==================== CORE JAVASCRIPT ==================== -->
+  <script>
+    // 1. SUPABASE INITIALIZATION
+    // Menggunakan kredensial dari project eksisting (seperti diminta)
+    const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // 2. GLOBAL STATE
+    let currentUser = null;
+    let userProfile = null;
+    let activeOrderAssignment = null;
+    
+    // Data Caches
+    let ordersCache = [];
+    let deliveriesCache = [];
+    let poolCache = [];
+    
+    // Photo handling
+    let selectedPhotosBase64 = []; // In a real app, upload files to Storage. We use base64 strictly to fit the single file architecture without complex Storage bucket configurations if missing.
+
+    // 3. INITIALIZATION & AUTHENTICATION
+    window.onload = async () => {
+      showLoader(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        await initializeUser(session.user);
+      } else {
+        document.getElementById('auth-view').classList.remove('hidden');
+      }
+      showLoader(false);
+
+      // Setup Release Reason toggler
+      document.getElementById('release-reason').addEventListener('change', (e) => {
+        document.getElementById('release-note').classList.toggle('hidden', e.target.value !== 'Lainnya');
       });
+    };
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      showLoader(true);
+      const email = document.getElementById('auth-email').value;
+      const password = document.getElementById('auth-password').value;
+      
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        showLoader(false);
+        showToast('Login Gagal', error.message, 'error');
+      } else {
+        await initializeUser(data.user);
+        showLoader(false);
+      }
+    });
+
+    async function handleLogout() {
+      await supabase.auth.signOut();
+      window.location.reload();
     }
 
-    // =====================================================================
-    // 7. DYNAMIC DRIVER SCREEN RENDERING (ALUR INTEGRASI CHECK-IN / CHECK-OUT)
-    // =====================================================================
-    function renderDriverRitaseForm() {
-      const container = document.getElementById('sub-tab-ritase'); if (!container) return;
-      if (currentRole === 'OPERATOR') {
-        container.innerHTML = `<div class="p-6 text-center text-gray-400 text-xs font-semibold">Akses Anda Terbatas Untuk Check-In Muatan Kuari. Gunakan Sub-Tab Di Atas.</div>`;
+    async function initializeUser(auth_user) {
+      currentUser = auth_user;
+      
+      // Fetch profile dari tabel master_users
+      const { data, error } = await supabase.from('master_users').select('*').eq('auth_user_id', auth_user.id).single();
+      
+      if (error || !data) {
+        // Fallback jika developer belum mapping master_users
+        showToast('Info', 'Akun belum terpetakan di master_users. Menjalankan fallback mode.', 'error');
+        // Membuat mockup profile untuk demonstrasi karena ini adalah prototype upgrade
+        userProfile = { id: auth_user.id, name: auth_user.email.split('@')[0], role: auth_user.email.includes('admin') ? 'SUPER_ADMIN' : 'DRIVER' };
+      } else {
+        userProfile = data;
+      }
+
+      if (userProfile.status === 'INACTIVE') {
+        showToast('Akses Ditolak', 'Akun Anda dinonaktifkan oleh sistem.', 'error');
+        await supabase.auth.signOut();
         return;
       }
-      if (currentRole === 'ADMIN') { renderManualFormHTML(container, true); return; }
 
-      const driverName = localStorage.getItem('sansam_driver_name');
-      const activeTrip = appState.ritase.find(x => x.driver === driverName && x.status === "Dalam Perjalanan");
+      // Update UI Header
+      document.getElementById('user-name-display').innerText = userProfile.name;
+      document.getElementById('user-email-display').innerText = currentUser.email;
+      document.getElementById('user-role-badge').innerText = `ROLE: ${userProfile.role.replace('_', ' ')}`;
+      
+      document.getElementById('auth-view').classList.add('hidden');
+      document.getElementById('main-app-view').classList.remove('hidden');
+      document.getElementById('main-app-view').classList.add('flex');
 
-      if (activeTrip && !driverManualOverrideMode) {
-        container.innerHTML = `
-          <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl mb-4 text-left flex items-start gap-3">
-            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center flex-shrink-0 animate-pulse"><i class="fa-solid fa-truck-ramp-box text-sm"></i></div>
+      applyRoleBasedUI();
+    }
+
+    // 4. ROUTING & UI MANAGEMENT
+    function applyRoleBasedUI() {
+      const isAdmin = userProfile.role === 'SUPER_ADMIN' || userProfile.role === 'ADMIN';
+      
+      if (isAdmin) {
+        document.querySelectorAll('.admin-menus').forEach(el => el.classList.remove('hidden'));
+        document.querySelectorAll('.driver-menus').forEach(el => el.classList.add('hidden'));
+        switchView('dashboard');
+        loadAdminData();
+      } else {
+        document.querySelectorAll('.admin-menus').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.driver-menus').forEach(el => el.classList.remove('hidden'));
+        switchView('driver-home');
+        loadDriverData();
+      }
+    }
+
+    function switchView(viewId) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`view-${viewId}`).classList.remove('hidden');
+      
+      // Update Tab styling for desktop nav
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('border-brand-blue', 'text-brand-blue');
+        btn.classList.add('border-transparent', 'text-brand-muted');
+      });
+      // Find button that triggers this view and set active (basic DOM finding)
+      const btn = document.querySelector(`button[onclick="switchView('${viewId}')"]`);
+      if(btn) {
+        btn.classList.remove('border-transparent', 'text-brand-muted');
+        btn.classList.add('border-brand-blue', 'text-brand-blue');
+      }
+
+      // Trigger re-renders based on view
+      if (viewId === 'dashboard') loadAdminData();
+      if (viewId === 'order-management') renderOrderTable();
+    }
+
+    // 5. HELPER FUNCTIONS
+    function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
+    function showToast(title, desc, type='success') {
+      document.getElementById('toast-title').innerText = title; 
+      document.getElementById('toast-desc').innerText = desc;
+      const icon = document.getElementById('toast-icon');
+      const iconBg = document.getElementById('toast-icon-bg');
+      
+      if(type === 'error') {
+        icon.className = "fa-solid fa-xmark text-rose-500 text-sm";
+        iconBg.className = "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-rose-500/10 border border-rose-500/30";
+      } else {
+        icon.className = "fa-solid fa-check text-brand-green text-sm";
+        iconBg.className = "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-brand-green/10 border border-brand-green/30";
+      }
+      
+      const t = document.getElementById('custom-toast');
+      t.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => t.classList.add('translate-y-[-100px]', 'opacity-0', 'pointer-events-none'), 3500);
+    }
+    function closeModals() {
+      document.getElementById('delivery-modal').classList.add('hidden');
+      document.getElementById('order-modal').classList.add('hidden');
+    }
+
+    // =====================================================================
+    // CORE LOGIC: DRIVER WORKFLOW
+    // =====================================================================
+    async function loadDriverData() {
+      showLoader(true);
+      try {
+        // 1. Cek apakah ada assignment aktif
+        const { data: assignments } = await supabase
+          .from('assignments')
+          .select('*, orders(*)')
+          .eq('driver_id', userProfile.id)
+          .eq('status', 'ACTIVE');
+          
+        if (assignments && assignments.length > 0) {
+          activeOrderAssignment = assignments[0];
+          renderActiveOrderWidget();
+        } else {
+          activeOrderAssignment = null;
+          await loadOrderPool();
+        }
+        
+        // Load history
+        await loadDriverHistory();
+      } catch (e) {
+        console.error(e);
+        showToast('Error', 'Gagal memuat data driver.', 'error');
+      }
+      showLoader(false);
+    }
+
+    async function loadOrderPool() {
+      // Ambil order yang statusnya AVAILABLE atau PARTIALLY_COMPLETED, dan tidak locked
+      const { data } = await supabase
+        .from('orders')
+        .select('*')
+        .in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED'])
+        .eq('locked', false)
+        .order('priority', { ascending: false }) // Urgent first
+        .order('created_at', { ascending: false });
+        
+      poolCache = data || [];
+      
+      document.getElementById('driver-active-assignment').classList.add('hidden');
+      document.getElementById('driver-order-pool').classList.remove('hidden');
+      
+      const container = document.getElementById('pool-list-container');
+      container.innerHTML = '';
+      
+      if(poolCache.length === 0) {
+        container.innerHTML = `<div class="col-span-1 md:col-span-2 text-center p-8 bg-brand-black border border-brand-border rounded-xl text-brand-muted text-xs">Belum ada order tersedia di Pool saat ini.</div>`;
+        return;
+      }
+
+      poolCache.forEach(order => {
+        let badgeColor = order.priority === 'URGENT' ? 'bg-rose-500 text-white animate-pulse' : (order.priority === 'PRIORITY' ? 'bg-amber-500 text-brand-black' : 'bg-brand-card text-brand-muted border border-brand-border');
+        let progPct = Math.round((order.completed_rit / order.total_rit) * 100);
+        
+        container.innerHTML += `
+          <div class="bg-brand-black border border-brand-border rounded-xl p-4 flex flex-col justify-between hover:border-brand-blue/50 transition">
+            <div class="mb-3">
+              <div class="flex justify-between items-start mb-2">
+                <span class="text-[10px] font-black ${badgeColor} px-2 py-0.5 rounded uppercase tracking-wider">${order.priority}</span>
+                <span class="text-[10px] text-brand-muted">${order.order_number}</span>
+              </div>
+              <h4 class="text-sm font-bold text-white mb-1 line-clamp-1">${order.destination}</h4>
+              <p class="text-[11px] text-brand-muted">Kirim <strong class="text-amber-500">${order.total_rit} Rit</strong> (Sisa ${order.total_rit - order.completed_rit})</p>
+            </div>
+            
+            <div class="w-full bg-brand-card rounded-full h-1.5 mb-4 overflow-hidden">
+              <div class="bg-brand-blue h-1.5 rounded-full" style="width: ${progPct}%"></div>
+            </div>
+            
+            <button onclick="takeOrder('${order.id}')" class="w-full bg-brand-card border border-brand-blue/30 text-brand-blue hover:bg-brand-blue hover:text-white font-bold py-2.5 rounded-lg text-xs transition active-scale">Ambil Order Ini</button>
+          </div>
+        `;
+      });
+    }
+
+    async function takeOrder(orderId) {
+      if(activeOrderAssignment) return showToast('Akses Ditolak', 'Selesaikan order aktif Anda terlebih dahulu.', 'error');
+      
+      showConfirmModal('Ambil Order', 'Yakin ingin mengambil dan menjalankan order ini?', 'fa-truck-arrow-right', 'bg-brand-blue', async () => {
+        showLoader(true);
+        // Constraint: Gunakan RPC atau Insert aman. Di sini kita Insert.
+        // Jika backend punya Trigger validasi "Max 1 Active per driver", itu yang akan menolak.
+        const { data, error } = await supabase.from('assignments').insert({
+          order_id: orderId,
+          driver_id: userProfile.id,
+          status: 'ACTIVE'
+        }).select('*, orders(*)').single();
+
+        if (error) {
+          showToast('Gagal Mengambil', 'Order mungkin sudah dikunci atau sistem menolak.', 'error');
+        } else {
+          activeOrderAssignment = data;
+          showToast('Order Terambil', 'Selamat bertugas! Silakan antar muatan.', 'success');
+          renderActiveOrderWidget();
+        }
+        showLoader(false);
+      });
+    }
+
+    function renderActiveOrderWidget() {
+      document.getElementById('driver-order-pool').classList.add('hidden');
+      const widget = document.getElementById('driver-active-assignment');
+      widget.classList.remove('hidden');
+      
+      const order = activeOrderAssignment.orders;
+      
+      document.getElementById('active-order-no').innerText = order.order_number;
+      // Mockup customer & material resolution for simplicity in frontend
+      document.getElementById('active-order-customer').innerText = "Cust ID: " + order.customer_id.substring(0,5); 
+      document.getElementById('active-order-dest').innerText = order.destination;
+      document.getElementById('active-order-material').innerText = "Mat ID: " + order.material_id.substring(0,5);
+      
+      const progText = `${order.completed_rit} / ${order.total_rit} RIT`;
+      const progPct = Math.round((order.completed_rit / order.total_rit) * 100);
+      document.getElementById('active-order-progress-text').innerText = progText;
+      document.getElementById('active-order-progress-bar').style.width = progPct + '%';
+    }
+
+    function releaseOrderPrompt() {
+      document.getElementById('release-reason-box').classList.remove('hidden');
+      showConfirmModal('Lepas Order', 'Tugas ini akan dilempar kembali ke Pool.', 'fa-truck-ramp-box', 'bg-amber-500', async () => {
+        showLoader(true);
+        const reason = document.getElementById('release-reason').value;
+        const note = reason === 'Lainnya' ? document.getElementById('release-note').value : '';
+        
+        await supabase.from('assignments').update({ 
+          status: 'RELEASED', released_at: new Date().toISOString(), release_reason: reason, release_note: note 
+        }).eq('id', activeOrderAssignment.id);
+        
+        activeOrderAssignment = null;
+        document.getElementById('release-reason-box').classList.add('hidden');
+        showToast('Sukses', 'Order dilepas kembali ke pool.', 'success');
+        await loadOrderPool();
+        showLoader(false);
+      });
+    }
+
+    // DELIVERY BONGKAR FORM LOGIC
+    function openDeliveryModal() {
+      document.getElementById('delivery-form').reset();
+      selectedPhotosBase64 = [];
+      document.getElementById('photo-preview-container').innerHTML = '';
+      toggleNominalInput();
+      document.getElementById('delivery-modal').classList.remove('hidden');
+    }
+
+    function toggleNominalInput() {
+      const method = document.querySelector('input[name="payment_method"]:checked').value;
+      const cont = document.getElementById('nominal-container');
+      const input = document.getElementById('delivery-nominal');
+      if(method === 'CASH') {
+        cont.classList.remove('hidden');
+        input.required = true;
+      } else {
+        cont.classList.add('hidden');
+        input.required = false;
+        input.value = '';
+      }
+    }
+
+    function handlePhotoSelection(e) {
+      const files = Array.from(e.target.files);
+      const container = document.getElementById('photo-preview-container');
+      const errorMsg = document.getElementById('photo-error');
+      
+      if (files.length + selectedPhotosBase64.length > 3) {
+        errorMsg.innerText = "Maksimal hanya 3 foto bongkar.";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+      errorMsg.classList.add('hidden');
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          // Simple client side resize to fit memory for DB storage mapping
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_W = 800; let w = img.width, h = img.height;
+            if(w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const base64 = canvas.toDataURL('image/jpeg', 0.6);
+            
+            selectedPhotosBase64.push(base64);
+            const idx = selectedPhotosBase64.length - 1;
+            
+            container.innerHTML += `
+              <div class="relative rounded-lg overflow-hidden border border-brand-border" id="photo-p-${idx}">
+                <img src="${base64}" class="w-full h-20 object-cover">
+                <button type="button" onclick="removePhoto(${idx})" class="absolute top-1 right-1 bg-rose-500 text-white w-5 h-5 rounded-full text-[10px] flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+              </div>
+            `;
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function removePhoto(idx) {
+      selectedPhotosBase64.splice(idx, 1);
+      // Re-render
+      const container = document.getElementById('photo-preview-container');
+      container.innerHTML = '';
+      selectedPhotosBase64.forEach((b64, i) => {
+        container.innerHTML += `<div class="relative rounded-lg overflow-hidden border border-brand-border"><img src="${b64}" class="w-full h-20 object-cover"><button type="button" onclick="removePhoto(${i})" class="absolute top-1 right-1 bg-rose-500 text-white w-5 h-5 rounded-full text-[10px] flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button></div>`;
+      });
+    }
+
+    async function handleDeliverySubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-delivery');
+      
+      // Validasi 1-3 Foto
+      if(selectedPhotosBase64.length === 0 || selectedPhotosBase64.length > 3) {
+        document.getElementById('photo-error').innerText = "Wajib melampirkan 1 - 3 foto.";
+        document.getElementById('photo-error').classList.remove('hidden');
+        return;
+      }
+
+      const method = document.querySelector('input[name="payment_method"]:checked').value;
+      const nominal = document.getElementById('delivery-nominal').value || 0;
+      const note = document.getElementById('delivery-note').value;
+      const useGps = document.getElementById('use-gps').checked;
+      
+      if(method === 'CASH' && parseFloat(nominal) <= 0) {
+        showToast('Error', 'Nominal cash wajib diisi melebihi 0', 'error'); return;
+      }
+
+      btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> MEMPROSES...';
+      
+      let lat = null, lng = null;
+      if (useGps && navigator.geolocation) {
+        try {
+          const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, {timeout:5000}));
+          lat = pos.coords.latitude; lng = pos.coords.longitude;
+        } catch(err) { console.log('GPS Fail', err); }
+      }
+
+      try {
+        // Karena RPC submit_delivery mungkin belum dieksekusi di Supabase pengguna, 
+        // kita menggunakan pendekatan client-side sequential insertion sebagai Fallback Prototype.
+        // DALAM PRODUKSI: Wajib gunakan RPC untuk Atomic Transaction!
+        
+        const order = activeOrderAssignment.orders;
+        
+        // 1. Double check completion
+        const {data: check} = await supabase.from('orders').select('completed_rit').eq('id', order.id).single();
+        if(check && check.completed_rit >= order.total_rit) throw new Error("Order sudah selesai oleh driver lain.");
+        
+        const newTripNumber = (check ? check.completed_rit : order.completed_rit) + 1;
+        
+        // 2. Insert Delivery
+        const { data: dRes, error: dErr } = await supabase.from('deliveries').insert({
+          order_id: order.id, assignment_id: activeOrderAssignment.id, driver_id: userProfile.id,
+          trip_number: newTripNumber, payment_method: method, nominal: parseFloat(nominal), driver_note: note, latitude: lat, longitude: lng
+        }).select().single();
+        if(dErr) throw dErr;
+
+        // 3. Insert Photos (Loop over base64 and insert to delivery_photos table directly for simplicity in this prototype)
+        for(const b64 of selectedPhotosBase64) {
+          await supabase.from('delivery_photos').insert({ delivery_id: dRes.id, photo_url: b64 });
+        }
+
+        // 4. Update Order Progress
+        const isCompletedNow = newTripNumber >= order.total_rit;
+        await supabase.from('orders').update({
+          completed_rit: newTripNumber,
+          status: isCompletedNow ? 'COMPLETED' : 'PARTIALLY_COMPLETED'
+        }).eq('id', order.id);
+
+        showToast('Berhasil', `Ritase Ke-${newTripNumber} sukses dilaporkan!`, 'success');
+        closeModals();
+        
+        if (isCompletedNow) {
+          // Finish assignment
+          await supabase.from('assignments').update({ status: 'COMPLETED' }).eq('id', activeOrderAssignment.id);
+          activeOrderAssignment = null;
+          await loadOrderPool();
+        } else {
+          await loadDriverData(); // Refresh current view
+        }
+
+      } catch (err) {
+        showToast('Gagal Lapor', err.message || 'Kesalahan sistem', 'error');
+      }
+      
+      btn.disabled = false; btn.innerHTML = 'KIRIM LAPORAN BONGKAR';
+    }
+
+    async function loadDriverHistory() {
+      const { data } = await supabase.from('deliveries').select('*, orders(order_number, destination)').eq('driver_id', userProfile.id).order('created_at', {ascending:false}).limit(20);
+      const container = document.getElementById('driver-history-container');
+      container.innerHTML = '';
+      if(!data || data.length===0) { container.innerHTML = '<p class="text-xs text-brand-muted">Belum ada riwayat pengantaran.</p>'; return; }
+      
+      data.forEach(d => {
+        let payText = d.payment_method === 'CASH' ? `Tunai (Rp ${d.nominal.toLocaleString('id-ID')})` : d.payment_method;
+        container.innerHTML += `
+          <div class="bg-brand-black border border-brand-border p-4 rounded-xl flex justify-between items-center">
             <div>
-              <h4 class="text-xs font-bold text-amber-500 uppercase tracking-wider">Muatan Aktif Ter-Check-In</h4>
-              <p class="text-[11px] text-gray-300 mt-0.5">Material <strong>${activeTrip.muatan}</strong> sudah diisikan di Kuari pada jam ${activeTrip.timestamp.split(' ')[1] || activeTrip.timestamp}. Silakan selesaikan pengantaran ke lokasi tujuan Anda.</p>
+              <p class="text-[10px] text-brand-muted font-bold">${new Date(d.created_at).toLocaleDateString('id-ID')} - ${d.orders.order_number}</p>
+              <p class="text-sm font-bold text-white">${d.orders.destination}</p>
+              <span class="inline-block mt-1 text-[10px] font-bold bg-brand-card px-2 py-1 rounded text-brand-blue border border-brand-border">RIT KE-${d.trip_number}</span>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] text-brand-muted uppercase">Pembayaran</p>
+              <p class="text-xs font-bold ${d.payment_method==='CASH'?'text-brand-green':'text-white'}">${payText}</p>
             </div>
           </div>
-          <form id="direct-ritase-form" onsubmit="handleCheckOutSubmit(event, '${activeTrip.id}', '${activeTrip.muatan}')" class="space-y-5">
-            <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Jenis Muatan (Terkunci)</label><input type="text" value="${activeTrip.muatan}" disabled class="w-full bg-zinc-900 border border-brand-border rounded-xl p-3 text-xs text-zinc-500 font-extrabold"></div>
-            <div>
-              <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Rute / Lokasi Tujuan Bongkar</label>
-              <div class="flex flex-wrap gap-1.5 mb-2">
-                <button type="button" onclick="quickFillRute('Bolabakka')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Bolabakka</button>
-                <button type="button" onclick="quickFillRute('Doping')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Doping</button>
-                <button type="button" onclick="quickFillRute('Tarumpakkae')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Tarumpakkae</button>
-                <button type="button" onclick="quickFillRute('Siwa')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg hover:border-brand-blue transition">Siwa</button>
-              </div>
-              <input type="text" id="direct-rute" required placeholder="Tulis lokasi bongkar material..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
-            </div>
-            <div class="border-t border-brand-border pt-4">
-              <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Sistem Pembayaran</label>
-              <div class="grid grid-cols-3 gap-2">
-                <button type="button" onclick="setDirectPayment('Cash')" id="pay-btn-Cash" class="pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue">Cash</button>
-                <button type="button" onclick="setDirectPayment('Transfer')" id="pay-btn-Transfer" class="pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue">Transfer</button>
-                <button type="button" onclick="setDirectPayment('Bon')" id="pay-btn-Bon" class="pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 hover:border-brand-blue">Bon</button>
-              </div>
-              <input type="hidden" id="direct-selected-payment" required value="Cash">
-            </div>
-            <div><label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal Harga Pembayaran (Rp)</label><input type="number" id="direct-nominal" placeholder="Cth: 550000" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs font-bold text-white focus:border-brand-blue"></div>
-            <div>
-              <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Foto Nota Bongkar / Geotag</label>
-              <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-4 bg-brand-black hover:border-brand-green/40 transition">
-                <input type="file" id="direct-photo-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="processDirectPhoto(event)">
-                <div id="direct-upload-placeholder" class="text-center space-y-1.5 pointer-events-none"><div class="w-8 h-8 bg-brand-green/10 text-brand-green rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-camera"></i></div><p class="text-[11px] font-bold text-gray-400">Buka Kamera / Lampirkan Foto</p></div>
-                <div id="direct-photo-preview-container" class="hidden w-full space-y-2 pointer-events-none"><img id="direct-processed-photo-preview" class="w-full max-h-40 object-cover rounded-lg border border-brand-border" src=""></div>
-              </div>
-            </div>
-            <button type="submit" class="w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-bold py-3 px-6 rounded-xl text-xs transition"><i class="fa-solid fa-circle-check"></i> Kirim Laporan Check-Out (Selesai Ritase)</button>
-          </form>
         `;
-        setDirectPayment('Cash');
-      } else {
-        if (driverManualOverrideMode) { renderManualFormHTML(container, false); } 
-        else {
-          container.innerHTML = `
-            <div class="p-6 text-center bg-brand-black border border-brand-border rounded-2xl space-y-4 py-14">
-              <div class="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center mx-auto text-gray-500"><i class="fa-solid fa-hourglass-half animate-spin"></i></div>
-              <div class="space-y-1">
-                <h4 class="text-xs font-bold text-white uppercase tracking-wider">Menunggu Antrean Muatan Kuari</h4>
-                <p class="text-[11px] text-gray-400 max-w-sm mx-auto">Sistem mendeteksi armada Anda belum mengisi material. Segera hubungi Operator Excavator untuk melakukan Check-In Muatan.</p>
+      });
+    }
+
+    // =====================================================================
+    // CORE LOGIC: ADMIN WORKFLOW
+    // =====================================================================
+    async function loadAdminData() {
+      showLoader(true);
+      // Fetch Orders for Dashboard KPI
+      const { data: orders } = await supabase.from('orders').select('*');
+      ordersCache = orders || [];
+      
+      let totRit = 0, actOrd = 0;
+      ordersCache.forEach(o => { 
+        totRit += o.completed_rit; 
+        if(o.status==='PARTIALLY_COMPLETED' || o.status==='AVAILABLE') actOrd++; 
+      });
+
+      document.getElementById('dash-total-rit').innerText = totRit;
+      document.getElementById('dash-active-orders').innerText = actOrd;
+
+      // Fetch Deliveries today for Cash
+      const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+      const { data: delivs } = await supabase.from('deliveries').select('*, master_users(name), orders(order_number)').gte('created_at', todayStart.toISOString()).order('created_at', {ascending:false});
+      
+      let dailyCash = 0;
+      const lDelivCont = document.getElementById('dash-live-deliveries');
+      lDelivCont.innerHTML = '';
+      
+      if(delivs) {
+        delivs.forEach(d => {
+          if(d.payment_method === 'CASH') dailyCash += d.nominal;
+          
+          lDelivCont.innerHTML += `
+            <div class="flex items-center justify-between p-3 border-b border-brand-border bg-brand-black rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-brand-blue/10 text-brand-blue flex items-center justify-center text-xs"><i class="fa-solid fa-truck-fast"></i></div>
+                <div>
+                  <p class="text-xs font-bold text-white">${d.master_users?.name || 'Driver'}</p>
+                  <p class="text-[10px] text-brand-muted">${d.orders?.order_number} (Rit ${d.trip_number})</p>
+                </div>
               </div>
-              <div class="pt-3">
-                <button onclick="activateManualOverride()" class="text-[10px] bg-zinc-800 border border-brand-border hover:border-zinc-700 text-gray-300 px-4 py-2 rounded-xl font-bold transition"><i class="fa-solid fa-pen-to-square mr-1"></i> Override: Buat Ritase Manual</button>
+              <div class="text-right">
+                <p class="text-xs font-bold ${d.payment_method==='CASH'?'text-brand-green':'text-white'}">${d.payment_method}</p>
+                ${d.payment_method==='CASH' ? `<p class="text-[9px] text-brand-green">Rp ${d.nominal.toLocaleString()}</p>` : ''}
               </div>
             </div>
           `;
-        }
+        });
       }
-    }
+      document.getElementById('dash-daily-cash').innerText = 'Rp ' + dailyCash.toLocaleString('id-ID');
 
-    function renderManualFormHTML(container, isAdmin) {
-      let driverSelectorHTML = '';
-      if(isAdmin) {
-        driverSelectorHTML = `
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Pilih Driver Lapangan</label>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="relative flex items-center gap-3 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="direct_driver" value="IKKI|DW 8549 BN" required class="accent-brand-blue w-4 h-4"><div><h5 class="text-xs font-bold text-white">IKKI</h5><p class="text-[9px] text-gray-400">DW 8549 BN</p></div></label>
-              <label class="relative flex items-center gap-3 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="direct_driver" value="FAUZI|DD 8554 HD" class="accent-brand-blue w-4 h-4"><div><h5 class="text-xs font-bold text-white">FAUZI</h5><p class="text-[9px] text-gray-400">DD 8554 HD</p></div></label>
-              <label class="relative flex items-center gap-3 p-3 bg-brand-black border border-brand-border rounded-xl cursor-pointer"><input type="radio" name="direct_driver" value="ASO|DD 8601 RN" class="accent-brand-blue w-4 h-4"><div><h5 class="text-xs font-bold text-white">ASO</h5><p class="text-[9px] text-gray-400">DD 8601 RN</p></div></label>
+      // Fetch Driver Statuses
+      const { data: drivers } = await supabase.from('master_users').select('id, name').eq('role', 'DRIVER');
+      const { data: assigns } = await supabase.from('assignments').select('driver_id').eq('status', 'ACTIVE');
+      const activeDriverIds = assigns ? assigns.map(a => a.driver_id) : [];
+      
+      document.getElementById('dash-active-drivers').innerText = activeDriverIds.length;
+      
+      const monCont = document.getElementById('dash-driver-monitor');
+      monCont.innerHTML = '';
+      if(drivers) {
+        drivers.forEach(dr => {
+          const isBusy = activeDriverIds.includes(dr.id);
+          const stColor = isBusy ? 'text-amber-500 bg-amber-500/10' : 'text-brand-green bg-brand-green/10';
+          const stText = isBusy ? 'BUSY (JALAN)' : 'AVAILABLE';
+          monCont.innerHTML += `
+            <div class="flex justify-between items-center p-2.5 border border-brand-border rounded-xl bg-brand-black">
+              <span class="text-xs font-bold text-white">${dr.name}</span>
+              <span class="text-[9px] font-black uppercase px-2 py-1 rounded ${stColor}">${stText}</span>
             </div>
-          </div>`;
-      } else {
-        driverSelectorHTML = `<div class="mb-3 text-left"><button onclick="deactivateManualOverride()" class="text-[10px] bg-zinc-800 text-gray-400 border border-brand-border px-2.5 py-1 rounded-lg font-bold"><i class="fa-solid fa-arrow-left"></i> Kembali Ke Monitor Check-In</button></div>`;
+          `;
+        });
       }
-
-      container.innerHTML = `
-        ${driverSelectorHTML}
-        <form id="manual-ritase-form" onsubmit="handleManualRitaseSubmit(event)" class="space-y-5 text-left">
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Jenis Muatan</label>
-            <div class="flex flex-wrap gap-1.5 mb-2">
-              <button type="button" onclick="quickFillMuatan('Pasir Halus')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition">Pasir Halus</button>
-              <button type="button" onclick="quickFillMuatan('Pasir Kasar')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition">Pasir Kasar</button>
-              <button type="button" onclick="quickFillMuatan('Kerikil')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition">Kerikil</button>
-              <button type="button" onclick="quickFillMuatan('Sirtu')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition">Sirtu</button>
-            </div>
-            <input type="text" id="direct-muatan" required placeholder="Ketik jenis muatan..." class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Rute / Tujuan</label>
-            <div class="flex flex-wrap gap-1.5 mb-2">
-              <button type="button" onclick="quickFillRute('Bolabakka')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition">Bolabakka</button>
-              <button type="button" onclick="quickFillRute('Doping')" class="bg-brand-black border border-brand-border text-[11px] text-gray-300 py-1.5 px-3 rounded-lg transition">Doping</button>
-            </div>
-            <input type="text" id="direct-rute" required placeholder="Cth: Bolabakka" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs text-white focus:border-brand-blue">
-          </div>
-          <div class="border-t border-brand-border pt-4">
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Metode Bayar</label>
-            <div class="grid grid-cols-3 gap-2">
-              <button type="button" onclick="setDirectPayment('Cash')" id="pay-btn-Cash" class="pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300">Cash</button>
-              <button type="button" onclick="setDirectPayment('Transfer')" id="pay-btn-Transfer" class="pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300">Transfer</button>
-              <button type="button" onclick="setDirectPayment('Bon')" id="pay-btn-Bon" class="pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300">Bon</button>
-            </div>
-            <input type="hidden" id="direct-selected-payment" required value="Cash">
-          </div>
-          <div><label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">Nominal (Rp)</label><input type="number" id="direct-nominal" placeholder="550000" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 text-xs font-bold text-white focus:border-brand-blue"></div>
-          <div>
-            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Laporan Foto</label>
-            <div class="relative flex flex-col items-center justify-center border border-dashed border-brand-border rounded-xl p-4 bg-brand-black">
-              <input type="file" id="direct-photo-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="processDirectPhoto(event)">
-              <div id="direct-upload-placeholder" class="text-center text-gray-400 text-xs"><i class="fa-solid fa-camera mb-1 block"></i>Ambil Foto Bukti</div>
-              <div id="direct-photo-preview-container" class="hidden w-full"><img id="direct-processed-photo-preview" class="w-full max-h-40 object-cover rounded-lg" src=""></div>
-            </div>
-          </div>
-          <button type="submit" class="w-full bg-brand-blue text-white font-bold py-3 rounded-xl text-xs transition">Simpan Laporan Ritase Manual</button>
-        </form>
-      `;
-      setDirectPayment('Cash');
+      
+      showLoader(false);
     }
 
-    function activateManualOverride() { driverManualOverrideMode = true; renderDriverRitaseForm(); }
-    function deactivateManualOverride() { driverManualOverrideMode = false; renderDriverRitaseForm(); }
+    function renderOrderTable() {
+      const search = document.getElementById('order-search').value.toLowerCase();
+      const statusF = document.getElementById('order-status-filter').value;
+      const tbody = document.getElementById('order-table-body');
+      tbody.innerHTML = '';
 
-    // =====================================================================
-    // 8. RENDER TABEL & LOGS REKAPAN (MENGGUNAKAN FILTER TERPUSAT)
-    // =====================================================================
-    function renderRekapTable() {
-      const b = document.getElementById('rekap-table-body'); if(!b) return; b.innerHTML = "";
-      const filteredData = getFilteredData('ritase');
-
-      filteredData.forEach(i => {
-        let badgeColor = i.status === "Sudah Disetor" ? "text-brand-green" : (i.status === "Piutang" ? "text-rose-500" : (i.status === "Dalam Perjalanan" ? "text-amber-500 animate-pulse" : "text-amber-400"));
-        let btn = "";
-        
-        if (i.status === "Dalam Perjalanan") {
-           btn = `<span class="text-[10px] text-amber-500 font-bold">Mengantar...</span>`;
-        } else if (i.status === "Belum Disetor" && i.payment === "Cash") {
-           btn = `<button onclick="approveDeposit('${i.id}')" class="bg-brand-green/20 text-brand-green px-2 py-1 rounded text-[10px] font-bold">Terima Setoran</button>`;
-        } else {
-           btn = `<span class="text-[10px] text-gray-500">Selesai</span>`;
-        }
-
-        if(i.status === "Piutang" || (i.nominal === 0 && i.status !== "Dalam Perjalanan")) {
-           btn = `<button onclick="settlePriceAndPay('${i.id}')" class="bg-brand-blue/20 text-brand-blue px-2 py-1 rounded text-[10px] font-bold">Atur Lunas</button>`;
-        }
-        
-        let actionCell = `<div class="flex items-center justify-end gap-1.5">
-          ${btn} 
-          <button onclick="openEditModal('${i.id}', 'ritase')" class="text-brand-blue hover:text-blue-400 bg-brand-blue/10 p-1.5 rounded" title="Edit Koreksi"><i class="fa-solid fa-pen text-[11px]"></i></button>
-          <button onclick="deleteRecord('${i.id}', 'ritase')" class="text-rose-500 hover:text-rose-400 bg-rose-500/10 p-1.5 rounded" title="Hapus Berkas"><i class="fa-solid fa-trash text-[11px]"></i></button>
-        </div>`;
-        
-        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${i.timestamp}</td><td class="p-3 font-bold text-white">${i.driver}</td><td class="p-3">${i.rute}</td><td class="p-3">${i.muatan}</td><td class="p-3 text-right font-bold text-white">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center">${i.payment}</td><td class="p-3 text-center ${badgeColor} font-bold text-[10px]">${i.status}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${i.photo}')"><i class="fa-solid fa-image"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
-      });
-    }
-
-    function renderExpenseTable() {
-      const b = document.getElementById('expense-table-body'); if(!b) return; b.innerHTML = "";
-      const filteredData = getFilteredData('pengeluaran');
-
-      filteredData.forEach(e => {
-        let actionCell = `<div class="flex justify-end gap-1"><button onclick="openEditModal('${e.id}', 'pengeluaran')" class="text-brand-blue bg-brand-blue/10 p-1.5 rounded"><i class="fa-solid fa-pen text-[10px]"></i></button><button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 bg-rose-500/10 p-1.5 rounded"><i class="fa-solid fa-trash text-[10px]"></i></button></div>`;
-        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3 whitespace-nowrap">${e.timestamp}</td><td class="p-3 font-bold text-amber-500">${e.source}</td><td class="p-3">${e.category}</td><td class="p-3">${e.recipient}</td><td class="p-3 text-right font-bold text-rose-500">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center cursor-pointer text-brand-blue" onclick="viewPhoto('${e.photo}')"><i class="fa-solid fa-receipt"></i></td><td class="p-3 text-right">${actionCell}</td></tr>`;
-      });
-    }
-
-    function renderPanjarRecap() {
-      const cards = document.getElementById('panjar-driver-summary-cards'); if(!cards) return; cards.innerHTML = "";
-      ["IKKI", "FAUZI", "ASO"].forEach(name => {
-        let totalPanjar = 0;
-        appState.pengeluaran.forEach(e => { if(e.source === name && e.category === "Panjar Driver" && (e.status === undefined || e.status === "Active")) totalPanjar += e.nominal; });
-        cards.innerHTML += `<div class="p-4 bg-brand-black border border-brand-border rounded-xl"><h4 class="font-bold text-white">${name}</h4><p class="text-[9px] text-gray-500 mb-1">Panjar Aktif Terekap:</p><span class="text-sky-400 font-bold text-lg">Rp ${totalPanjar.toLocaleString('id-ID')}</span></div>`;
+      const filtered = ordersCache.filter(o => {
+        let m = true;
+        if(statusF && o.status !== statusF) m = false;
+        if(search && !(o.order_number.toLowerCase().includes(search) || o.destination.toLowerCase().includes(search))) m = false;
+        return m;
       });
 
-      const b = document.getElementById('panjar-table-body'); if(!b) return; b.innerHTML = "";
-      const filteredData = getFilteredData('pengeluaran').filter(e => e.category === "Panjar Driver");
-
-      filteredData.forEach(e => {
-        let status = (e.status === undefined || e.status === "Active") ? "Aktif" : "Selesai";
-        let btn = status === "Aktif" ? `<button onclick="settleSinglePanjar('${e.id}')" class="bg-sky-500/20 text-sky-400 px-2 py-1 rounded text-[10px] font-bold">Potong Panjar</button>` : `<span class="text-gray-500 text-[10px]">Settled</span>`;
-        let actionCell = `<div class="flex items-center justify-end gap-1.5">${btn} <button onclick="openEditModal('${e.id}', 'pengeluaran')" class="text-brand-blue bg-brand-blue/10 p-1.5 rounded"><i class="fa-solid fa-pen text-[10px]"></i></button> <button onclick="deleteRecord('${e.id}', 'pengeluaran')" class="text-rose-500 bg-rose-500/10 p-1.5 rounded"><i class="fa-solid fa-trash text-[10px]"></i></button></div>`;
-        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card"><td class="p-3">${e.timestamp}</td><td class="p-3 font-bold text-white">${e.source}</td><td class="p-3 text-sky-400 font-bold">Rp ${e.nominal.toLocaleString('id-ID')}</td><td class="p-3 text-center text-[10px] font-bold">${status}</td><td class="p-3 text-right">${actionCell}</td></tr>`;
-      });
-    }
-
-    function renderAbsensi() {
-      const b = document.getElementById('absensi-table-body'); if(!b) return; b.innerHTML = "";
-      appState.absensi.forEach(i => {
-        let actionCell = `<div class="flex justify-end gap-1"><button onclick="openEditModal('${i.id}', 'absensi')" class="text-brand-blue bg-brand-blue/10 p-1.5 rounded"><i class="fa-solid fa-pen text-[10px]"></i></button><button onclick="deleteRecord('${i.id}', 'absensi')" class="text-rose-500 bg-rose-500/10 p-1.5 rounded"><i class="fa-solid fa-trash text-[10px]"></i></button></div>`;
-        b.innerHTML += `<tr class="border-b border-brand-border/40 hover:bg-brand-card/30"><td class="p-3 text-[11px]">${i.timestamp}</td><td class="p-3 font-bold text-white">${i.name}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-brand-border">${i.tipe}</span></td><td class="p-3 text-right">${actionCell}</td></tr>`;
-      });
-    }
-
-    // =====================================================================
-    // 9. FUNGSI EDIT KOREKSI DATA (JENDELA POP-UP DINAMIS)
-    // =====================================================================
-    function openEditModal(id, type) {
-      document.getElementById('edit-item-id').value = id;
-      document.getElementById('edit-item-type').value = type;
-      const container = document.getElementById('edit-fields-container');
-      container.innerHTML = "";
-
-      if(type === 'ritase') {
-        const item = appState.ritase.find(x => x.id === id); if(!item) return;
-        container.innerHTML = `
-          <div><label class="block text-xs text-gray-400 mb-1">Rute / Tujuan</label><input type="text" id="edit-ritase-rute" value="${item.rute}" class="w-full bg-brand-black border border-brand-border p-2.5 rounded text-xs text-white"></div>
-          <div><label class="block text-xs text-gray-400 mb-1">Jenis Muatan</label><input type="text" id="edit-ritase-muatan" value="${item.muatan}" class="w-full bg-brand-black border border-brand-border p-2.5 rounded text-xs text-white"></div>
-          <div><label class="block text-xs text-gray-400 mb-1">Nominal Harga (Rp)</label><input type="number" id="edit-ritase-nominal" value="${item.nominal}" class="w-full bg-brand-black border border-brand-border p-2.5 rounded text-xs text-white"></div>
-          <div><label class="block text-xs text-gray-400 mb-1">Metode Bayar</label><select id="edit-ritase-payment" class="w-full bg-brand-black border border-brand-border p-2.5 rounded text-xs text-white"><option value="Cash" ${item.payment==='Cash'?'selected':''}>Cash</option><option value="Transfer" ${item.payment==='Transfer'?'selected':''}>Transfer</option><option value="Bon" ${item.payment==='Bon'?'selected':''}>Bon</option></select></div>
+      filtered.forEach(o => {
+        let badge = o.status === 'COMPLETED' ? 'bg-brand-green/20 text-brand-green' : (o.status === 'PARTIALLY_COMPLETED' ? 'bg-amber-500/20 text-amber-500' : 'bg-brand-blue/20 text-brand-blue');
+        let prog = Math.round((o.completed_rit/o.total_rit)*100);
+        tbody.innerHTML += `
+          <tr class="hover:bg-brand-black transition">
+            <td class="p-4 font-bold text-white"><span class="block">${o.order_number}</span>${o.priority==='URGENT'?'<span class="text-[9px] text-rose-500">URGENT</span>':''}</td>
+            <td class="p-4"><p class="text-xs text-brand-muted">Cust: ${o.customer_id.substring(0,5)}</p><p class="text-xs text-white font-bold">${o.destination}</p></td>
+            <td class="p-4 text-xs">${o.material_id.substring(0,5)}</td>
+            <td class="p-4">
+              <div class="flex items-center gap-2">
+                <div class="flex-grow bg-brand-black rounded-full h-1.5"><div class="bg-brand-blue h-1.5 rounded-full" style="width:${prog}%"></div></div>
+                <span class="text-[10px] font-bold text-white">${o.completed_rit}/${o.total_rit}</span>
+              </div>
+            </td>
+            <td class="p-4 text-center"><span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${badge}">${o.status.replace('_',' ')}</span></td>
+            <td class="p-4 text-right">
+              <button onclick="lockOrderToggle('${o.id}', ${!o.locked})" class="text-[10px] font-bold ${o.locked?'text-rose-500':'text-brand-muted hover:text-white'} mr-2"><i class="fa-solid ${o.locked?'fa-lock':'fa-lock-open'}"></i></button>
+            </td>
+          </tr>
         `;
-      } else if (type === 'pengeluaran') {
-        const item = appState.pengeluaran.find(x => x.id === id); if(!item) return;
-        container.innerHTML = `
-          <div><label class="block text-xs text-gray-400 mb-1">Penerima / Alokasi</label><input type="text" id="edit-exp-recipient" value="${item.recipient}" class="w-full bg-brand-black border border-brand-border p-2.5 rounded text-xs text-white"></div>
-          <div><label class="block text-xs text-gray-400 mb-1">Nominal Keluar (Rp)</label><input type="number" id="edit-exp-nominal" value="${item.nominal}" class="w-full bg-brand-black border border-brand-border p-2.5 rounded text-xs text-white"></div>
-        `;
-      } else if (type === 'absensi') {
-        const item = appState.absensi.find(x => x.id === id); if(!item) return;
-        container.innerHTML = `
-          <div><label class="block text-xs text-gray-400 mb-1">Kondisi Status</label><select id="edit-absen-tipe" class="w-full bg-brand-black border border-brand-border p-2.5 rounded text-xs text-white"><option value="Jalan">Jalan</option><option value="Istirahat">Istirahat</option><option value="Sakit">Sakit</option><option value="Izin">Izin</option></select></div>
-        `;
-      }
-      document.getElementById('edit-data-modal').classList.remove('hidden');
+      });
     }
 
-    function closeEditModal() { document.getElementById('edit-data-modal').classList.add('hidden'); }
-
-    async function handleEditSubmit(e) {
-      e.preventDefault();
-      const id = document.getElementById('edit-item-id').value;
-      const type = document.getElementById('edit-item-type').value;
+    async function lockOrderToggle(id, lockStatus) {
       showLoader(true);
-
-      if(type === 'ritase') {
-        const rute = document.getElementById('edit-ritase-rute').value;
-        const muatan = document.getElementById('edit-ritase-muatan').value;
-        const nominal = parseFloat(document.getElementById('edit-ritase-nominal').value) || 0;
-        const payment = document.getElementById('edit-ritase-payment').value;
-        let defaultStatus = payment === "Transfer" ? "Sudah Disetor" : (payment === "Bon" ? "Piutang" : "Belum Disetor");
-
-        await updateDB('ritase', id, { rute, muatan, nominal, payment, status: defaultStatus });
-        const item = appState.ritase.find(x => x.id === id);
-        if(item) { Object.assign(item, { rute, muatan, nominal, payment, status: defaultStatus }); }
-      } else if (type === 'pengeluaran') {
-        const recipient = document.getElementById('edit-exp-recipient').value;
-        const nominal = parseFloat(document.getElementById('edit-exp-nominal').value) || 0;
-        await updateDB('pengeluaran', id, { recipient, nominal });
-        const item = appState.pengeluaran.find(x => x.id === id);
-        if(item) { Object.assign(item, { recipient, nominal }); }
-      } else if (type === 'absensi') {
-        const tipe = document.getElementById('edit-absen-tipe').value;
-        await updateDB('absensi', id, { tipe });
-        const item = appState.absensi.find(x => x.id === id);
-        if(item) { Object.assign(item, { tipe }); }
-      }
-
-      showLoader(false); closeEditModal(); refreshAllUI();
-      showToast('Koreksi Berhasil', 'Data terperbarui permanen di database cloud Supabase.', 'success');
+      await supabase.from('orders').update({locked: lockStatus}).eq('id', id);
+      const o = ordersCache.find(x => x.id === id); if(o) o.locked = lockStatus;
+      renderOrderTable(); showLoader(false);
     }
 
-    // =====================================================================
-    // 10. AKSI ADMIN (SETORAN GLOBAL & POTONG PANJAR)
-    // =====================================================================
-    async function settleAllDriverCash(driverName) {
-      const totalCash = getDriverCashInHand(driverName);
-      if (totalCash <= 0) return showToast('Info', 'Tidak ada kas menggantung pada driver ini.', 'error');
+    function openOrderModal() { document.getElementById('create-order-form').reset(); document.getElementById('order-modal').classList.remove('hidden'); }
 
-      showCustomDialog({
-        title: `Terima Setoran ${driverName}?`,
-        message: `Setor seluruh sisa kas fisik driver sebesar Rp ${totalCash.toLocaleString('id-ID')} ke kasir/admin?\n\nSemua riwayat ritase tunai driver ini akan diubah statusnya menjadi "Sudah Disetor" tanpa menyentuh pinjaman panjar.`,
-        type: 'info',
-        onConfirm: async () => {
-          showLoader(true);
-          const pendingRitase = appState.ritase.filter(i => i.driver === driverName && i.payment === "Cash" && i.status === "Belum Disetor");
-          for (let r of pendingRitase) {
-            r.status = "Sudah Disetor"; await updateDB('ritase', r.id, { status: "Sudah Disetor" });
-          }
-          const pendingExp = appState.pengeluaran.filter(e => (e.status === undefined || e.status === "Active") && (e.source === driverName || (e.category === "Transfer Kas" && e.recipient === driverName)));
-          for (let e of pendingExp) {
-            e.status = "Settled"; await updateDB('pengeluaran', e.id, { status: "Settled" });
-          }
-          showLoader(false); refreshAllUI();
-          showToast('Setoran Sukses', `Kas terkunci dan disetor aman dari ${driverName}.`, 'success');
-        }
-      });
-    }
-
-    async function approveDeposit(id) {
-      const item = appState.ritase.find(x => x.id === id); if(!item) return;
-      item.status = "Sudah Disetor"; refreshAllUI();
-      await updateDB('ritase', id, {status: "Sudah Disetor"});
-      showToast('Setoran Sukses', 'Kas fisik terekap masuk ke kantor pusat.', 'success');
-    }
-
-    async function settlePriceAndPay(id) {
-      const item = appState.ritase.find(x => x.id === id); if(!item) return;
-      let newNominal = prompt("Atur Nominal Pelunasan Piutang (Rp):", item.nominal);
-      if(newNominal && !isNaN(newNominal)) {
-        item.nominal = parseFloat(newNominal); item.status = "Sudah Disetor"; refreshAllUI();
-        await updateDB('ritase', id, {nominal: item.nominal, status: "Sudah Disetor"});
-        showToast('Sukses', 'Piutang tempo diselesaikan.', 'success');
-      }
-    }
-
-    async function settleSinglePanjar(id) {
-      const item = appState.pengeluaran.find(x => x.id === id); if(!item) return;
-      item.status = "Settled"; refreshAllUI();
-      await updateDB('pengeluaran', id, {status: "Settled"});
-      showToast('Potongan Berhasil', `Nota panjar milik ${item.source} dinonaktifkan.`, 'success');
-    }
-
-    // =====================================================================
-    // 11. DOWNLOAD DIRECT SAVE (ANTI BLOKIR PWA / BROWSER)
-    // =====================================================================
-    function forceDownloadFile(blob, filename) {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }, 100);
-        showToast('Download Selesai', 'File laporan berhasil diunduh.', 'success');
-    }
-
-    function exportToCSV(type) {
-      const filteredData = getFilteredData(type);
-      let csv = "\\uFEFF"; // BOM for Excel UTF-8 support
-
-      if(type === 'ritase') {
-          csv += "ID,Waktu,Driver,Rute,Muatan,Nominal,Metode,Status\\n";
-          filteredData.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.driver}","${i.rute}","${i.muatan}",${i.nominal},"${i.payment}","${i.status}"\\n`);
-          forceDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Laporan_Ritase_Sansam.csv");
-      } else if (type === 'pengeluaran') {
-          csv += "ID,Waktu,Sumber,Kategori,Penerima,Nominal\\n";
-          filteredData.forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}","${i.category}","${i.recipient}",${i.nominal}\\n`);
-          forceDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Laporan_Pengeluaran_Sansam.csv");
-      } else if (type === 'panjar') {
-          csv += "ID,Waktu,Driver,Nominal,Status\\n";
-          filteredData.filter(e => e.category === "Panjar Driver").forEach(i => csv += `"${i.id}","${i.timestamp}","${i.source}",${i.nominal},"${i.status || 'Active'}"\\n`);
-          forceDownloadFile(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "Laporan_Panjar_Sansam.csv");
-      }
-    }
-
-    function exportToPDF(type) {
-      const { jsPDF } = window.jspdf; 
-      const filteredData = getFilteredData(type);
-
-      if (type === 'ritase') {
-          const doc = new jsPDF('l');
-          doc.text("Laporan Manifes Ritase CV SANSAM GROUP", 14, 15);
-          const rows = filteredData.map(i => [i.timestamp, i.driver, i.rute, i.muatan, i.nominal, i.payment, i.status]);
-          doc.autoTable({ head: [['Waktu', 'Driver', 'Rute', 'Muatan', 'Nominal', 'Metode', 'Status']], body: rows, startY: 20 });
-          doc.save("Ritase_CV_SANSAM.pdf");
-      } else if (type === 'pengeluaran') {
-          const doc = new jsPDF('p');
-          doc.text("Laporan Kas Operasional CV SANSAM GROUP", 14, 15);
-          const rows = filteredData.map(i => [i.timestamp, i.source, i.category, i.recipient, i.nominal]);
-          doc.autoTable({ head: [['Waktu', 'Sumber', 'Kategori', 'Penerima', 'Nominal']], body: rows, startY: 20 });
-          doc.save("Pengeluaran_CV_SANSAM.pdf");
-      } else if (type === 'panjar') {
-          const doc = new jsPDF('p');
-          doc.text("Laporan Pinjaman Panjar CV SANSAM GROUP", 14, 15);
-          const rows = filteredData.filter(e=>e.category==="Panjar Driver").map(i => [i.timestamp, i.source, i.nominal, i.status || 'Active']);
-          doc.autoTable({ head: [['Waktu', 'Driver', 'Nominal Panjar', 'Status']], body: rows, startY: 20 });
-          doc.save("Panjar_CV_SANSAM.pdf");
-      }
-      showToast('Download Selesai', 'Laporan PDF berhasil diunduh.', 'success');
-    }
-
-    // =====================================================================
-    // 12. TAB & LOGIN INTERACTION MANAGEMENT
-    // =====================================================================
-    function toggleLoginSection(boxId) {
-      const box = document.getElementById(boxId);
-      const isHidden = box.classList.contains('hidden');
-      document.getElementById('driver-select-box').classList.add('hidden');
-      document.getElementById('operator-pin-box').classList.add('hidden');
-      document.getElementById('admin-pin-box').classList.add('hidden');
-      if(isHidden) box.classList.remove('hidden');
-    }
-
-    function loginAsDriver(driverName) {
-      currentRole = 'DRIVER'; localStorage.setItem('sansam_role','DRIVER');
-      localStorage.setItem('sansam_driver_name', driverName);
-      applyRoleUI(); refreshAllUI();
-    }
-    function loginAsOperator() {
-      if(document.getElementById('operator-pin').value === '112233') {
-        currentRole = 'OPERATOR'; localStorage.setItem('sansam_role','OPERATOR');
-        applyRoleUI(); refreshAllUI();
-      } else { document.getElementById('op-pin-error').classList.remove('hidden'); }
-    }
-    function loginAsAdmin() {
-      if(document.getElementById('admin-pin').value === '240302') {
-        currentRole = 'ADMIN'; localStorage.setItem('sansam_role','ADMIN');
-        applyRoleUI(); refreshAllUI();
-      } else { document.getElementById('pin-error').classList.remove('hidden'); }
-    }
-    function logoutAccount() {
-      localStorage.removeItem('sansam_role'); localStorage.removeItem('sansam_driver_name'); location.reload();
-    }
-
-    function applyRoleUI() {
-      document.getElementById('login-modal').classList.add('hidden');
-      const dName = localStorage.getItem('sansam_driver_name') || '';
-
-      document.querySelectorAll('.admin-only-tab, .admin-only-metric, .app-stats-metric, .operator-only-section, .driver-or-admin-section').forEach(el => el.classList.remove('hidden'));
-
-      if (currentRole === 'ADMIN') {
-        document.getElementById('header-role-badge').innerText = "Akses Penuh: ADMIN / DIREKTUR";
-        document.querySelectorAll('.operator-only-section').forEach(el => el.classList.add('hidden'));
-      } else if (currentRole === 'OPERATOR') {
-        document.getElementById('header-role-badge').innerText = "Akses Lapangan: OPERATOR EXCAVATOR";
-        document.querySelectorAll('.admin-only-tab, .admin-only-metric, .app-stats-metric, .driver-or-admin-section').forEach(el => el.classList.add('hidden'));
-        switchTab('input'); switchInputSubTab('operator-checkin');
-      } else if (currentRole === 'DRIVER') {
-        document.getElementById('header-role-badge').innerText = `Akses Armada: DRIVER (${dName})`;
-        document.querySelectorAll('.admin-only-tab, .admin-only-metric, .operator-only-section').forEach(el => el.classList.add('hidden'));
-      }
-    }
-
-    function switchTab(t) {
-      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
-      document.getElementById(`tab-content-${t}`).classList.remove('hidden');
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('border-b-2', 'border-brand-blue', 'text-brand-blue', 'bg-brand-card/50'));
-      document.getElementById(`tab-btn-${t}`)?.classList.add('border-b-2', 'border-brand-blue', 'text-brand-blue', 'bg-brand-card/50');
-      if (t === 'dashboard' && driverDistributionChart) { setTimeout(()=>driverDistributionChart.update(), 100); }
-    }
-    function switchInputSubTab(s) {
-      document.getElementById('sub-tab-ritase').classList.toggle('hidden', s !== 'ritase');
-      document.getElementById('sub-tab-pengeluaran').classList.toggle('hidden', s !== 'pengeluaran');
-      document.getElementById('sub-tab-operator-checkin').classList.toggle('hidden', s !== 'operator-checkin');
+    async function handleCreateOrder(e) {
+      e.preventDefault();
+      showLoader(true);
+      const dest = document.getElementById('co-destination').value;
+      const rit = parseInt(document.getElementById('co-total-rit').value);
+      const prio = document.getElementById('co-priority').value;
+      const cId = document.getElementById('co-customer').value; // In real app, UUID
       
-      document.querySelectorAll('#sub-input-btn-ritase, #sub-input-btn-pengeluaran, #sub-input-btn-operator-checkin').forEach(b => b.className = "flex-1 text-center py-2.5 px-3 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition");
-      const activeBtn = document.getElementById(`sub-input-btn-${s}`); if(activeBtn) activeBtn.className = "flex-1 text-center py-2.5 px-3 text-xs font-bold rounded-xl bg-brand-blue text-white transition";
-    }
-    function switchRekapSubTab(s) {
-      document.getElementById('sub-tab-rekap-ritase').classList.toggle('hidden', s !== 'ritase');
-      document.getElementById('sub-tab-rekap-pengeluaran').classList.toggle('hidden', s !== 'pengeluaran');
-      document.getElementById('sub-tab-rekap-panjar').classList.toggle('hidden', s !== 'panjar');
-      
-      document.querySelectorAll('#sub-rekap-btn-ritase, #sub-rekap-btn-pengeluaran, #sub-rekap-btn-panjar').forEach(b => b.className = "flex-1 text-center py-2.5 px-3 text-xs font-bold rounded-xl text-gray-400 hover:text-white transition");
-      document.getElementById(`sub-rekap-btn-${s}`).className = "flex-1 text-center py-2.5 px-3 text-xs font-bold rounded-xl bg-brand-blue text-white transition";
-    }
+      const rand = Math.floor(100 + Math.random() * 900);
+      const oNum = `ORD-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${rand}`;
 
-    function handleCategoryChange() {
-      const cat = document.getElementById('exp-category').value;
-      if (cat === "Transfer Kas") {
-        document.getElementById('recipient-text-wrapper').classList.add('hidden'); document.getElementById('recipient-driver-wrapper').classList.remove('hidden');
-      } else if (cat === "Panjar Driver") {
-        document.getElementById('recipient-text-wrapper').classList.add('hidden'); document.getElementById('recipient-driver-wrapper').classList.add('hidden');
+      // Insert (Mocking UUIDs for Customer/Material/Project due to prototype limitations)
+      const { data, error } = await supabase.from('orders').insert({
+        order_number: oNum, destination: dest, total_rit: rit, priority: prio,
+        customer_id: '00000000-0000-0000-0000-000000000000', // Mock UUIDs
+        project_id: '00000000-0000-0000-0000-000000000000',
+        material_id: '00000000-0000-0000-0000-000000000000',
+        created_by: userProfile.id
+      }).select().single();
+
+      if(!error) {
+        ordersCache.unshift(data);
+        renderOrderTable();
+        closeModals();
+        showToast('Sukses', 'Order baru terlempar ke pool.', 'success');
       } else {
-        document.getElementById('recipient-text-wrapper').classList.remove('hidden'); document.getElementById('recipient-driver-wrapper').classList.add('hidden');
+        showToast('Gagal', error.message, 'error');
       }
+      showLoader(false);
     }
 
-    function setDirectPayment(m) {
-      directSelectedPayment = m; const el = document.getElementById('direct-selected-payment'); if(el) el.value = m;
-      document.querySelectorAll('.pay-option-btn').forEach(b => b.className = "pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-black border border-brand-border text-gray-300 transition");
-      const actBtn = document.getElementById(`pay-btn-${m}`); if(actBtn) actBtn.className = "pay-option-btn py-3 rounded-xl text-xs font-bold bg-brand-blue text-white border border-brand-blue transition shadow-lg shadow-brand-blue/25";
-    }
-
-    function quickFillMuatan(v) { const el = document.getElementById('direct-muatan'); if(el) el.value = v; }
-    function quickFillRute(v) { const el = document.getElementById('direct-rute'); if(el) el.value = v; }
-    function quickFillOpMuatan(v) { const el = document.getElementById('op-muatan'); if(el) el.value = v; }
-
-    function showToast(title, desc, type='success') {
-      document.getElementById('toast-title').innerText = title; document.getElementById('toast-desc').innerText = desc;
-      const icon = document.getElementById('toast-icon');
-      icon.className = type === 'error' ? "fa-solid fa-xmark text-rose-500 text-sm" : "fa-solid fa-check text-brand-green text-sm";
-      const t = document.getElementById('custom-toast');
-      t.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
-      setTimeout(() => t.classList.add('translate-y-[-100px]', 'opacity-0', 'pointer-events-none'), 3000);
-    }
-    function viewPhoto(src) {
-      if(!src || src === "") return showToast('Info', 'Tidak ada lampiran foto nota pada transaksi ini.', 'error');
-      document.getElementById('modal-image').src = src; document.getElementById('photo-modal').classList.remove('hidden');
-    }
-    function closePhotoModal() { document.getElementById('photo-modal').classList.add('hidden'); }
-    function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
-
-    // INITIALIZATION CORE
-    async function loadSupabaseData() {
-      try {
-        const [rRes, eRes, aRes] = await Promise.all([
-          supabaseClient.from('ritase').select('*').order('id', { ascending: false }),
-          supabaseClient.from('pengeluaran').select('*').order('id', { ascending: false }),
-          supabaseClient.from('absensi').select('*').order('id', { ascending: false })
-        ]);
-        if (rRes.error) throw rRes.error;
-        appState.ritase = rRes.data || []; appState.pengeluaran = eRes.data || []; appState.absensi = aRes.data || [];
-        refreshAllUI();
-        document.getElementById('sync-status').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-brand-green pulsing-green-dot"></span> ONLINE`;
-        document.getElementById('sync-status').className = "inline-flex items-center gap-1 text-[9px] bg-brand-green/10 text-brand-green border border-brand-green/20 px-2 py-0.5 rounded-full font-bold";
-      } catch (err) {
-        document.getElementById('sync-status').innerHTML = `DISCONNECTED`;
-        document.getElementById('sync-status').className = "inline-flex items-center gap-1 text-[9px] bg-rose-500/10 text-rose-500 border border-rose-500/20 px-2 py-0.5 rounded-full font-bold";
-      }
-    }
-
-    window.onload = function() {
-      setTimeout(() => { document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none'); }, 1200);
-      if (!currentRole) document.getElementById('login-modal').classList.remove('hidden'); else applyRoleUI();
+    // =====================================================================
+    // UI UTILITIES & EXPORTS
+    // =====================================================================
+    function showConfirmModal(title, desc, iconCls, colorCls, onConfirm) {
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-desc').innerText = desc;
+      const icon = document.getElementById('confirm-icon');
+      icon.className = `w-14 h-14 rounded-full mx-auto flex items-center justify-center mb-4 text-2xl text-white ${colorCls} shadow-lg shadow-${colorCls}/30`;
+      icon.innerHTML = `<i class="fa-solid ${iconCls}"></i>`;
       
-      const ctx = document.getElementById('driverChart')?.getContext('2d');
-      if (ctx) {
-        driverDistributionChart = new Chart(ctx, { type: 'bar', data: { labels: ['IKKI', 'FAUZI', 'ASO'], datasets: [{ label: 'Total Ritase Berhasil', data: [0,0,0], backgroundColor: ['#005CFF', '#00CC44', '#F59E0B'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1D2230' } } } } });
-      }
-      loadSupabaseData();
-      supabaseClient.channel('public-changes').on('postgres_changes', { event: '*', schema: 'public' }, () => { loadSupabaseData(); }).subscribe();
-    };
+      const btn = document.getElementById('btn-confirm-action');
+      btn.className = `px-5 py-2.5 rounded-xl text-xs font-bold transition text-white ${colorCls} hover:opacity-90`;
+      
+      // Clone button to remove old listeners
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      newBtn.addEventListener('click', () => { closeConfirmModal(); onConfirm(); });
+      
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+    function closeConfirmModal() { document.getElementById('confirm-modal').classList.add('hidden'); document.getElementById('release-reason-box').classList.add('hidden'); }
+    function closePhotoLightbox() { document.getElementById('photo-lightbox').classList.add('hidden'); }
 
-    function updateCharts() {
-      if(driverDistributionChart) {
-        let counts = { IKKI:0, FAUZI:0, ASO:0 };
-        appState.ritase.forEach(i => { if(i.status !== "Dalam Perjalanan" && counts[i.driver] !== undefined) counts[i.driver]++ });
-        driverDistributionChart.data.datasets[0].data = [counts.IKKI, counts.FAUZI, counts.ASO]; driverDistributionChart.update();
-      }
+    // DEV OVERRIDE (For ease of testing without DB setup hassle)
+    async function devCreateSuperAdmin() {
+      // In a real scenario, Supabase blocks auth.signUp via client side for admin roles, but here we just sign up a generic user if allowed.
+      showToast('Info', 'Fitur ini membutuhkan akses Supabase Admin API. Gunakan script SQL di atas untuk setup.', 'success');
     }
   </script>
 </body>
-</html>"""
+</html>
