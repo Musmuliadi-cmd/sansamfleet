@@ -556,10 +556,7 @@
   <script>
     // 1. SUPABASE INITIALIZATION
     // Menggunakan kredensial dari project eksisting (seperti diminta)
-    const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+    const supabase = window.supabaseClient;
     // 2. GLOBAL STATE
     let currentUser = null;
     let userProfile = null;
