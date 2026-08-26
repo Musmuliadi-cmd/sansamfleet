@@ -1203,66 +1203,74 @@
       // In a real scenario, Supabase blocks auth.signUp via client side for admin roles, but here we just sign up a generic user if allowed.
       showToast('Info', 'Fitur ini membutuhkan akses Supabase Admin API. Gunakan script SQL di atas untuk setup.', 'success');
     }
-    document.addEventListener('DOMContentLoaded', () => {
+   document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
-  if (loginForm) {
-    loginForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const email = document.getElementById('auth-email').value.trim();
-      const password = document.getElementById('auth-password').value;
-
-      if (!email || !password) {
-        alert('Email dan Password wajib diisi!');
-        return;
-      }
-
-      if (typeof showLoader === 'function') showLoader(true);
-
-      try {
-        // 1. Autentikasi ke Supabase Auth
-        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-
-        if (authError) throw authError;
-
-        // 2. Ambil data role dari tabel master_users
-        const { data: userData, error: userError } = await supabaseClient
-          .from('master_users')
-          .select('*')
-          .eq('auth_user_id', authData.user.id)
-          .single();
-
-        if (userError || !userData) {
-          throw new Error("Akun terdaftar di Auth, tapi belum terhubung ke tabel master_users.");
-        }
-
-        if (userData.status !== 'ACTIVE') {
-          throw new Error("Akun Anda berstatus INACTIVE (Non-aktif).");
-        }
-
-        // 3. Simpan sesi & masuk aplikasi
-        localStorage.setItem('sansam_role', userData.role);
-        localStorage.setItem('sansam_user_name', userData.name);
-        
-        if (typeof showLoader === 'function') showLoader(false);
-        
-        // Tutup modal login & muat UI
-        const modal = document.getElementById('login-modal');
-        if (modal) modal.classList.add('hidden');
-        
-        if (typeof applyRoleUI === 'function') applyRoleUI();
-        if (typeof refreshAllUI === 'function') refreshAllUI();
-        
-        alert('Login Berhasil! Selamat datang, ' + userData.name);
-
-      } catch (err) {
-        if (typeof showLoader === 'function') showLoader(false);
-        alert('Gagal Login: ' + (err.message || 'Terjadi kesalahan sistem.'));
-      }
-    });
+  
+  if (!loginForm) {
+    console.error("Elemen form id='login-form' tidak ditemukan di HTML!");
+    return;
   }
+
+  loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault(); // Mencegah halaman refresh otomatis
+    
+    const emailField = document.getElementById('auth-email');
+    const passwordField = document.getElementById('auth-password');
+    
+    if (!emailField || !passwordField) {
+      alert('Input email atau password tidak ditemukan di form!');
+      return;
+    }
+
+    const email = emailField.value.trim();
+    const password = passwordField.value;
+
+    if (!email || !password) {
+      alert('Email dan Password wajib diisi!');
+      return;
+    }
+
+    alert('Mencoba menghubungi server Supabase...'); // Tes apakah tombol merespons
+
+    try {
+      // 1. Autentikasi ke Supabase Auth
+      const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (authError) {
+        throw new Error("Auth Error: " + authError.message);
+      }
+
+      alert('Auth berhasil, mengambil data user dari database...');
+
+      // 2. Ambil data role dari tabel master_users
+      const { data: userData, error: userError } = await supabaseClient
+        .from('master_users')
+        .select('*')
+        .eq('auth_user_id', authData.user.id)
+        .single();
+
+      if (userError || !userData) {
+        throw new Error("Data user tidak ditemukan di tabel master_users. Pastikan UUID auth_user_id sudah benar.");
+      }
+
+      if (userData.status !== 'ACTIVE') {
+        throw new Error("Akun Anda berstatus INACTIVE (Non-aktif).");
+      }
+
+      // 3. Simpan sesi & masuk aplikasi
+      localStorage.setItem('sansam_role', userData.role);
+      localStorage.setItem('sansam_user_name', userData.name);
+      
+      alert('Login Sukses! Memuat aplikasi...');
+      location.reload(); // Muat ulang halaman untuk masuk sebagai Super Admin
+
+    } catch (err) {
+      alert('GAGAL LOGIN: ' + err.message);
+    }
+  });
 });
   </script>
 </body>
