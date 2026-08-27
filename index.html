@@ -779,7 +779,9 @@
       } else {
         select.innerHTML = `<option value="Umum">Belum ada material (Tambah di menu Material)</option>`;
       }
-      openModal('modal-add-order');
+      
+      // PERBAIKANNYA DI SINI
+      document.getElementById('modal-add-order').classList.remove('hidden');
     }
 
     // ==========================================
