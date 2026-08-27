@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>CV SANSAM GROUP - Fleet App V2</title>
+  <title>CV SANSAM GROUP - Fleet App Pro</title>
   
   <meta name="theme-color" content="#ffffff">
   
@@ -11,7 +11,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Google Fonts & FontAwesome -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Supabase SDK -->
@@ -59,7 +59,7 @@
     </div>
   </div>
 
-  <!-- LOGIN MODAL (SUPABASE AUTH) -->
+  <!-- LOGIN MODAL -->
   <div id="login-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-[99999] flex flex-col items-center justify-center p-4 transition-all duration-500 hidden">
     <div class="bg-white border border-slate-200 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-5">
       <div class="w-16 h-16 bg-blue-50 rounded-2xl mx-auto flex items-center justify-center border border-blue-100 shadow-inner">
@@ -67,7 +67,7 @@
       </div>
       <div>
         <h2 class="text-xl font-black text-slate-900">SANSAM FLEET</h2>
-        <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-1">Sistem Operasional V2</p>
+        <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-1">Sistem Operasional Pro</p>
       </div>
 
       <form id="login-form" class="space-y-4 pt-2 text-left">
@@ -114,7 +114,9 @@
       <div class="max-w-7xl mx-auto px-4 flex gap-6 overflow-x-auto custom-scrollbar">
         <button onclick="switchView('admin-dashboard')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-brand-blue text-brand-blue"><i class="fa-solid fa-chart-pie mr-2"></i>Dashboard</button>
         <button onclick="switchView('admin-orders')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-clipboard-list mr-2"></i>Manajemen Order</button>
-        <button onclick="switchView('admin-master')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-database mr-2"></i>Master Data</button>
+        <button onclick="switchView('admin-materials')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-boxes-stacked mr-2"></i>Jenis Material</button>
+        <button onclick="switchView('admin-users')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-users-gear mr-2"></i>Kelola Pengguna</button>
+        <button onclick="switchView('admin-reports')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-file-lines mr-2"></i>Rekapan & Kas</button>
       </div>
     </nav>
   </header>
@@ -122,9 +124,7 @@
   <!-- MAIN CONTENT WRAPPER -->
   <main id="app-content" class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 pb-24 md:pb-6 hidden">
 
-    <!-- ==========================================
-         VIEW: ADMIN DASHBOARD
-         ========================================== -->
+    <!-- VIEW: ADMIN DASHBOARD -->
     <section id="view-admin-dashboard" class="app-view hidden space-y-6">
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
         <h3 class="text-base font-bold text-slate-800 mb-4"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i>Ringkasan Operasional Hari Ini</h3>
@@ -149,9 +149,7 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         VIEW: ADMIN ORDERS (MANAJEMEN)
-         ========================================== -->
+    <!-- VIEW: ADMIN ORDERS -->
     <section id="view-admin-orders" class="app-view hidden space-y-6">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         <div>
@@ -170,54 +168,115 @@
               <tr>
                 <th class="p-4 font-bold uppercase">No. Order</th>
                 <th class="p-4 font-bold uppercase">Customer / Tujuan</th>
+                <th class="p-4 font-bold uppercase">Material</th>
                 <th class="p-4 font-bold uppercase text-center">Progress Ritase</th>
                 <th class="p-4 font-bold uppercase text-center">Status</th>
               </tr>
             </thead>
-            <tbody id="admin-orders-tbody" class="divide-y divide-slate-100">
-              <!-- Render via JS -->
-            </tbody>
+            <tbody id="admin-orders-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ==========================================
-         VIEW: ADMIN MASTER DATA (PLACEHOLDER)
-         ========================================== -->
-    <section id="view-admin-master" class="app-view hidden space-y-6">
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm text-center py-10">
-        <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400 mb-4">
-          <i class="fa-solid fa-database text-2xl"></i>
+    <!-- VIEW: ADMIN MATERIALS (JENIS MATERIAL) -->
+    <section id="view-admin-materials" class="app-view hidden space-y-6">
+      <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div>
+          <h3 class="text-base font-bold text-slate-800">Manajemen Jenis Material</h3>
+          <p class="text-xs text-slate-500">Daftar material yang dapat dipilih dalam pembuatan order.</p>
         </div>
-        <h3 class="text-lg font-bold text-slate-800 mb-2">Master Data</h3>
-        <p class="text-sm text-slate-500 max-w-sm mx-auto">Fitur pengelolaan Driver, Armada, dan Material akan segera aktif di sini.</p>
+        <button onclick="openModal('modal-add-material')" class="active-scale bg-brand-blue text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md hover:bg-blue-700 transition">
+          <i class="fa-solid fa-plus mr-1"></i> Tambah Material
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+              <tr>
+                <th class="p-4 font-bold uppercase">Nama Material</th>
+                <th class="p-4 font-bold uppercase">Deskripsi / Satuan</th>
+                <th class="p-4 font-bold uppercase text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="admin-materials-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
-    <!-- ==========================================
-         VIEW: DRIVER POOL (DAFTAR ORDER TERSEDIA)
-         ========================================== -->
+    <!-- VIEW: ADMIN USERS (KELOLA PENGGUNA) -->
+    <section id="view-admin-users" class="app-view hidden space-y-6">
+      <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div>
+          <h3 class="text-base font-bold text-slate-800">Kelola Akun Admin & Driver</h3>
+          <p class="text-xs text-slate-500">Super Admin dapat membuat akun baru untuk sistem.</p>
+        </div>
+        <button onclick="openModal('modal-add-user')" class="active-scale bg-brand-blue text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md hover:bg-blue-700 transition">
+          <i class="fa-solid fa-user-plus mr-1"></i> Buat Akun Baru
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+              <tr>
+                <th class="p-4 font-bold uppercase">Nama</th>
+                <th class="p-4 font-bold uppercase">Email</th>
+                <th class="p-4 font-bold uppercase">Role / Hak Akses</th>
+                <th class="p-4 font-bold uppercase text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: ADMIN REPORTS (REKAPAN) -->
+    <section id="view-admin-reports" class="app-view hidden space-y-6">
+      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
+        <h3 class="text-base font-bold text-slate-800 mb-2"><i class="fa-solid fa-file-lines text-brand-blue mr-2"></i> Rekapan Pengiriman & Keuangan</h3>
+        <p class="text-xs text-slate-500 mb-4">Riwayat seluruh laporan bongkar dan pembayaran tunai dari driver.</p>
+        
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+              <tr>
+                <th class="p-4 font-bold uppercase">Waktu</th>
+                <th class="p-4 font-bold uppercase">Driver</th>
+                <th class="p-4 font-bold uppercase">Ritase Ke</th>
+                <th class="p-4 font-bold uppercase">Metode & Nominal</th>
+                <th class="p-4 font-bold uppercase text-center">Foto Bukti</th>
+              </tr>
+            </thead>
+            <tbody id="admin-reports-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: DRIVER POOL -->
     <section id="view-driver-pool" class="app-view hidden space-y-4">
       <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
         <h3 class="text-sm font-bold text-slate-800">Order Pool (Tersedia)</h3>
         <p class="text-[11px] text-slate-500">Pilih dan ambil order yang siap dijalankan di bawah ini.</p>
       </div>
-      <div id="driver-pool-container" class="space-y-4">
-        <!-- Render via JS -->
-      </div>
+      <div id="driver-pool-container" class="space-y-4"></div>
     </section>
 
-    <!-- ==========================================
-         VIEW: DRIVER ACTIVE TASK (SEDANG JALAN)
-         ========================================== -->
+    <!-- VIEW: DRIVER ACTIVE TASK -->
     <section id="view-driver-task" class="app-view hidden space-y-4">
       <div class="bg-brand-blue text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
         <div class="absolute -right-4 -top-4 opacity-10"><i class="fa-solid fa-truck-fast text-9xl"></i></div>
         <div class="relative z-10">
           <span class="bg-white/20 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase mb-3 inline-block">Order Aktif Anda</span>
           <h2 class="text-xl font-black mb-1" id="task-customer">Memuat...</h2>
-          <p class="text-xs text-blue-100 mb-4"><i class="fa-solid fa-location-dot mr-1"></i> <span id="task-destination">...</span></p>
+          <p class="text-xs text-blue-100 mb-2"><i class="fa-solid fa-location-dot mr-1"></i> <span id="task-destination">...</span></p>
+          <p class="text-xs text-blue-200 mb-4"><i class="fa-solid fa-boxes-stacked mr-1"></i> Material: <span id="task-material" class="font-bold text-white">-</span></p>
           <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm border border-white/20">
              <div class="flex justify-between text-xs font-bold mb-1">
                <span>Progress Ritase</span>
@@ -234,8 +293,6 @@
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
         <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4"><i class="fa-solid fa-camera text-brand-blue mr-2"></i> Laporan Bongkar (Ritase Selesai)</h3>
         <form id="driver-delivery-form" class="space-y-5 text-left">
-          
-          <!-- Foto Wajib -->
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-2">Foto Bukti Bongkar (Wajib)</label>
             <div class="relative flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-6 bg-slate-50 hover:bg-slate-100 transition">
@@ -249,30 +306,28 @@
             <input type="hidden" id="photo-base64">
           </div>
 
-          <!-- Pilihan Pembayaran -->
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-2">Metode Pembayaran</label>
             <div class="grid grid-cols-2 gap-2">
               <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
                 <input type="radio" name="pay_method" value="TF" required class="absolute opacity-0" onchange="toggleNominalInput()">
-                <span class="text-xs font-bold text-slate-700 pay-label"><i class="fa-solid fa-money-bill-transfer mr-1"></i> Transfer (TF)</span>
+                <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-money-bill-transfer mr-1"></i> Transfer (TF)</span>
               </label>
               <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
                 <input type="radio" name="pay_method" value="BB" class="absolute opacity-0" onchange="toggleNominalInput()">
-                <span class="text-xs font-bold text-slate-700 pay-label"><i class="fa-solid fa-file-invoice mr-1"></i> Bayar Belakang (BB)</span>
+                <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-file-invoice mr-1"></i> Bayar Belakang (BB)</span>
               </label>
               <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
                 <input type="radio" name="pay_method" value="CASH" class="absolute opacity-0" onchange="toggleNominalInput()">
-                <span class="text-xs font-bold text-slate-700 pay-label"><i class="fa-solid fa-money-bill-wave text-brand-green mr-1"></i> Uang Tunai (CASH)</span>
+                <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-money-bill-wave text-brand-green mr-1"></i> Tunai (CASH)</span>
               </label>
               <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
                 <input type="radio" name="pay_method" value="NONE" class="absolute opacity-0" onchange="toggleNominalInput()">
-                <span class="text-xs font-bold text-slate-700 pay-label"><i class="fa-solid fa-xmark mr-1"></i> Tidak Ada</span>
+                <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-xmark mr-1"></i> Tidak Ada</span>
               </label>
             </div>
           </div>
 
-          <!-- Nominal Cash -->
           <div id="nominal-container" class="hidden">
             <label class="block text-xs font-bold text-slate-600 mb-2">Nominal Cash Diterima (Rp)</label>
             <input type="number" id="pay-nominal" placeholder="Contoh: 150000" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-900 focus:border-brand-blue focus:outline-none">
@@ -283,7 +338,7 @@
           </button>
           
           <button type="button" onclick="releaseOrder()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl text-xs transition mt-2">
-            Lepas Order (Ada Kendala)
+            Lepas Order (Kendala)
           </button>
         </form>
       </div>
@@ -299,7 +354,7 @@
     </div>
   </nav>
 
-  <!-- MODAL: ADD ORDER (ADMIN ONLY) -->
+  <!-- MODAL: ADD ORDER -->
   <div id="modal-add-order" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center p-4 hidden">
     <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
       <button onclick="closeModal('modal-add-order')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -313,6 +368,12 @@
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Lokasi Tujuan / Proyek</label>
           <input type="text" id="order-destination" required class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Pilih Jenis Material</label>
+          <select id="order-material" required class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none bg-white">
+            <!-- Loaded via JS -->
+          </select>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
@@ -332,11 +393,60 @@
     </div>
   </div>
 
-  <!-- ==========================================
-       JAVASCRIPT APP LOGIC
-       ========================================== -->
+  <!-- MODAL: ADD MATERIAL -->
+  <div id="modal-add-material" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl relative">
+      <button onclick="closeModal('modal-add-material')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
+      <h3 class="text-base font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Tambah Jenis Material</h3>
+      
+      <form id="form-add-material" class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Nama Material</label>
+          <input type="text" id="mat-name" required placeholder="Contoh: Pasir, Batu Split" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Keterangan / Satuan</label>
+          <input type="text" id="mat-desc" placeholder="Contoh: Kubik / Ton" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
+        </div>
+        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2 shadow-md hover:bg-blue-700">Simpan Material</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD USER (SUPER ADMIN ONLY) -->
+  <div id="modal-add-user" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+      <button onclick="closeModal('modal-add-user')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
+      <h3 class="text-base font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Buat Akun Baru (Admin / Driver)</h3>
+      
+      <form id="form-add-user" class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Nama Lengkap</label>
+          <input type="text" id="usr-name" required placeholder="Nama Karyawan/Driver" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Email (Untuk Login)</label>
+          <input type="email" id="usr-email" required placeholder="email@sansamgroup.com" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Password Awal</label>
+          <input type="password" id="usr-pass" required placeholder="Minimal 6 karakter" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Hak Akses (Role)</label>
+          <select id="usr-role" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none bg-white">
+            <option value="ADMIN">ADMIN (Pengelola Order)</option>
+            <option value="DRIVER">DRIVER (Armada Lapangan)</option>
+            <option value="SUPER_ADMIN">SUPER_ADMIN (Akses Penuh)</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2 shadow-md hover:bg-blue-700">Daftarkan Akun</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT UTAMA -->
   <script>
-    // 1. SUPABASE INIT (Ganti nama variabel jadi supabaseClient agar tidak bentrok)
     const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -345,101 +455,76 @@
     let currentUser = null; 
     let activeAssignment = null; 
 
-    // 2. AWAL HALAMAN DIMUAT
     document.addEventListener('DOMContentLoaded', async () => {
-      
-      // Hapus Splash Screen dengan AMAN (Bahkan jika error terjadi)
       setTimeout(() => { 
         const splash = document.getElementById('splash-screen');
-        if(splash) {
-            splash.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => splash.classList.add('hidden'), 500);
-        }
+        if(splash) { splash.classList.add('opacity-0', 'pointer-events-none'); setTimeout(() => splash.classList.add('hidden'), 500); }
       }, 1000);
       
-      // Gunakan Try-Catch agar proses tidak berhenti mendadak
       try {
-          showLoader(true);
-          const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-          
-          if (sessionError) throw sessionError;
-
-          if (session) {
-            const { data: userData, error: userError } = await supabaseClient.from('master_users').select('*').eq('auth_user_id', session.user.id).single();
-            
-            if (userError) throw userError;
-
-            if (userData && userData.status === 'ACTIVE') {
-              currentUser = userData;
-              currentRole = userData.role;
-              setupUI();
-            } else {
-              await supabaseClient.auth.signOut();
-              document.getElementById('login-modal').classList.remove('hidden');
-            }
-          } else {
-            // Tampilkan Form Login jika belum masuk
-            document.getElementById('login-modal').classList.remove('hidden');
-          }
-      } catch (err) {
-          console.error("Terjadi masalah saat memuat data:", err);
-          document.getElementById('login-modal').classList.remove('hidden');
-      } finally {
-          showLoader(false);
-      }
-
-      // EVENT LISTENER: Form Login
-      const loginForm = document.getElementById('login-form');
-      if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
-          e.preventDefault();
-          const email = document.getElementById('auth-email').value.trim();
-          const password = document.getElementById('auth-password').value;
-
-          if (!email || !password) return alert('Email dan Password wajib diisi!');
-
-          showLoader(true);
-          try {
-            // A. Supabase Auth Login
-            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (authError) throw authError;
-
-            // B. Cek Hak Akses Database
-            const { data: userData, error: userError } = await supabaseClient.from('master_users').select('*').eq('auth_user_id', authData.user.id).single();
-            if (userError || !userData) throw new Error("Akun Anda belum terdaftar di sistem master.");
-            if (userData.status !== 'ACTIVE') throw new Error("Akun Anda berstatus Non-aktif.");
-
-            // C. Simpan & Masuk
+        showLoader(true);
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+          const { data: userData } = await supabaseClient.from('master_users').select('*').eq('auth_user_id', session.user.id).single();
+          if (userData && userData.status === 'ACTIVE') {
             currentUser = userData;
             currentRole = userData.role;
-            localStorage.setItem('sansam_role', currentRole);
-
-            document.getElementById('login-modal').classList.add('hidden');
             setupUI();
-            alert('Login Berhasil! Selamat datang, ' + currentUser.name);
-          } catch (err) {
-            alert('GAGAL LOGIN: ' + err.message);
+          } else {
+            await supabaseClient.auth.signOut();
+            document.getElementById('login-modal').classList.remove('hidden');
           }
-          showLoader(false);
-        });
+        } else {
+          document.getElementById('login-modal').classList.remove('hidden');
+        }
+      } catch (err) {
+        document.getElementById('login-modal').classList.remove('hidden');
+      } finally {
+        showLoader(false);
       }
 
-      // Event Listener: Form Delivery & Form Order
-      const deliveryForm = document.getElementById('driver-delivery-form');
-      if (deliveryForm) deliveryForm.addEventListener('submit', handleDeliverySubmit);
-      
-      const addOrderForm = document.getElementById('form-add-order');
-      if (addOrderForm) addOrderForm.addEventListener('submit', handleAddOrder);
+      // Event Listener Login
+      document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value.trim();
+        const password = document.getElementById('auth-password').value;
+        if (!email || !password) return alert('Email dan Password wajib diisi!');
+
+        showLoader(true);
+        try {
+          const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
+          if (authError) throw authError;
+
+          const { data: userData, error: userError } = await supabaseClient.from('master_users').select('*').eq('auth_user_id', authData.user.id).single();
+          if (userError || !userData) throw new Error("Akun belum terdaftar di master database.");
+          if (userData.status !== 'ACTIVE') throw new Error("Akun Anda berstatus Non-aktif.");
+
+          currentUser = userData;
+          currentRole = userData.role;
+          localStorage.setItem('sansam_role', currentRole);
+
+          document.getElementById('login-modal').classList.add('hidden');
+          setupUI();
+          alert('Login Berhasil! Selamat datang, ' + currentUser.name);
+        } catch (err) {
+          alert('GAGAL LOGIN: ' + err.message);
+        }
+        showLoader(false);
+      });
+
+      // Form Submissions
+      document.getElementById('driver-delivery-form').addEventListener('submit', handleDeliverySubmit);
+      document.getElementById('form-add-order').addEventListener('submit', handleAddOrder);
+      document.getElementById('form-add-material').addEventListener('submit', handleAddMaterial);
+      document.getElementById('form-add-user').addEventListener('submit', handleAddUser);
     });
 
-    // 3. FUNGSI ANTARMUKA (UI)
     function setupUI() {
-      document.getElementById('login-modal').classList.add('hidden'); // Pastikan tertutup
+      document.getElementById('login-modal').classList.add('hidden');
       document.getElementById('app-header').classList.remove('hidden');
       document.getElementById('app-content').classList.remove('hidden');
       
-      const badge = document.getElementById('header-role-badge');
-      badge.innerText = `${currentUser.name} (${currentRole})`;
+      document.getElementById('header-role-badge').innerText = `${currentUser.name} (${currentRole})`;
 
       if (currentRole === 'SUPER_ADMIN' || currentRole === 'ADMIN') {
         document.getElementById('admin-nav').classList.remove('hidden');
@@ -463,7 +548,11 @@
           event.currentTarget.classList.add('border-brand-blue', 'text-brand-blue');
           event.currentTarget.classList.remove('border-transparent', 'text-slate-500');
         }
+        if(viewId === 'admin-dashboard') loadAdminDashboard();
         if(viewId === 'admin-orders') loadAdminOrders();
+        if(viewId === 'admin-materials') loadAdminMaterials();
+        if(viewId === 'admin-users') loadAdminUsers();
+        if(viewId === 'admin-reports') loadAdminReports();
       }
       
       if (currentRole === 'DRIVER') {
@@ -479,45 +568,189 @@
     }
 
     // ==========================================
-    // LOGIKA ADMIN
+    // LOGIKA ADMIN & DASHBOARD
     // ==========================================
+    async function loadAdminDashboard() {
+      showLoader(true);
+      const { data: orders } = await supabaseClient.from('orders').select('*');
+      const { data: deliveries } = await supabaseClient.from('deliveries').select('*');
+      const { data: drivers } = await supabaseClient.from('master_users').select('*').eq('role', 'DRIVER').eq('status', 'ACTIVE');
+      showLoader(false);
+
+      if(orders) document.getElementById('dash-active-order').innerText = orders.filter(o => o.status !== 'COMPLETED').length;
+      if(deliveries) {
+        let totalRit = deliveries.length;
+        document.getElementById('dash-completed-rit').innerText = totalRit;
+        let cashSum = deliveries.filter(d => d.payment_method === 'CASH').reduce((sum, d) => sum + (parseFloat(d.nominal) || 0), 0);
+        document.getElementById('dash-cash-today').innerText = 'Rp ' + cashSum.toLocaleString('id-ID');
+      }
+      if(drivers) document.getElementById('dash-standby-driver').innerText = drivers.length;
+    }
+
     async function loadAdminOrders() {
       showLoader(true);
       const { data, error } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
       showLoader(false);
       
-      if (error) return alert("Gagal memuat data order.");
+      if (error) return alert("Gagal memuat order.");
       const tbody = document.getElementById('admin-orders-tbody');
       tbody.innerHTML = '';
       
       data.forEach(o => {
-        let statusBadge = '';
-        if(o.status === 'AVAILABLE') statusBadge = '<span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">Tersedia</span>';
-        else if(o.status === 'PARTIALLY_COMPLETED') statusBadge = '<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-[10px] font-bold">Berjalan</span>';
-        else if(o.status === 'COMPLETED') statusBadge = '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold">Selesai</span>';
-        
+        let badge = o.status === 'COMPLETED' ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold">Selesai</span>' : '<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-[10px] font-bold">Berjalan</span>';
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50">
-            <td class="p-4 font-mono font-bold text-slate-700">${o.order_number || o.id.split('-')[0].toUpperCase()}</td>
-            <td class="p-4"><p class="font-bold text-slate-800">${o.customer_id || 'Umum'}</p><p class="text-[10px] text-slate-500">${o.destination}</p></td>
+            <td class="p-4 font-mono font-bold text-slate-700">${o.order_number || '-'}</td>
+            <td class="p-4"><p class="font-bold text-slate-800">${o.customer_id}</p><p class="text-[10px] text-slate-500">${o.destination}</p></td>
+            <td class="p-4 font-medium text-slate-700">${o.material_name || '-'}</td>
             <td class="p-4 text-center font-bold text-brand-blue">${o.completed_rit} / ${o.total_rit}</td>
-            <td class="p-4 text-center">${statusBadge}</td>
+            <td class="p-4 text-center">${badge}</td>
           </tr>
         `;
       });
+    }
+
+    async function loadAdminMaterials() {
+      showLoader(true);
+      const { data, error } = await supabaseClient.from('master_materials').select('*');
+      showLoader(false);
+
+      const tbody = document.getElementById('admin-materials-tbody');
+      tbody.innerHTML = '';
+      if(data) {
+        data.forEach(m => {
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-4 font-bold text-slate-800">${m.name}</td>
+              <td class="p-4 text-slate-600">${m.description || '-'}</td>
+              <td class="p-4 text-right"><button onclick="deleteMaterial('${m.id}')" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash"></i></button></td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    async function handleAddMaterial(e) {
+      e.preventDefault();
+      const name = document.getElementById('mat-name').value;
+      const desc = document.getElementById('mat-desc').value;
+
+      showLoader(true);
+      const { error } = await supabaseClient.from('master_materials').insert([{ name, description: desc }]);
+      showLoader(false);
+
+      if(error) alert("Gagal tambah material: " + error.message);
+      else {
+        alert("Material berhasil ditambahkan!");
+        closeModal('modal-add-material');
+        document.getElementById('form-add-material').reset();
+        loadAdminMaterials();
+      }
+    }
+
+    async function deleteMaterial(id) {
+      if(confirm("Hapus material ini?")) {
+        await supabaseClient.from('master_materials').delete().eq('id', id);
+        loadAdminMaterials();
+      }
+    }
+
+    async function loadAdminUsers() {
+      showLoader(true);
+      const { data } = await supabaseClient.from('master_users').select('*');
+      showLoader(false);
+
+      const tbody = document.getElementById('admin-users-tbody');
+      tbody.innerHTML = '';
+      if(data) {
+        data.forEach(u => {
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-4 font-bold text-slate-800">${u.name}</td>
+              <td class="p-4 text-slate-600">${u.email}</td>
+              <td class="p-4"><span class="px-2 py-1 bg-blue-50 text-brand-blue rounded text-[10px] font-bold">${u.role}</span></td>
+              <td class="p-4 text-center"><span class="px-2 py-1 bg-emerald-50 text-emerald-600 rounded text-[10px] font-bold">${u.status}</span></td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    async function handleAddUser(e) {
+      e.preventDefault();
+      if(currentUser.role !== 'SUPER_ADMIN') return alert("Hanya Super Admin yang dapat membuat akun baru.");
+
+      const name = document.getElementById('usr-name').value;
+      const email = document.getElementById('usr-email').value;
+      const password = document.getElementById('usr-pass').value;
+      const role = document.getElementById('usr-role').value;
+
+      showLoader(true);
+      try {
+        // Buat akun di Supabase Auth
+        const { data: authData, error: authErr } = await supabaseClient.auth.signUp({ email, password });
+        if(authErr) throw authErr;
+
+        if(authData.user) {
+          // Masukkan ke master_users
+          const { error: dbErr } = await supabaseClient.from('master_users').insert([{
+            auth_user_id: authData.user.id,
+            name: name,
+            email: email,
+            role: role,
+            status: 'ACTIVE'
+          }]);
+          if(dbErr) throw dbErr;
+
+          alert("Akun berhasil dibuat!");
+          closeModal('modal-add-user');
+          document.getElementById('form-add-user').reset();
+          loadAdminUsers();
+        }
+      } catch (err) {
+        alert("Gagal membuat akun: " + err.message);
+      }
+      showLoader(false);
+    }
+
+    async function loadAdminReports() {
+      showLoader(true);
+      const { data } = await supabaseClient.from('deliveries').select('*, master_users(name), delivery_photos(photo_url)').order('created_at', { ascending: false });
+      showLoader(false);
+
+      const tbody = document.getElementById('admin-reports-tbody');
+      tbody.innerHTML = '';
+      if(data) {
+        data.forEach(d => {
+          let photo = d.delivery_photos?.[0]?.photo_url ? `<a href="${d.delivery_photos[0].photo_url}" target="_blank" class="text-brand-blue underline font-bold">Lihat Foto</a>` : 'Tidak ada';
+          let nom = d.payment_method === 'CASH' ? `Rp ${parseInt(d.nominal || 0).toLocaleString('id-ID')}` : '-';
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-4 text-slate-500">${new Date(d.created_at).toLocaleString('id-ID')}</td>
+              <td class="p-4 font-bold text-slate-800">${d.master_users?.name || 'Driver'}</td>
+              <td class="p-4 text-center font-bold text-brand-blue">Ritase #${d.trip_number}</td>
+              <td class="p-4"><span class="font-bold text-slate-700">${d.payment_method}</span> ${nom}</td>
+              <td class="p-4 text-center">${photo}</td>
+            </tr>
+          `;
+        });
+      }
     }
 
     async function handleAddOrder(e) {
       e.preventDefault();
       const customer = document.getElementById('order-customer').value;
       const destination = document.getElementById('order-destination').value;
+      const material = document.getElementById('order-material').value;
       const rit = parseInt(document.getElementById('order-rit').value);
       const priority = document.getElementById('order-priority').value;
       
       showLoader(true);
       const { error } = await supabaseClient.from('orders').insert([{
         order_number: 'ORD-' + Date.now().toString().slice(-6),
+        customer_id: customer,
         destination: destination,
+        material_name: material,
         total_rit: rit,
         priority: priority,
         created_by: currentUser.id,
@@ -534,18 +767,34 @@
       }
     }
 
+    async function openModalAddOrder() {
+      // Ambil daftar material untuk pilihan dropdown
+      const { data } = await supabaseClient.from('master_materials').select('*');
+      const select = document.getElementById('order-material');
+      select.innerHTML = '';
+      if(data && data.length > 0) {
+        data.forEach(m => {
+          select.innerHTML += `<option value="${m.name}">${m.name} (${m.description || ''})</option>`;
+        });
+      } else {
+        select.innerHTML = `<option value="Umum">Belum ada material (Tambah di menu Material)</option>`;
+      }
+      openModal('modal-add-order');
+    }
+
     // ==========================================
     // LOGIKA DRIVER
     // ==========================================
     async function checkActiveDriverTask() {
       showLoader(true);
-      const { data, error } = await supabaseClient.from('assignments').select('*, orders(*)').eq('driver_id', currentUser.id).eq('status', 'ACTIVE').single();
+      const { data } = await supabaseClient.from('assignments').select('*, orders(*)').eq('driver_id', currentUser.id).eq('status', 'ACTIVE').single();
       showLoader(false);
       
       if (data && data.orders) {
         activeAssignment = data;
-        document.getElementById('task-customer').innerText = data.orders.order_number || "Order Proyek";
+        document.getElementById('task-customer').innerText = data.orders.order_number + ' - ' + data.orders.customer_id;
         document.getElementById('task-destination').innerText = data.orders.destination;
+        document.getElementById('task-material').innerText = data.orders.material_name || '-';
         document.getElementById('task-progress-text').innerText = `${data.orders.completed_rit} / ${data.orders.total_rit} Rit`;
         
         let pct = (data.orders.completed_rit / data.orders.total_rit) * 100;
@@ -560,7 +809,7 @@
 
     async function loadDriverPool() {
       showLoader(true);
-      const { data, error } = await supabaseClient.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']).eq('locked', false);
+      const { data } = await supabaseClient.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']).eq('locked', false);
       showLoader(false);
       
       const container = document.getElementById('driver-pool-container');
@@ -568,12 +817,13 @@
       
       if(data && data.length > 0) {
         data.forEach(o => {
-          let isUrgent = o.priority === 'URGENT' ? '<span class="bg-rose-100 text-rose-600 px-2 py-0.5 rounded text-[9px] font-bold ml-2">URGENT</span>' : '';
+          let urgent = o.priority === 'URGENT' ? '<span class="bg-rose-100 text-rose-600 px-2 py-0.5 rounded text-[9px] font-bold ml-2">URGENT</span>' : '';
           container.innerHTML += `
             <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-left flex justify-between items-center">
               <div>
-                <h4 class="font-bold text-slate-800 text-sm">${o.destination} ${isUrgent}</h4>
-                <p class="text-[10px] text-slate-500 mt-1">Sisa Ritase: <strong class="text-brand-blue">${o.total_rit - o.completed_rit} Rit</strong></p>
+                <h4 class="font-bold text-slate-800 text-sm">${o.destination} ${urgent}</h4>
+                <p class="text-[10px] text-slate-500 mt-0.5">Material: <strong class="text-slate-700">${o.material_name || 'Umum'}</strong></p>
+                <p class="text-[10px] text-slate-500 mt-0.5">Sisa Ritase: <strong class="text-brand-blue">${o.total_rit - o.completed_rit} Rit</strong></p>
               </div>
               <button onclick="takeOrder('${o.id}')" class="bg-brand-blue hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Ambil</button>
             </div>
@@ -585,74 +835,38 @@
     }
 
     async function takeOrder(orderId) {
-      if(activeAssignment) return alert("Anda masih memiliki tugas aktif! Selesaikan atau lepas terlebih dahulu.");
-      
+      if(activeAssignment) return alert("Anda masih memiliki tugas aktif!");
       if(confirm("Ambil order ini sekarang?")) {
         showLoader(true);
-        const { error } = await supabaseClient.from('assignments').insert([{
-          order_id: orderId, driver_id: currentUser.id, status: 'ACTIVE'
-        }]);
+        const { error } = await supabaseClient.from('assignments').insert([{ order_id: orderId, driver_id: currentUser.id, status: 'ACTIVE' }]);
         showLoader(false);
-        
         if(error) alert("Gagal mengambil order: " + error.message);
-        else {
-          alert("Order berhasil diambil! Silakan mulai pengantaran.");
-          checkActiveDriverTask();
-        }
+        else checkActiveDriverTask();
       }
     }
 
     async function releaseOrder() {
       if(!activeAssignment) return;
-      let reason = prompt("Sebutkan alasan pelepasan order (Kendala mobil/proyek):");
-      if(!reason) return; 
-      
+      let reason = prompt("Alasan pelepasan order:");
+      if(!reason) return;
       showLoader(true);
-      const { error } = await supabaseClient.from('assignments').update({
-        status: 'RELEASED', release_reason: reason, released_at: new Date().toISOString()
-      }).eq('id', activeAssignment.id);
+      await supabaseClient.from('assignments').update({ status: 'RELEASED', release_reason: reason }).eq('id', activeAssignment.id);
       showLoader(false);
-      
-      if(error) alert("Gagal: " + error.message);
-      else {
-        alert("Tugas berhasil dilepas.");
-        activeAssignment = null;
-        document.querySelectorAll('.driver-tab-btn')[0].click(); 
-      }
+      activeAssignment = null;
+      checkActiveDriverTask();
     }
 
-    // ==========================================
-    // LOGIKA PENYERAHAN LAPORAN BONGKAR
-    // ==========================================
     function toggleNominalInput() {
-      document.querySelectorAll('input[name="pay_method"]').forEach(r => {
-        let parent = r.parentElement;
-        if(r.checked) {
-          parent.classList.add('border-brand-blue', 'bg-blue-50');
-          parent.classList.remove('border-slate-200', 'bg-slate-50');
-        } else {
-          parent.classList.remove('border-brand-blue', 'bg-blue-50');
-          parent.classList.add('border-slate-200', 'bg-slate-50');
-        }
-      });
-      
       const val = document.querySelector('input[name="pay_method"]:checked')?.value;
       const nomCont = document.getElementById('nominal-container');
       const nomInput = document.getElementById('pay-nominal');
-      if (val === 'CASH') {
-        nomCont.classList.remove('hidden');
-        nomInput.required = true;
-      } else {
-        nomCont.classList.add('hidden');
-        nomInput.required = false;
-        nomInput.value = '';
-      }
+      if (val === 'CASH') { nomCont.classList.remove('hidden'); nomInput.required = true; }
+      else { nomCont.classList.add('hidden'); nomInput.required = false; nomInput.value = ''; }
     }
 
     function compressAndPreviewImage(event) {
       const file = event.target.files[0];
       if (!file) return;
-      
       const reader = new FileReader();
       reader.onload = function(e) {
         const img = new Image();
@@ -662,14 +876,11 @@
           if (w > MAX) { h *= MAX / w; w = MAX; }
           canvas.width = w; canvas.height = h;
           const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
-          
           const base64 = canvas.toDataURL('image/jpeg', 0.6); 
           document.getElementById('photo-base64').value = base64;
-          
           document.getElementById('photo-placeholder').classList.add('hidden');
           const preview = document.getElementById('photo-preview');
-          preview.src = base64;
-          preview.classList.remove('hidden');
+          preview.src = base64; preview.classList.remove('hidden');
         }
         img.src = e.target.result;
       }
@@ -678,60 +889,55 @@
 
     async function handleDeliverySubmit(e) {
       e.preventDefault();
-      if(!activeAssignment) return alert("Sistem mendeteksi Anda tidak memiliki order aktif.");
+      if(!activeAssignment) return alert("Tidak ada order aktif.");
 
       const payMethod = document.querySelector('input[name="pay_method"]:checked').value;
       const nominal = document.getElementById('pay-nominal').value || 0;
       const photo = document.getElementById('photo-base64').value;
 
-      if(!photo) return alert("Foto bukti bongkar WAJIB dilampirkan!");
-      if(payMethod === 'CASH' && nominal <= 0) return alert("Nominal CASH wajib diisi dan lebih dari Rp 0!");
+      if(!photo) return alert("Foto bukti bongkar wajib dilampirkan!");
 
       showLoader(true);
       try {
-        const { data: orderData, error: orderErr } = await supabaseClient.from('orders').select('completed_rit, total_rit').eq('id', activeAssignment.order_id).single();
-        if (orderErr) throw orderErr;
-        
-        if (orderData.completed_rit >= orderData.total_rit) throw new Error("Order ini sudah selesai diantar sepenuhnya.");
+        const { data: orderData } = await supabaseClient.from('orders').select('completed_rit, total_rit').eq('id', activeAssignment.order_id).single();
+        const newTrip = orderData.completed_rit + 1;
 
-        const newTripNumber = orderData.completed_rit + 1;
-
-        const { data: delivData, error: delivErr } = await supabaseClient.from('deliveries').insert([{
+        const { data: deliv } = await supabaseClient.from('deliveries').insert([{
           order_id: activeAssignment.order_id,
           assignment_id: activeAssignment.id,
           driver_id: currentUser.id,
-          trip_number: newTripNumber,
+          trip_number: newTrip,
           payment_method: payMethod,
           nominal: nominal
         }]).select().single();
-        if (delivErr) throw delivErr;
 
-        await supabaseClient.from('delivery_photos').insert([{ delivery_id: delivData.id, photo_url: photo }]);
+        await supabaseClient.from('delivery_photos').insert([{ delivery_id: deliv.id, photo_url: photo }]);
 
-        let newStatus = (newTripNumber >= orderData.total_rit) ? 'COMPLETED' : 'PARTIALLY_COMPLETED';
-        await supabaseClient.from('orders').update({ completed_rit: newTripNumber, status: newStatus }).eq('id', activeAssignment.order_id);
+        let newStatus = (newTrip >= orderData.total_rit) ? 'COMPLETED' : 'PARTIALLY_COMPLETED';
+        await supabaseClient.from('orders').update({ completed_rit: newTrip, status: newStatus }).eq('id', activeAssignment.order_id);
         
         if (newStatus === 'COMPLETED') {
            await supabaseClient.from('assignments').update({ status: 'COMPLETED' }).eq('id', activeAssignment.id);
-           alert("Laporan dikirim! ORDER TELAH SELESAI SELURUHNYA.");
+           alert("Laporan terkirim! Order telah selesai sepenuhnya.");
         } else {
-           alert("Laporan Ritase ke-" + newTripNumber + " berhasil dikirim!");
+           alert("Laporan ritase ke-" + newTrip + " berhasil dikirim!");
         }
 
         document.getElementById('driver-delivery-form').reset();
         document.getElementById('photo-base64').value = "";
         document.getElementById('photo-preview').classList.add('hidden');
         document.getElementById('photo-placeholder').classList.remove('hidden');
-        toggleNominalInput();
-        
-        checkActiveDriverTask(); 
+        checkActiveDriverTask();
       } catch (err) {
-        alert("Gagal mengirim laporan: " + err.message);
+        alert("Gagal: " + err.message);
       }
       showLoader(false);
     }
 
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function openModal(id) { 
+      if(id === 'modal-add-order') { openModalAddOrder(); return; }
+      document.getElementById(id).classList.remove('hidden'); 
+    }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
     async function logoutAccount() { showLoader(true); await supabaseClient.auth.signOut(); location.reload(); }
     function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
