@@ -336,10 +336,10 @@
        JAVASCRIPT APP LOGIC
        ========================================== -->
   <script>
-    // 1. SUPABASE INIT 
+    // 1. SUPABASE INIT (Ganti nama variabel jadi supabaseClient agar tidak bentrok)
     const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentRole = null;
     let currentUser = null; 
@@ -347,28 +347,46 @@
 
     // 2. AWAL HALAMAN DIMUAT
     document.addEventListener('DOMContentLoaded', async () => {
-      // Hapus splash screen setelah 1 detik
-      setTimeout(() => { document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none'); }, 1000);
       
-      // Cek Sesi Tersimpan
-      showLoader(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        const { data: userData } = await supabase.from('master_users').select('*').eq('auth_user_id', session.user.id).single();
-        if (userData && userData.status === 'ACTIVE') {
-          currentUser = userData;
-          currentRole = userData.role;
-          setupUI();
-        } else {
-          await supabase.auth.signOut();
-          document.getElementById('login-modal').classList.remove('hidden');
+      // Hapus Splash Screen dengan AMAN (Bahkan jika error terjadi)
+      setTimeout(() => { 
+        const splash = document.getElementById('splash-screen');
+        if(splash) {
+            splash.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => splash.classList.add('hidden'), 500);
         }
-      } else {
-        // Tampilkan Form Login
-        document.getElementById('login-modal').classList.remove('hidden');
+      }, 1000);
+      
+      // Gunakan Try-Catch agar proses tidak berhenti mendadak
+      try {
+          showLoader(true);
+          const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+          
+          if (sessionError) throw sessionError;
+
+          if (session) {
+            const { data: userData, error: userError } = await supabaseClient.from('master_users').select('*').eq('auth_user_id', session.user.id).single();
+            
+            if (userError) throw userError;
+
+            if (userData && userData.status === 'ACTIVE') {
+              currentUser = userData;
+              currentRole = userData.role;
+              setupUI();
+            } else {
+              await supabaseClient.auth.signOut();
+              document.getElementById('login-modal').classList.remove('hidden');
+            }
+          } else {
+            // Tampilkan Form Login jika belum masuk
+            document.getElementById('login-modal').classList.remove('hidden');
+          }
+      } catch (err) {
+          console.error("Terjadi masalah saat memuat data:", err);
+          document.getElementById('login-modal').classList.remove('hidden');
+      } finally {
+          showLoader(false);
       }
-      showLoader(false);
 
       // EVENT LISTENER: Form Login
       const loginForm = document.getElementById('login-form');
@@ -383,11 +401,11 @@
           showLoader(true);
           try {
             // A. Supabase Auth Login
-            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (authError) throw authError;
 
             // B. Cek Hak Akses Database
-            const { data: userData, error: userError } = await supabase.from('master_users').select('*').eq('auth_user_id', authData.user.id).single();
+            const { data: userData, error: userError } = await supabaseClient.from('master_users').select('*').eq('auth_user_id', authData.user.id).single();
             if (userError || !userData) throw new Error("Akun Anda belum terdaftar di sistem master.");
             if (userData.status !== 'ACTIVE') throw new Error("Akun Anda berstatus Non-aktif.");
 
@@ -465,7 +483,7 @@
     // ==========================================
     async function loadAdminOrders() {
       showLoader(true);
-      const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+      const { data, error } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
       showLoader(false);
       
       if (error) return alert("Gagal memuat data order.");
@@ -497,7 +515,7 @@
       const priority = document.getElementById('order-priority').value;
       
       showLoader(true);
-      const { error } = await supabase.from('orders').insert([{
+      const { error } = await supabaseClient.from('orders').insert([{
         order_number: 'ORD-' + Date.now().toString().slice(-6),
         destination: destination,
         total_rit: rit,
@@ -521,7 +539,7 @@
     // ==========================================
     async function checkActiveDriverTask() {
       showLoader(true);
-      const { data, error } = await supabase.from('assignments').select('*, orders(*)').eq('driver_id', currentUser.id).eq('status', 'ACTIVE').single();
+      const { data, error } = await supabaseClient.from('assignments').select('*, orders(*)').eq('driver_id', currentUser.id).eq('status', 'ACTIVE').single();
       showLoader(false);
       
       if (data && data.orders) {
@@ -542,7 +560,7 @@
 
     async function loadDriverPool() {
       showLoader(true);
-      const { data, error } = await supabase.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']).eq('locked', false);
+      const { data, error } = await supabaseClient.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']).eq('locked', false);
       showLoader(false);
       
       const container = document.getElementById('driver-pool-container');
@@ -571,7 +589,7 @@
       
       if(confirm("Ambil order ini sekarang?")) {
         showLoader(true);
-        const { error } = await supabase.from('assignments').insert([{
+        const { error } = await supabaseClient.from('assignments').insert([{
           order_id: orderId, driver_id: currentUser.id, status: 'ACTIVE'
         }]);
         showLoader(false);
@@ -590,7 +608,7 @@
       if(!reason) return; 
       
       showLoader(true);
-      const { error } = await supabase.from('assignments').update({
+      const { error } = await supabaseClient.from('assignments').update({
         status: 'RELEASED', release_reason: reason, released_at: new Date().toISOString()
       }).eq('id', activeAssignment.id);
       showLoader(false);
@@ -671,14 +689,14 @@
 
       showLoader(true);
       try {
-        const { data: orderData, error: orderErr } = await supabase.from('orders').select('completed_rit, total_rit').eq('id', activeAssignment.order_id).single();
+        const { data: orderData, error: orderErr } = await supabaseClient.from('orders').select('completed_rit, total_rit').eq('id', activeAssignment.order_id).single();
         if (orderErr) throw orderErr;
         
         if (orderData.completed_rit >= orderData.total_rit) throw new Error("Order ini sudah selesai diantar sepenuhnya.");
 
         const newTripNumber = orderData.completed_rit + 1;
 
-        const { data: delivData, error: delivErr } = await supabase.from('deliveries').insert([{
+        const { data: delivData, error: delivErr } = await supabaseClient.from('deliveries').insert([{
           order_id: activeAssignment.order_id,
           assignment_id: activeAssignment.id,
           driver_id: currentUser.id,
@@ -688,13 +706,13 @@
         }]).select().single();
         if (delivErr) throw delivErr;
 
-        await supabase.from('delivery_photos').insert([{ delivery_id: delivData.id, photo_url: photo }]);
+        await supabaseClient.from('delivery_photos').insert([{ delivery_id: delivData.id, photo_url: photo }]);
 
         let newStatus = (newTripNumber >= orderData.total_rit) ? 'COMPLETED' : 'PARTIALLY_COMPLETED';
-        await supabase.from('orders').update({ completed_rit: newTripNumber, status: newStatus }).eq('id', activeAssignment.order_id);
+        await supabaseClient.from('orders').update({ completed_rit: newTripNumber, status: newStatus }).eq('id', activeAssignment.order_id);
         
         if (newStatus === 'COMPLETED') {
-           await supabase.from('assignments').update({ status: 'COMPLETED' }).eq('id', activeAssignment.id);
+           await supabaseClient.from('assignments').update({ status: 'COMPLETED' }).eq('id', activeAssignment.id);
            alert("Laporan dikirim! ORDER TELAH SELESAI SELURUHNYA.");
         } else {
            alert("Laporan Ritase ke-" + newTripNumber + " berhasil dikirim!");
@@ -715,7 +733,7 @@
 
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-    async function logoutAccount() { showLoader(true); await supabase.auth.signOut(); location.reload(); }
+    async function logoutAccount() { showLoader(true); await supabaseClient.auth.signOut(); location.reload(); }
     function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
   </script>
 </body>
