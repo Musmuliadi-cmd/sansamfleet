@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>CV SANSAM GROUP - Fleet App</title>
+  <title>CV SANSAM GROUP - Fleet App V2</title>
   
-  <meta name="theme-color" content="#07080B">
+  <meta name="theme-color" content="#ffffff">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Google Fonts & FontAwesome -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Supabase SDK -->
@@ -22,275 +22,633 @@
       theme: {
         extend: {
           fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], },
-          colors: {
-            brand: { black: '#07080B', card: '#10121A', border: '#1D2230', blue: '#005CFF', green: '#00CC44', accent: '#3B82F6' }
-          }
+          colors: { brand: { blue: '#2563eb', green: '#16a34a', red: '#dc2626', dark: '#1e293b', light: '#f8fafc' } }
         }
       }
     }
   </script>
   
   <style>
-    body { background-color: #07080B; color: #F3F4F6; -webkit-tap-highlight-color: transparent; }
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #10121A; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #1D2230; border-radius: 4px; }
-    .active-scale:active { transform: scale(0.96); }
-    @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+    body { background-color: #f8fafc; color: #334155; -webkit-tap-highlight-color: transparent; }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .active-scale:active { transform: scale(0.97); }
+    .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
   </style>
 </head>
-<body class="min-h-screen pb-24 md:pb-6 overflow-x-hidden">
-
-  <!-- SPLASH SCREEN -->
-  <div id="splash-screen" class="fixed inset-0 bg-brand-black z-[999999] flex flex-col items-center justify-center transition-all duration-700">
-    <div class="text-center space-y-4 animate-bounce">
-      <div class="w-20 h-20 bg-gradient-to-tr from-brand-blue to-brand-green rounded-3xl mx-auto flex items-center justify-center shadow-xl shadow-brand-blue/20">
-        <i class="fa-solid fa-truck-fast text-white text-3xl"></i>
-      </div>
-      <div>
-        <h2 class="text-2xl font-black tracking-wider text-white">SANSAM FLEET</h2>
-      </div>
-    </div>
-  </div>
+<body class="min-h-screen flex flex-col">
 
   <!-- GLOBAL LOADER -->
-  <div id="global-loader" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999999] flex flex-col items-center justify-center hidden">
-    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-blue mb-4"></i>
-    <p class="text-xs font-bold text-white tracking-widest uppercase">Memproses...</p>
-  </div>
-
-  <!-- LOGIN MODAL (SUPABASE AUTH) -->
-  <div id="login-modal" class="fixed inset-0 bg-brand-black/95 backdrop-blur-md z-[99999] flex flex-col items-center justify-center p-4 transition-all duration-500 hidden">
-    <div class="bg-brand-card border border-brand-border w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-5">
-      <div class="w-16 h-16 bg-brand-blue/10 rounded-2xl mx-auto flex items-center justify-center border border-brand-blue/30 shadow-lg shadow-brand-blue/20">
-        <i class="fa-solid fa-shield-halved text-brand-blue text-2xl"></i>
-      </div>
-      <div>
-        <h2 class="text-xl font-black text-white">SANSAM FLEET</h2>
-        <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Sistem Operasional V2</p>
-      </div>
-
-      <form id="login-form" class="space-y-4 pt-2 text-left">
-        <div>
-          <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Email Akses</label>
-          <div class="relative">
-            <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"></i>
-            <input type="email" id="auth-email" required placeholder="nama@email.com" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 pl-10 text-xs text-white focus:border-brand-blue focus:outline-none">
-          </div>
-        </div>
-        <div>
-          <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Password</label>
-          <div class="relative">
-            <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"></i>
-            <input type="password" id="auth-password" required placeholder="********" class="w-full bg-brand-black border border-brand-border rounded-xl p-3 pl-10 text-xs text-white focus:border-brand-blue focus:outline-none">
-          </div>
-        </div>
-        <button type="submit" class="w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-extrabold py-3.5 rounded-xl text-xs transition active-scale shadow-lg shadow-brand-blue/25">
-          LOGIN SEKARANG
-        </button>
-      </form>
+  <div id="global-loader" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9999999] flex flex-col items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center">
+      <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-blue mb-3"></i>
+      <p class="text-xs font-bold text-slate-700 tracking-widest uppercase">Memproses...</p>
     </div>
   </div>
 
   <!-- HEADER -->
-  <header class="border-b border-brand-border bg-brand-black/95 sticky top-0 z-50 backdrop-blur-md hidden" id="app-header">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-      <div class="text-left">
-        <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
-          CV SANSAM GROUP
-        </h1>
-        <span class="text-[9px] text-brand-green font-bold tracking-[0.25em] uppercase block mt-0.5" id="header-role-badge">
-          Memuat hak akses...
-        </span>
+  <header class="border-b border-slate-200 glass-nav sticky top-0 z-50 shadow-sm hidden" id="app-header">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-brand-blue text-white rounded-xl flex items-center justify-center shadow-md">
+          <i class="fa-solid fa-truck-fast text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-extrabold tracking-tight text-slate-900">SANSAM FLEET</h1>
+          <span class="text-[10px] text-brand-blue font-bold uppercase tracking-wider block" id="header-role-badge">Memuat...</span>
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="logoutAccount()" class="active-scale bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-extrabold py-2 px-3 rounded-lg flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">KELUAR</span>
-        </button>
-      </div>
+      <button onclick="logoutAccount()" class="active-scale bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 text-xs font-bold py-2 px-3 rounded-lg flex items-center gap-2 transition">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">Keluar</span>
+      </button>
     </div>
+    
+    <!-- ADMIN DESKTOP NAV -->
+    <nav id="admin-nav" class="hidden bg-white border-t border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 flex gap-6 overflow-x-auto custom-scrollbar">
+        <button onclick="switchView('admin-dashboard')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-brand-blue text-brand-blue"><i class="fa-solid fa-chart-pie mr-2"></i>Dashboard</button>
+        <button onclick="switchView('admin-orders')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-clipboard-list mr-2"></i>Manajemen Order</button>
+        <button onclick="switchView('admin-master')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-database mr-2"></i>Master Data</button>
+      </div>
+    </nav>
   </header>
 
-  <!-- MAIN DASHBOARD KONTEN -->
-  <main id="app-content" class="max-w-7xl mx-auto px-4 py-6 hidden">
-    
-    <!-- Bagian khusus SUPER ADMIN / ADMIN -->
-    <section id="admin-dashboard" class="space-y-6 hidden">
-      <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
-        <h4 class="text-lg font-bold text-white mb-2"><i class="fa-solid fa-chart-pie text-brand-blue mr-2"></i> Dashboard Pusat</h4>
-        <p class="text-sm text-gray-400">Selamat datang di Panel Manajemen. Fitur Order Pool, Delivery, dan Master Data akan aktif di sini.</p>
-        <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-           <div class="p-4 bg-brand-black border border-brand-border rounded-xl">
-             <p class="text-[10px] text-gray-500 font-bold uppercase">Total Driver Aktif</p>
-             <h3 class="text-2xl font-black text-brand-green mt-1">3</h3>
+  <!-- MAIN CONTENT WRAPPER -->
+  <main id="app-content" class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 pb-24 md:pb-6 hidden">
+
+    <!-- ==========================================
+         VIEW: ADMIN DASHBOARD
+         ========================================== -->
+    <section id="view-admin-dashboard" class="app-view hidden space-y-6">
+      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
+        <h3 class="text-base font-bold text-slate-800 mb-4"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i>Ringkasan Operasional Hari Ini</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+           <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+             <p class="text-[10px] text-slate-500 font-bold uppercase">Total Order Aktif</p>
+             <h3 class="text-2xl font-black text-brand-blue mt-1" id="dash-active-order">0</h3>
            </div>
-           <div class="p-4 bg-brand-black border border-brand-border rounded-xl">
-             <p class="text-[10px] text-gray-500 font-bold uppercase">Order Tersedia</p>
-             <h3 class="text-2xl font-black text-amber-500 mt-1">0</h3>
+           <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+             <p class="text-[10px] text-slate-500 font-bold uppercase">Ritase Selesai</p>
+             <h3 class="text-2xl font-black text-brand-green mt-1" id="dash-completed-rit">0</h3>
+           </div>
+           <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+             <p class="text-[10px] text-slate-500 font-bold uppercase">Driver Standby</p>
+             <h3 class="text-2xl font-black text-slate-700 mt-1" id="dash-standby-driver">0</h3>
+           </div>
+           <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+             <p class="text-[10px] text-slate-500 font-bold uppercase">Kas Masuk (Cash)</p>
+             <h3 class="text-lg font-black text-amber-600 mt-1" id="dash-cash-today">Rp 0</h3>
            </div>
         </div>
       </div>
     </section>
 
-    <!-- Bagian khusus DRIVER -->
-    <section id="driver-dashboard" class="space-y-6 hidden">
-      <div class="bg-brand-card border border-brand-border p-5 rounded-2xl text-center py-10">
-        <div class="w-16 h-16 rounded-full bg-brand-blue/10 flex items-center justify-center mx-auto text-brand-blue mb-4">
-          <i class="fa-solid fa-truck-pickup text-2xl"></i>
+    <!-- ==========================================
+         VIEW: ADMIN ORDERS (MANAJEMEN)
+         ========================================== -->
+    <section id="view-admin-orders" class="app-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div>
+          <h3 class="text-base font-bold text-slate-800">Daftar Order Proyek</h3>
+          <p class="text-xs text-slate-500">Pantau dan kelola seluruh pesanan material.</p>
         </div>
-        <h4 class="text-lg font-bold text-white mb-2">Order Pool Anda Kosong</h4>
-        <p class="text-sm text-gray-400 max-w-sm mx-auto">Saat ini belum ada order material yang perlu diantar. Standby untuk instruksi selanjutnya.</p>
+        <button onclick="openModal('modal-add-order')" class="active-scale bg-brand-blue text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md hover:bg-blue-700 transition">
+          <i class="fa-solid fa-plus mr-1"></i> Buat Order Baru
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+              <tr>
+                <th class="p-4 font-bold uppercase">No. Order</th>
+                <th class="p-4 font-bold uppercase">Customer / Tujuan</th>
+                <th class="p-4 font-bold uppercase text-center">Progress Ritase</th>
+                <th class="p-4 font-bold uppercase text-center">Status</th>
+                <th class="p-4 font-bold uppercase text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-tbody" class="divide-y divide-slate-100">
+              <!-- Render via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW: DRIVER POOL (DAFTAR ORDER TERSEDIA)
+         ========================================== -->
+    <section id="view-driver-pool" class="app-view hidden space-y-4">
+      <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
+        <h3 class="text-sm font-bold text-slate-800">Order Pool (Tersedia)</h3>
+        <p class="text-[11px] text-slate-500">Pilih dan ambil order yang siap dijalankan di bawah ini.</p>
+      </div>
+      <div id="driver-pool-container" class="space-y-4">
+        <!-- Render via JS -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW: DRIVER ACTIVE TASK (SEDANG JALAN)
+         ========================================== -->
+    <section id="view-driver-task" class="app-view hidden space-y-4">
+      <div class="bg-brand-blue text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 opacity-10"><i class="fa-solid fa-truck-fast text-9xl"></i></div>
+        <div class="relative z-10">
+          <span class="bg-white/20 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase mb-3 inline-block">Order Aktif Anda</span>
+          <h2 class="text-xl font-black mb-1" id="task-customer">Memuat...</h2>
+          <p class="text-xs text-blue-100 mb-4"><i class="fa-solid fa-location-dot mr-1"></i> <span id="task-destination">...</span></p>
+          <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm border border-white/20">
+             <div class="flex justify-between text-xs font-bold mb-1">
+               <span>Progress Ritase</span>
+               <span id="task-progress-text">0 / 0 Rit</span>
+             </div>
+             <div class="w-full bg-black/20 rounded-full h-2 mt-2">
+               <div class="bg-brand-green h-2 rounded-full" id="task-progress-bar" style="width: 0%"></div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM LAPOR BONGKAR -->
+      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
+        <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4"><i class="fa-solid fa-camera text-brand-blue mr-2"></i> Laporan Bongkar (Ritase Selesai)</h3>
+        <form id="driver-delivery-form" class="space-y-5 text-left">
+          
+          <!-- Foto Wajib -->
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-2">Foto Bukti Bongkar (Wajib)</label>
+            <div class="relative flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-6 bg-slate-50 hover:bg-slate-100 transition">
+              <input type="file" id="delivery-photo" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer" onchange="compressAndPreviewImage(event)">
+              <div id="photo-placeholder" class="text-center">
+                <i class="fa-solid fa-image text-3xl text-slate-400 mb-2"></i>
+                <p class="text-[11px] font-bold text-slate-500">Ketuk untuk Buka Kamera / Galeri</p>
+              </div>
+              <img id="photo-preview" class="hidden w-full max-h-48 object-contain rounded-lg shadow-sm" src="">
+            </div>
+            <input type="hidden" id="photo-base64">
+          </div>
+
+          <!-- Pilihan Pembayaran -->
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-2">Metode Pembayaran</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
+                <input type="radio" name="pay_method" value="TF" required class="absolute opacity-0" onchange="toggleNominalInput()">
+                <span class="text-xs font-bold text-slate-700 pay-label"><i class="fa-solid fa-money-bill-transfer mr-1"></i> Transfer (TF)</span>
+              </label>
+              <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
+                <input type="radio" name="pay_method" value="BB" class="absolute opacity-0" onchange="toggleNominalInput()">
+                <span class="text-xs font-bold text-slate-700 pay-label"><i class="fa-solid fa-file-invoice mr-1"></i> Bayar Belakang (BB)</span>
+              </label>
+              <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
+                <input type="radio" name="pay_method" value="CASH" class="absolute opacity-0" onchange="toggleNominalInput()">
+                <span class="text-xs font-bold text-slate-700 pay-label"><i class="fa-solid fa-money-bill-wave text-brand-green mr-1"></i> Uang Tunai (CASH)</span>
+              </label>
+              <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
+                <input type="radio" name="pay_method" value="NONE" class="absolute opacity-0" onchange="toggleNominalInput()">
+                <span class="text-xs font-bold text-slate-700 pay-label"><i class="fa-solid fa-xmark mr-1"></i> Tidak Ada</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Nominal Cash (Hidden by default) -->
+          <div id="nominal-container" class="hidden">
+            <label class="block text-xs font-bold text-slate-600 mb-2">Nominal Cash Diterima (Rp)</label>
+            <input type="number" id="pay-nominal" placeholder="Contoh: 150000" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-900 focus:border-brand-blue focus:outline-none">
+          </div>
+
+          <button type="submit" class="w-full bg-brand-green hover:bg-green-700 text-white font-bold py-3.5 rounded-xl text-xs transition shadow-md">
+            <i class="fa-solid fa-paper-plane mr-1"></i> Kirim Laporan Ritase
+          </button>
+          
+          <button type="button" onclick="releaseOrder()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl text-xs transition mt-2">
+            Lepas Order (Ada Kendala)
+          </button>
+        </form>
       </div>
     </section>
 
   </main>
 
+  <!-- DRIVER BOTTOM NAV -->
+  <nav id="driver-nav" class="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40">
+    <div class="flex justify-around items-center p-2">
+      <button onclick="switchView('driver-pool')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-brand-blue"><i class="fa-solid fa-list-ul text-lg"></i><span class="text-[9px] font-bold">Order Pool</span></button>
+      <button onclick="switchView('driver-task')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-brand-blue transition"><i class="fa-solid fa-truck-fast text-lg"></i><span class="text-[9px] font-bold">Tugas Aktif</span></button>
+    </div>
+  </nav>
+
+  <!-- MODAL: ADD ORDER (ADMIN ONLY) -->
+  <div id="modal-add-order" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+      <button onclick="closeModal('modal-add-order')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
+      <h3 class="text-base font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Buat Order Baru</h3>
+      
+      <form id="form-add-order" class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Nama Customer</label>
+          <input type="text" id="order-customer" required class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Lokasi Tujuan / Proyek</label>
+          <input type="text" id="order-destination" required class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Total Ritase</label>
+            <input type="number" id="order-rit" required min="1" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Prioritas</label>
+            <select id="order-priority" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
+              <option value="NORMAL">Normal</option>
+              <option value="URGENT">Urgent</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2 shadow-md hover:bg-blue-700">Simpan Order</button>
+      </form>
+    </div>
+  </div>
 
   <!-- ==========================================
-       JAVASCRIPT & SUPABASE CORE 
+       JAVASCRIPT APP LOGIC
        ========================================== -->
   <script>
-    // 1. Inisialisasi Supabase - HANYA DITULIS 1 KALI DI SINI
+    // 1. SUPABASE INIT (Sesuai dengan project Anda)
     const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentRole = null;
-    let currentUserName = null;
+    let currentUser = null; // { id, name, ... } dari master_users
+    let activeAssignment = null; // Menyimpan data order aktif untuk driver
 
-    // 2. Event Listener Utama setelah halaman dimuat
-    document.addEventListener('DOMContentLoaded', () => {
-      // Sembunyikan splash screen
-      setTimeout(() => { 
-        document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none'); 
-      }, 1000);
-
-      // Cek apakah user sudah login sebelumnya
-      checkSessionOnLoad();
-
-      // Logika Form Login
-      const loginForm = document.getElementById('login-form');
-      if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
-          e.preventDefault();
-          
-          const email = document.getElementById('auth-email').value.trim();
-          const password = document.getElementById('auth-password').value;
-
-          if (!email || !password) {
-            alert('Email dan Password wajib diisi!');
-            return;
-          }
-
-          showLoader(true);
-          try {
-            // A. Login ke Supabase Auth
-            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-              email: email,
-              password: password
-            });
-            if (authError) throw authError;
-
-            // B. Cek Hak Akses di Tabel master_users
-            const { data: userData, error: userError } = await supabaseClient
-              .from('master_users')
-              .select('*')
-              .eq('auth_user_id', authData.user.id)
-              .single();
-
-            if (userError || !userData) {
-              throw new Error("Akun berhasil masuk, tapi belum terdaftar di tabel master_users (Akses Ditolak).");
-            }
-            if (userData.status !== 'ACTIVE') {
-              throw new Error("Akun Anda berstatus INACTIVE (Non-aktif).");
-            }
-
-            // C. Simpan sesi & render UI
-            currentRole = userData.role;
-            currentUserName = userData.name;
-            localStorage.setItem('sansam_role', currentRole);
-            localStorage.setItem('sansam_user_name', currentUserName);
-            
-            showLoader(false);
-            alert('Login Berhasil! Selamat datang, ' + currentUserName);
-            
-            document.getElementById('login-modal').classList.add('hidden');
-            applyRoleUI();
-
-          } catch (err) {
-            showLoader(false);
-            alert('GAGAL LOGIN: ' + err.message);
-          }
-        });
-      }
-    });
-
-    // 3. Fungsi Cek Sesi (Agar tidak perlu login ulang jika sudah masuk)
-    async function checkSessionOnLoad() {
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Hapus splash screen
+      setTimeout(() => { document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none'); }, 1000);
+      
       showLoader(true);
-      const { data: { session } } = await supabaseClient.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-         // Cek ulang data di master_users
-         const { data: userData } = await supabaseClient
-           .from('master_users')
-           .select('*')
-           .eq('auth_user_id', session.user.id)
-           .single();
-
-         if (userData && userData.status === 'ACTIVE') {
-            currentRole = userData.role;
-            currentUserName = userData.name;
-            localStorage.setItem('sansam_role', currentRole);
-            
-            document.getElementById('login-modal').classList.add('hidden');
-            applyRoleUI();
-         } else {
-            // Sesi ada tapi user di-nonaktifkan, paksa logout
-            await supabaseClient.auth.signOut();
-            document.getElementById('login-modal').classList.remove('hidden');
-         }
+        // Ambil profil dari master_users
+        const { data: userData } = await supabase.from('master_users').select('*').eq('auth_user_id', session.user.id).single();
+        if (userData && userData.status === 'ACTIVE') {
+          currentUser = userData;
+          currentRole = userData.role;
+          setupUI();
+        } else {
+          await supabase.auth.signOut();
+          alert("Akun Anda tidak aktif atau tidak ditemukan di Master Users.");
+        }
       } else {
-         // Belum login, tampilkan modal form login
-         document.getElementById('login-modal').classList.remove('hidden');
+        alert("Silakan login terlebih dahulu.");
+        // Anda bisa redirect ke file login.html terpisah atau tampilkan modal login di sini.
+        // Karena ini upgrade langsung dari dalam, pastikan form login Supabase tetap ada jika butuh.
+      }
+      showLoader(false);
+
+      // Event Listener: Driver Form Delivery
+      document.getElementById('driver-delivery-form').addEventListener('submit', handleDeliverySubmit);
+      
+      // Event Listener: Admin Add Order
+      document.getElementById('form-add-order').addEventListener('submit', handleAddOrder);
+    });
+
+    function setupUI() {
+      document.getElementById('app-header').classList.remove('hidden');
+      document.getElementById('app-content').classList.remove('hidden');
+      
+      const badge = document.getElementById('header-role-badge');
+      badge.innerText = `${currentUser.name} (${currentRole})`;
+
+      if (currentRole === 'SUPER_ADMIN' || currentRole === 'ADMIN') {
+        document.getElementById('admin-nav').classList.remove('hidden');
+        switchView('admin-dashboard');
+      } else if (currentRole === 'DRIVER') {
+        document.getElementById('driver-nav').classList.remove('hidden');
+        checkActiveDriverTask();
+      }
+    }
+
+    function switchView(viewId) {
+      // Hide all views
+      document.querySelectorAll('.app-view').forEach(el => el.classList.add('hidden'));
+      document.getElementById('view-' + viewId).classList.remove('hidden');
+      
+      // Update Tab Styles Admin
+      if (currentRole === 'ADMIN' || currentRole === 'SUPER_ADMIN') {
+        document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+          btn.classList.remove('border-brand-blue', 'text-brand-blue');
+          btn.classList.add('border-transparent', 'text-slate-500');
+        });
+        event.currentTarget.classList.add('border-brand-blue', 'text-brand-blue');
+        event.currentTarget.classList.remove('border-transparent', 'text-slate-500');
+        
+        if(viewId === 'admin-orders') loadAdminOrders();
+      }
+      
+      // Update Tab Styles Driver
+      if (currentRole === 'DRIVER') {
+        document.querySelectorAll('.driver-tab-btn').forEach(btn => {
+          btn.classList.remove('text-brand-blue'); btn.classList.add('text-slate-400');
+        });
+        event.currentTarget.classList.add('text-brand-blue');
+        event.currentTarget.classList.remove('text-slate-400');
+        
+        if(viewId === 'driver-pool') loadDriverPool();
+      }
+    }
+
+    // ==========================================
+    // LOGIKA ADMIN
+    // ==========================================
+    async function loadAdminOrders() {
+      showLoader(true);
+      const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+      showLoader(false);
+      
+      if (error) return alert("Gagal memuat data order.");
+      
+      const tbody = document.getElementById('admin-orders-tbody');
+      tbody.innerHTML = '';
+      
+      data.forEach(o => {
+        let statusBadge = '';
+        if(o.status === 'AVAILABLE') statusBadge = '<span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">Tersedia</span>';
+        else if(o.status === 'PARTIALLY_COMPLETED') statusBadge = '<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-[10px] font-bold">Berjalan</span>';
+        else if(o.status === 'COMPLETED') statusBadge = '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold">Selesai</span>';
+        
+        // Simpan Customer name directly in DB for simplicity in this MVP, or fetch relation
+        // For MVP we assume we stored it simply
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-4 font-mono font-bold text-slate-700">${o.order_number || o.id.split('-')[0].toUpperCase()}</td>
+            <td class="p-4"><p class="font-bold text-slate-800">${o.customer_id || 'Umum'}</p><p class="text-[10px] text-slate-500">${o.destination}</p></td>
+            <td class="p-4 text-center font-bold text-brand-blue">${o.completed_rit} / ${o.total_rit}</td>
+            <td class="p-4 text-center">${statusBadge}</td>
+            <td class="p-4 text-right">
+              <button class="text-slate-400 hover:text-brand-blue p-2"><i class="fa-solid fa-eye"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function handleAddOrder(e) {
+      e.preventDefault();
+      const customer = document.getElementById('order-customer').value;
+      const destination = document.getElementById('order-destination').value;
+      const rit = parseInt(document.getElementById('order-rit').value);
+      const priority = document.getElementById('order-priority').value;
+      
+      showLoader(true);
+      // Dummy insert order (menyederhanakan relation untuk MVP)
+      const { error } = await supabase.from('orders').insert([{
+        order_number: 'ORD-' + Date.now().toString().slice(-6),
+        destination: destination,
+        total_rit: rit,
+        priority: priority,
+        created_by: currentUser.id,
+        status: 'AVAILABLE'
+        // customer_id diabaikan sejenak untuk versi ringan tanpa master customer table wajib
+      }]);
+      showLoader(false);
+      
+      if(error) alert("Error: " + error.message);
+      else {
+        alert("Order berhasil dibuat!");
+        closeModal('modal-add-order');
+        document.getElementById('form-add-order').reset();
+        loadAdminOrders();
+      }
+    }
+
+    // ==========================================
+    // LOGIKA DRIVER
+    // ==========================================
+    async function checkActiveDriverTask() {
+      showLoader(true);
+      // Cek tabel assignment untuk driver ini yang statusnya ACTIVE
+      const { data, error } = await supabase.from('assignments').select('*, orders(*)').eq('driver_id', currentUser.id).eq('status', 'ACTIVE').single();
+      showLoader(false);
+      
+      if (data && data.orders) {
+        // Driver sedang pegang tugas
+        activeAssignment = data;
+        document.getElementById('task-customer').innerText = data.orders.order_number || "Order Proyek";
+        document.getElementById('task-destination').innerText = data.orders.destination;
+        document.getElementById('task-progress-text').innerText = `${data.orders.completed_rit} / ${data.orders.total_rit} Rit`;
+        
+        let pct = (data.orders.completed_rit / data.orders.total_rit) * 100;
+        document.getElementById('task-progress-bar').style.width = pct + '%';
+        
+        // Paksa pindah ke tab tugas aktif
+        document.querySelectorAll('.driver-tab-btn')[1].click(); 
+      } else {
+        // Driver nganggur
+        activeAssignment = null;
+        document.querySelectorAll('.driver-tab-btn')[0].click(); // Buka Pool
+      }
+    }
+
+    async function loadDriverPool() {
+      showLoader(true);
+      // Ambil order yang statusnya AVAILABLE atau PARTIALLY_COMPLETED, dan belum dilock
+      const { data, error } = await supabase.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']).eq('locked', false);
+      showLoader(false);
+      
+      const container = document.getElementById('driver-pool-container');
+      container.innerHTML = '';
+      
+      if(data && data.length > 0) {
+        data.forEach(o => {
+          let isUrgent = o.priority === 'URGENT' ? '<span class="bg-rose-100 text-rose-600 px-2 py-0.5 rounded text-[9px] font-bold ml-2">URGENT</span>' : '';
+          container.innerHTML += `
+            <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-left flex justify-between items-center">
+              <div>
+                <h4 class="font-bold text-slate-800 text-sm">${o.destination} ${isUrgent}</h4>
+                <p class="text-[10px] text-slate-500 mt-1">Sisa Ritase: <strong class="text-brand-blue">${o.total_rit - o.completed_rit} Rit</strong></p>
+              </div>
+              <button onclick="takeOrder('${o.id}')" class="bg-brand-blue hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Ambil</button>
+            </div>
+          `;
+        });
+      } else {
+        container.innerHTML = `<div class="text-center p-6 text-slate-400 text-xs">Belum ada order tersedia.</div>`;
+      }
+    }
+
+    async function takeOrder(orderId) {
+      if(activeAssignment) return alert("Anda masih memiliki tugas aktif! Selesaikan atau lepas terlebih dahulu.");
+      
+      if(confirm("Ambil order ini sekarang?")) {
+        showLoader(true);
+        // Insert assignment
+        const { error } = await supabase.from('assignments').insert([{
+          order_id: orderId, driver_id: currentUser.id, status: 'ACTIVE'
+        }]);
+        showLoader(false);
+        
+        if(error) alert("Gagal mengambil order: " + error.message);
+        else {
+          alert("Order berhasil diambil! Silakan mulai pengantaran.");
+          checkActiveDriverTask();
+        }
+      }
+    }
+
+    async function releaseOrder() {
+      if(!activeAssignment) return;
+      let reason = prompt("Sebutkan alasan pelepasan order (Kendala mobil/proyek):");
+      if(!reason) return; // cancel
+      
+      showLoader(true);
+      const { error } = await supabase.from('assignments').update({
+        status: 'RELEASED', release_reason: reason, released_at: new Date().toISOString()
+      }).eq('id', activeAssignment.id);
+      showLoader(false);
+      
+      if(error) alert("Gagal: " + error.message);
+      else {
+        alert("Tugas berhasil dilepas.");
+        activeAssignment = null;
+        document.querySelectorAll('.driver-tab-btn')[0].click(); // Balik ke pool
+      }
+    }
+
+    // ==========================================
+    // LOGIKA PENYERAHAN LAPORAN BONGKAR (DELIVERY)
+    // ==========================================
+    function toggleNominalInput() {
+      // Mengubah visual radio button yang terpilih
+      document.querySelectorAll('input[name="pay_method"]').forEach(r => {
+        let parent = r.parentElement;
+        if(r.checked) {
+          parent.classList.add('border-brand-blue', 'bg-blue-50');
+          parent.classList.remove('border-slate-200', 'bg-slate-50');
+        } else {
+          parent.classList.remove('border-brand-blue', 'bg-blue-50');
+          parent.classList.add('border-slate-200', 'bg-slate-50');
+        }
+      });
+      
+      // Munculkan input nominal jika CASH
+      const val = document.querySelector('input[name="pay_method"]:checked')?.value;
+      const nomCont = document.getElementById('nominal-container');
+      const nomInput = document.getElementById('pay-nominal');
+      if (val === 'CASH') {
+        nomCont.classList.remove('hidden');
+        nomInput.required = true;
+      } else {
+        nomCont.classList.add('hidden');
+        nomInput.required = false;
+        nomInput.value = '';
+      }
+    }
+
+    // Kompresi Foto sebelum upload agar enteng
+    function compressAndPreviewImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let w = img.width, h = img.height; const MAX = 800; 
+          if (w > MAX) { h *= MAX / w; w = MAX; }
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
+          
+          const base64 = canvas.toDataURL('image/jpeg', 0.6); // Kompres kualitas 60%
+          document.getElementById('photo-base64').value = base64;
+          
+          document.getElementById('photo-placeholder').classList.add('hidden');
+          const preview = document.getElementById('photo-preview');
+          preview.src = base64;
+          preview.classList.remove('hidden');
+        }
+        img.src = e.target.result;
+      }
+      reader.readAsDataURL(file);
+    }
+
+    async function handleDeliverySubmit(e) {
+      e.preventDefault();
+      if(!activeAssignment) return alert("Sistem mendeteksi Anda tidak memiliki order aktif.");
+
+      const payMethod = document.querySelector('input[name="pay_method"]:checked').value;
+      const nominal = document.getElementById('pay-nominal').value || 0;
+      const photo = document.getElementById('photo-base64').value;
+
+      if(!photo) return alert("Foto bukti bongkar WAJIB dilampirkan!");
+      if(payMethod === 'CASH' && nominal <= 0) return alert("Nominal CASH wajib diisi dan lebih dari Rp 0!");
+
+      showLoader(true);
+      try {
+        // 1. Dapatkan order data terbaru (menghindari selisih progress)
+        const { data: orderData, error: orderErr } = await supabase.from('orders').select('completed_rit, total_rit').eq('id', activeAssignment.order_id).single();
+        if (orderErr) throw orderErr;
+        
+        if (orderData.completed_rit >= orderData.total_rit) {
+           throw new Error("Order ini ternyata sudah selesai diantar sepenuhnya. Laporan ditolak.");
+        }
+
+        const newTripNumber = orderData.completed_rit + 1;
+
+        // 2. Insert ke tabel deliveries
+        const { data: delivData, error: delivErr } = await supabase.from('deliveries').insert([{
+          order_id: activeAssignment.order_id,
+          assignment_id: activeAssignment.id,
+          driver_id: currentUser.id,
+          trip_number: newTripNumber,
+          payment_method: payMethod,
+          nominal: nominal
+        }]).select().single();
+        if (delivErr) throw delivErr;
+
+        // 3. Insert ke delivery_photos (menggunakan base64 agar aman dan langsung jalan)
+        await supabase.from('delivery_photos').insert([{ delivery_id: delivData.id, photo_url: photo }]);
+
+        // 4. Update tabel Order (tambah rit, cek status)
+        let newStatus = (newTripNumber >= orderData.total_rit) ? 'COMPLETED' : 'PARTIALLY_COMPLETED';
+        await supabase.from('orders').update({ completed_rit: newTripNumber, status: newStatus }).eq('id', activeAssignment.order_id);
+        
+        // 5. Update assignment jika order sudah complete
+        if (newStatus === 'COMPLETED') {
+           await supabase.from('assignments').update({ status: 'COMPLETED' }).eq('id', activeAssignment.id);
+           alert("Laporan berhasil dikirim! ORDER TELAH SELESAI SELURUHNYA.");
+        } else {
+           alert("Laporan Ritase ke-" + newTripNumber + " berhasil dikirim!");
+        }
+
+        // Reset form & kembali ke awal
+        document.getElementById('driver-delivery-form').reset();
+        document.getElementById('photo-base64').value = "";
+        document.getElementById('photo-preview').classList.add('hidden');
+        document.getElementById('photo-placeholder').classList.remove('hidden');
+        toggleNominalInput();
+        
+        checkActiveDriverTask(); // Cek lagi apakah dia masih pegang tugas ini (jika blm selesai)
+
+      } catch (err) {
+        alert("Gagal mengirim laporan: " + err.message);
       }
       showLoader(false);
     }
 
-    // 4. Fungsi Logout
-    async function logoutAccount() {
-      showLoader(true);
-      await supabaseClient.auth.signOut();
-      localStorage.removeItem('sansam_role');
-      localStorage.removeItem('sansam_user_name');
-      location.reload();
-    }
-
-    // 5. Fungsi Render Tampilan Sesuai Role
-    function applyRoleUI() {
-      // Tampilkan App Header & Konten
-      document.getElementById('app-header').classList.remove('hidden');
-      document.getElementById('app-content').classList.remove('hidden');
-      
-      // Update tulisan Badge di Header
-      const badge = document.getElementById('header-role-badge');
-      if(currentRole === 'SUPER_ADMIN' || currentRole === 'ADMIN') {
-        badge.innerText = `AKSES MANAJEMEN: ${currentUserName} (${currentRole})`;
-        document.getElementById('admin-dashboard').classList.remove('hidden');
-        document.getElementById('driver-dashboard').classList.add('hidden');
-      } else {
-        badge.innerText = `AKSES ARMADA: ${currentUserName}`;
-        document.getElementById('admin-dashboard').classList.add('hidden');
-        document.getElementById('driver-dashboard').classList.remove('hidden');
-      }
-    }
-
-    // Fungsi Loader Animasi
-    function showLoader(show) { 
-      const loader = document.getElementById('global-loader');
-      if (show) loader.classList.remove('hidden');
-      else loader.classList.add('hidden');
-    }
+    // Utility 
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    async function logoutAccount() { showLoader(true); await supabase.auth.signOut(); location.reload(); }
+    function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
   </script>
 </body>
 </html>
