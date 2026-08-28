@@ -14,8 +14,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Supabase SDK -->
+  <!-- Supabase & SheetJS (Untuk Export Excel) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -39,19 +40,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- SPLASH SCREEN -->
-  <div id="splash-screen" class="fixed inset-0 bg-slate-900 z-[999999] flex flex-col items-center justify-center transition-all duration-700">
-    <div class="text-center space-y-4 animate-bounce">
-      <div class="w-20 h-20 bg-brand-blue rounded-3xl mx-auto flex items-center justify-center shadow-xl shadow-brand-blue/20">
-        <i class="fa-solid fa-truck-fast text-white text-3xl"></i>
-      </div>
-      <div>
-        <h2 class="text-2xl font-black tracking-wider text-white">SANSAM FLEET</h2>
-      </div>
-    </div>
-  </div>
-
-  <!-- GLOBAL LOADER -->
+  <!-- LOADER -->
   <div id="global-loader" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9999999] flex flex-col items-center justify-center hidden">
     <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center">
       <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-blue mb-3"></i>
@@ -61,33 +50,24 @@
 
   <!-- LOGIN MODAL -->
   <div id="login-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-[99999] flex flex-col items-center justify-center p-4 transition-all duration-500 hidden">
-    <div class="bg-white border border-slate-200 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-5">
-      <div class="w-16 h-16 bg-blue-50 rounded-2xl mx-auto flex items-center justify-center border border-blue-100 shadow-inner">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-5">
+      <div class="w-16 h-16 bg-blue-50 rounded-2xl mx-auto flex items-center justify-center">
         <i class="fa-solid fa-shield-halved text-brand-blue text-2xl"></i>
       </div>
       <div>
         <h2 class="text-xl font-black text-slate-900">SANSAM FLEET</h2>
         <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-1">Sistem Operasional Pro</p>
       </div>
-
       <form id="login-form" class="space-y-4 pt-2 text-left">
         <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email Akses</label>
-          <div class="relative">
-            <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-            <input type="email" id="auth-email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 pl-10 text-xs text-slate-900 focus:border-brand-blue focus:outline-none focus:bg-white transition">
-          </div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
+          <input type="email" id="auth-email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-blue focus:outline-none">
         </div>
         <div>
           <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Password</label>
-          <div class="relative">
-            <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-            <input type="password" id="auth-password" required placeholder="********" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 pl-10 text-xs text-slate-900 focus:border-brand-blue focus:outline-none focus:bg-white transition">
-          </div>
+          <input type="password" id="auth-password" required placeholder="********" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-blue focus:outline-none">
         </div>
-        <button type="submit" class="w-full bg-brand-blue hover:bg-blue-700 text-white font-extrabold py-3.5 rounded-xl text-xs transition active-scale shadow-lg shadow-brand-blue/25">
-          LOGIN SEKARANG
-        </button>
+        <button type="submit" class="w-full bg-brand-blue text-white font-extrabold py-3.5 rounded-xl text-xs active-scale">LOGIN</button>
       </form>
     </div>
   </div>
@@ -104,74 +84,57 @@
           <span class="text-[10px] text-brand-blue font-bold uppercase tracking-wider block" id="header-role-badge">Memuat...</span>
         </div>
       </div>
-      <button onclick="logoutAccount()" class="active-scale bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 text-xs font-bold py-2 px-3 rounded-lg flex items-center gap-2 transition">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">Keluar</span>
-      </button>
+      <button onclick="logoutAccount()" class="text-rose-500 text-xs font-bold px-3 py-2 bg-rose-50 rounded-lg"><i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar</button>
     </div>
     
-    <!-- ADMIN DESKTOP NAV -->
+    <!-- ADMIN NAV -->
     <nav id="admin-nav" class="hidden bg-white border-t border-slate-200">
       <div class="max-w-7xl mx-auto px-4 flex gap-6 overflow-x-auto custom-scrollbar">
-        <button onclick="switchView('admin-dashboard')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-brand-blue text-brand-blue"><i class="fa-solid fa-chart-pie mr-2"></i>Dashboard</button>
-        <button onclick="switchView('admin-orders')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-clipboard-list mr-2"></i>Manajemen Order</button>
-        <button onclick="switchView('admin-materials')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-boxes-stacked mr-2"></i>Jenis Material</button>
-        <button onclick="switchView('admin-users')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-users-gear mr-2"></i>Kelola Pengguna</button>
-        <button onclick="switchView('admin-reports')" class="admin-tab-btn whitespace-nowrap py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-brand-blue"><i class="fa-solid fa-file-lines mr-2"></i>Rekapan & Kas</button>
+        <button onclick="switchView('admin-dashboard')" class="admin-tab-btn py-3 text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-chart-pie mr-2"></i>Dashboard</button>
+        <button onclick="switchView('admin-orders')" class="admin-tab-btn py-3 text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-clipboard-list mr-2"></i>Order</button>
+        <button onclick="switchView('admin-materials')" class="admin-tab-btn py-3 text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-boxes-stacked mr-2"></i>Material</button>
+        <button onclick="switchView('admin-users')" class="admin-tab-btn py-3 text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-users-gear mr-2"></i>Pengguna</button>
+        <button onclick="switchView('admin-reports')" class="admin-tab-btn py-3 text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-file-lines mr-2"></i>Rekapan Pro</button>
       </div>
     </nav>
   </header>
 
-  <!-- MAIN CONTENT WRAPPER -->
+  <!-- MAIN CONTENT -->
   <main id="app-content" class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 pb-24 md:pb-6 hidden">
 
-    <!-- VIEW: ADMIN DASHBOARD -->
+    <!-- ADMIN: DASHBOARD -->
     <section id="view-admin-dashboard" class="app-view hidden space-y-6">
-      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
-        <h3 class="text-base font-bold text-slate-800 mb-4"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i>Ringkasan Operasional Hari Ini</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-           <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-[10px] text-slate-500 font-bold uppercase">Total Order Aktif</p>
-             <h3 class="text-2xl font-black text-brand-blue mt-1" id="dash-active-order">0</h3>
-           </div>
-           <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-[10px] text-slate-500 font-bold uppercase">Ritase Selesai</p>
-             <h3 class="text-2xl font-black text-brand-green mt-1" id="dash-completed-rit">0</h3>
-           </div>
-           <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-[10px] text-slate-500 font-bold uppercase">Driver Standby</p>
-             <h3 class="text-2xl font-black text-slate-700 mt-1" id="dash-standby-driver">0</h3>
-           </div>
-           <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-[10px] text-slate-500 font-bold uppercase">Kas Masuk (Cash)</p>
-             <h3 class="text-lg font-black text-amber-600 mt-1" id="dash-cash-today">Rp 0</h3>
-           </div>
+      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+          <p class="text-[10px] text-slate-500 font-bold uppercase">Total Slot Tersedia</p>
+          <h3 class="text-2xl font-black text-brand-blue mt-1" id="dash-active-order">0</h3>
+        </div>
+        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+          <p class="text-[10px] text-slate-500 font-bold uppercase">Ritase Selesai</p>
+          <h3 class="text-2xl font-black text-brand-green mt-1" id="dash-completed-rit">0</h3>
+        </div>
+        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+          <p class="text-[10px] text-slate-500 font-bold uppercase">Kasbon / Keluar</p>
+          <h3 class="text-lg font-black text-rose-500 mt-1" id="dash-expenses">Rp 0</h3>
+        </div>
+        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+          <p class="text-[10px] text-slate-500 font-bold uppercase">Pemasukan Cash</p>
+          <h3 class="text-lg font-black text-amber-600 mt-1" id="dash-cash-today">Rp 0</h3>
         </div>
       </div>
     </section>
 
-    <!-- VIEW: ADMIN ORDERS -->
+    <!-- ADMIN: ORDER -->
     <section id="view-admin-orders" class="app-view hidden space-y-6">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <div>
-          <h3 class="text-base font-bold text-slate-800">Daftar Order Proyek</h3>
-          <p class="text-xs text-slate-500">Pantau dan kelola seluruh pesanan material.</p>
-        </div>
-        <button onclick="openModal('modal-add-order')" class="active-scale bg-brand-blue text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md hover:bg-blue-700 transition">
-          <i class="fa-solid fa-plus mr-1"></i> Buat Order Baru
-        </button>
+      <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <div><h3 class="text-base font-bold text-slate-800">Daftar Order</h3></div>
+        <button onclick="openModal('modal-add-order')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale"><i class="fa-solid fa-plus"></i> Order</button>
       </div>
-
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-              <tr>
-                <th class="p-4 font-bold uppercase">No. Order</th>
-                <th class="p-4 font-bold uppercase">Customer / Tujuan</th>
-                <th class="p-4 font-bold uppercase">Material</th>
-                <th class="p-4 font-bold uppercase text-center">Progress Ritase</th>
-                <th class="p-4 font-bold uppercase text-center">Status</th>
-              </tr>
+              <tr><th class="p-4">No. Order</th><th class="p-4">Customer/Tujuan</th><th class="p-4">Material</th><th class="p-4 text-center">Progress</th></tr>
             </thead>
             <tbody id="admin-orders-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
@@ -179,27 +142,17 @@
       </div>
     </section>
 
-    <!-- VIEW: ADMIN MATERIALS (JENIS MATERIAL) -->
+    <!-- ADMIN: MATERIAL -->
     <section id="view-admin-materials" class="app-view hidden space-y-6">
-      <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <div>
-          <h3 class="text-base font-bold text-slate-800">Manajemen Jenis Material</h3>
-          <p class="text-xs text-slate-500">Daftar material yang dapat dipilih dalam pembuatan order.</p>
-        </div>
-        <button onclick="openModal('modal-add-material')" class="active-scale bg-brand-blue text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md hover:bg-blue-700 transition">
-          <i class="fa-solid fa-plus mr-1"></i> Tambah Material
-        </button>
+      <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <div><h3 class="text-base font-bold text-slate-800">Jenis Material</h3></div>
+        <button onclick="openModal('modal-add-material')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale"><i class="fa-solid fa-plus"></i> Material</button>
       </div>
-
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-              <tr>
-                <th class="p-4 font-bold uppercase">Nama Material</th>
-                <th class="p-4 font-bold uppercase">Deskripsi / Satuan</th>
-                <th class="p-4 font-bold uppercase text-right">Aksi</th>
-              </tr>
+              <tr><th class="p-4">Nama</th><th class="p-4">Satuan</th><th class="p-4 text-right">Aksi</th></tr>
             </thead>
             <tbody id="admin-materials-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
@@ -207,28 +160,17 @@
       </div>
     </section>
 
-    <!-- VIEW: ADMIN USERS (KELOLA PENGGUNA) -->
+    <!-- ADMIN: USERS -->
     <section id="view-admin-users" class="app-view hidden space-y-6">
-      <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <div>
-          <h3 class="text-base font-bold text-slate-800">Kelola Akun Admin & Driver</h3>
-          <p class="text-xs text-slate-500">Super Admin dapat membuat akun baru untuk sistem.</p>
-        </div>
-        <button onclick="openModal('modal-add-user')" class="active-scale bg-brand-blue text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md hover:bg-blue-700 transition">
-          <i class="fa-solid fa-user-plus mr-1"></i> Buat Akun Baru
-        </button>
+      <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <div><h3 class="text-base font-bold text-slate-800">Kelola Akun</h3></div>
+        <button onclick="openModal('modal-add-user')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale"><i class="fa-solid fa-user-plus"></i> Akun</button>
       </div>
-
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-              <tr>
-                <th class="p-4 font-bold uppercase">Nama</th>
-                <th class="p-4 font-bold uppercase">Email</th>
-                <th class="p-4 font-bold uppercase">Role / Hak Akses</th>
-                <th class="p-4 font-bold uppercase text-center">Status</th>
-              </tr>
+              <tr><th class="p-4">Nama</th><th class="p-4">Email</th><th class="p-4">Role</th><th class="p-4">Status</th></tr>
             </thead>
             <tbody id="admin-users-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
@@ -236,299 +178,252 @@
       </div>
     </section>
 
-    <!-- VIEW: ADMIN REPORTS (REKAPAN) -->
+    <!-- ADMIN: REKAPAN PRO (Filter & Excel) -->
     <section id="view-admin-reports" class="app-view hidden space-y-6">
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
-        <h3 class="text-base font-bold text-slate-800 mb-2"><i class="fa-solid fa-file-lines text-brand-blue mr-2"></i> Rekapan Pengiriman & Keuangan</h3>
-        <p class="text-xs text-slate-500 mb-4">Riwayat seluruh laporan bongkar dan pembayaran tunai dari driver.</p>
-        
-        <div class="overflow-x-auto custom-scrollbar">
-          <table class="w-full text-left text-xs whitespace-nowrap">
-            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-              <tr>
-                <th class="p-4 font-bold uppercase">Waktu</th>
-                <th class="p-4 font-bold uppercase">Driver</th>
-                <th class="p-4 font-bold uppercase">Ritase Ke</th>
-                <th class="p-4 font-bold uppercase">Metode & Nominal</th>
-                <th class="p-4 font-bold uppercase text-center">Foto Bukti</th>
-              </tr>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
+          <div class="flex-1 w-full flex flex-col md:flex-row gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Mulai Tanggal</label>
+              <input type="date" id="filter-start" class="border border-slate-300 rounded-lg p-2 text-xs w-full">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sampai Tanggal</label>
+              <input type="date" id="filter-end" class="border border-slate-300 rounded-lg p-2 text-xs w-full">
+            </div>
+            <div>
+               <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Filter Driver</label>
+               <select id="filter-driver" class="border border-slate-300 rounded-lg p-2 text-xs w-full min-w-[150px]"><option value="ALL">Semua Driver</option></select>
+            </div>
+            <div class="flex items-end">
+              <button onclick="loadAdminReports()" class="bg-brand-blue text-white px-4 py-2 rounded-lg text-xs font-bold h-[34px]">Terapkan Filter</button>
+            </div>
+          </div>
+          <button onclick="exportExcel()" class="bg-brand-green text-white px-4 py-2 rounded-lg text-xs font-bold w-full md:w-auto h-[34px]"><i class="fa-solid fa-file-excel mr-1"></i> Download Excel</button>
+        </div>
+
+        <!-- Tabel Rekapan Pengiriman -->
+        <h4 class="font-bold text-sm text-slate-800 mb-2 border-b pb-2">Laporan Pengiriman / Ritase</h4>
+        <div class="overflow-x-auto custom-scrollbar mb-6">
+          <table class="w-full text-left text-xs whitespace-nowrap" id="table-rekapan-ritase">
+            <thead class="bg-slate-50 text-slate-500">
+              <tr><th class="p-3">Tanggal</th><th class="p-3">No. Order</th><th class="p-3">Tujuan/Material</th><th class="p-3">Driver</th><th class="p-3">Ritase</th><th class="p-3">Pembayaran</th><th class="p-3">Nominal (CASH)</th></tr>
             </thead>
             <tbody id="admin-reports-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <!-- Tabel Rekapan Pengeluaran -->
+        <h4 class="font-bold text-sm text-slate-800 mb-2 border-b pb-2">Laporan Kasbon & Pengeluaran Operasional</h4>
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs whitespace-nowrap" id="table-rekapan-expenses">
+            <thead class="bg-rose-50 text-rose-600">
+              <tr><th class="p-3">Tanggal</th><th class="p-3">Driver</th><th class="p-3">Jenis Dana</th><th class="p-3">Keterangan</th><th class="p-3">Nominal Keluar</th></tr>
+            </thead>
+            <tbody id="admin-expenses-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- VIEW: DRIVER POOL -->
+    <!-- =========================
+         DRIVER VIEWS
+         ========================= -->
+    
+    <!-- DRIVER: POOL (Multi Slot) -->
     <section id="view-driver-pool" class="app-view hidden space-y-4">
       <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
-        <h3 class="text-sm font-bold text-slate-800">Order Pool (Tersedia)</h3>
-        <p class="text-[11px] text-slate-500">Pilih dan ambil order yang siap dijalankan di bawah ini.</p>
+        <h3 class="text-sm font-bold text-slate-800">Order Pool Aktif</h3>
+        <p class="text-[11px] text-slate-500">Ketuk <b>"Ambil 1 Ritase"</b> untuk mulai menjalankan tugas.</p>
       </div>
-      <div id="driver-pool-container" class="space-y-4"></div>
+      <div id="driver-pool-container" class="space-y-3"></div>
     </section>
 
-    <!-- VIEW: DRIVER ACTIVE TASK -->
+    <!-- DRIVER: ACTIVE TASK -->
     <section id="view-driver-task" class="app-view hidden space-y-4">
-      <div class="bg-brand-blue text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
+      <div class="bg-brand-blue text-white p-5 rounded-2xl shadow-lg relative">
         <div class="absolute -right-4 -top-4 opacity-10"><i class="fa-solid fa-truck-fast text-9xl"></i></div>
         <div class="relative z-10">
-          <span class="bg-white/20 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase mb-3 inline-block">Order Aktif Anda</span>
+          <span class="bg-white/20 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase mb-3 inline-block">Order Sedang Dijalankan</span>
           <h2 class="text-xl font-black mb-1" id="task-customer">Memuat...</h2>
-          <p class="text-xs text-blue-100 mb-2"><i class="fa-solid fa-location-dot mr-1"></i> <span id="task-destination">...</span></p>
+          <p class="text-xs text-blue-100 mb-1"><i class="fa-solid fa-location-dot mr-1"></i> <span id="task-destination">...</span></p>
           <p class="text-xs text-blue-200 mb-4"><i class="fa-solid fa-boxes-stacked mr-1"></i> Material: <span id="task-material" class="font-bold text-white">-</span></p>
-          <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm border border-white/20">
-             <div class="flex justify-between text-xs font-bold mb-1">
-               <span>Progress Ritase</span>
-               <span id="task-progress-text">0 / 0 Rit</span>
-             </div>
-             <div class="w-full bg-black/20 rounded-full h-2 mt-2">
-               <div class="bg-brand-green h-2 rounded-full" id="task-progress-bar" style="width: 0%"></div>
-             </div>
-          </div>
+          <button onclick="releaseOrder()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-xl text-xs transition border border-rose-400">
+            <i class="fa-solid fa-triangle-exclamation mr-1"></i> Lepas Order (Ada Kendala)
+          </button>
         </div>
       </div>
 
-      <!-- FORM LAPOR BONGKAR -->
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
-        <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4"><i class="fa-solid fa-camera text-brand-blue mr-2"></i> Laporan Bongkar (Ritase Selesai)</h3>
-        <form id="driver-delivery-form" class="space-y-5 text-left">
+        <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4"><i class="fa-solid fa-camera text-brand-blue mr-2"></i> Laporan Selesai Bongkar</h3>
+        <form id="driver-delivery-form" class="space-y-4 text-left">
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-2">Foto Bukti Bongkar (Wajib)</label>
-            <div class="relative flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-6 bg-slate-50 hover:bg-slate-100 transition">
+            <div class="relative flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-6 bg-slate-50">
               <input type="file" id="delivery-photo" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer" onchange="compressAndPreviewImage(event)">
-              <div id="photo-placeholder" class="text-center">
-                <i class="fa-solid fa-image text-3xl text-slate-400 mb-2"></i>
-                <p class="text-[11px] font-bold text-slate-500">Ketuk untuk Buka Kamera / Galeri</p>
-              </div>
+              <div id="photo-placeholder" class="text-center"><i class="fa-solid fa-image text-3xl text-slate-400 mb-2"></i><p class="text-[11px] font-bold text-slate-500">Ketuk Buka Kamera</p></div>
               <img id="photo-preview" class="hidden w-full max-h-48 object-contain rounded-lg shadow-sm" src="">
             </div>
             <input type="hidden" id="photo-base64">
           </div>
-
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-2">Metode Pembayaran</label>
-            <div class="grid grid-cols-2 gap-2">
-              <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="pay_method" value="TF" required class="absolute opacity-0" onchange="toggleNominalInput()">
-                <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-money-bill-transfer mr-1"></i> Transfer (TF)</span>
-              </label>
-              <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="pay_method" value="BB" class="absolute opacity-0" onchange="toggleNominalInput()">
-                <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-file-invoice mr-1"></i> Bayar Belakang (BB)</span>
-              </label>
-              <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="pay_method" value="CASH" class="absolute opacity-0" onchange="toggleNominalInput()">
-                <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-money-bill-wave text-brand-green mr-1"></i> Tunai (CASH)</span>
-              </label>
-              <label class="relative flex items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-brand-blue transition">
-                <input type="radio" name="pay_method" value="NONE" class="absolute opacity-0" onchange="toggleNominalInput()">
-                <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-xmark mr-1"></i> Tidak Ada</span>
-              </label>
-            </div>
+            <label class="block text-xs font-bold text-slate-600 mb-2">Sistem Pembayaran</label>
+            <select id="pay_method" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs" onchange="toggleNominalInput()">
+              <option value="TF">Transfer (TF)</option>
+              <option value="BB">Bayar Belakang (BB)</option>
+              <option value="CASH">Tunai (CASH)</option>
+              <option value="NONE">Tidak Ada (0)</option>
+            </select>
           </div>
-
           <div id="nominal-container" class="hidden">
             <label class="block text-xs font-bold text-slate-600 mb-2">Nominal Cash Diterima (Rp)</label>
-            <input type="number" id="pay-nominal" placeholder="Contoh: 150000" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-900 focus:border-brand-blue focus:outline-none">
+            <input type="number" id="pay-nominal" placeholder="Contoh: 150000" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold">
           </div>
+          <button type="submit" class="w-full bg-brand-green text-white font-bold py-3.5 rounded-xl text-xs shadow-md">Kirim Laporan Ritase</button>
+        </form>
+      </div>
+    </section>
 
-          <button type="submit" class="w-full bg-brand-green hover:bg-green-700 text-white font-bold py-3.5 rounded-xl text-xs transition shadow-md">
-            <i class="fa-solid fa-paper-plane mr-1"></i> Kirim Laporan Ritase
-          </button>
-          
-          <button type="button" onclick="releaseOrder()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl text-xs transition mt-2">
-            Lepas Order (Kendala)
-          </button>
+    <!-- DRIVER: KEUANGAN (Kasbon/Pengeluaran) -->
+    <section id="view-driver-finance" class="app-view hidden space-y-4">
+      <div class="bg-amber-500 text-white p-5 rounded-2xl shadow-sm text-center">
+        <h3 class="text-base font-bold">Laporan Kasbon & Pengeluaran</h3>
+        <p class="text-[11px] text-amber-100 mt-1">Catat permintaan dana operasional atau pengeluaran di jalan.</p>
+      </div>
+      <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
+        <form id="driver-expense-form" class="space-y-4 text-left">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Jenis Dana</label>
+            <select id="exp-type" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs">
+              <option value="PANJAR">Panjar / Kasbon (Minta Dana)</option>
+              <option value="BBM">Pengeluaran BBM / Solar</option>
+              <option value="TOL">Pengeluaran Tol / Parkir / Retribusi</option>
+              <option value="BAN">Kendala Kendaraan (Ban/Mesin)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Nominal (Rp)</label>
+            <input type="number" id="exp-nom" required placeholder="Contoh: 200000" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Keterangan / Alasan</label>
+            <input type="text" id="exp-desc" required placeholder="Contoh: Beli solar di SPBU Siwa" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs">
+          </div>
+          <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl text-xs shadow-md">Kirim Laporan Dana</button>
         </form>
       </div>
     </section>
 
   </main>
 
-  <!-- DRIVER BOTTOM NAV -->
+  <!-- DRIVER NAV BOTTOM -->
   <nav id="driver-nav" class="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40">
     <div class="flex justify-around items-center p-2">
-      <button onclick="switchView('driver-pool')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-brand-blue"><i class="fa-solid fa-list-ul text-lg"></i><span class="text-[9px] font-bold">Order Pool</span></button>
-      <button onclick="switchView('driver-task')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-brand-blue transition"><i class="fa-solid fa-truck-fast text-lg"></i><span class="text-[9px] font-bold">Tugas Aktif</span></button>
+      <button onclick="switchView('driver-pool')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400"><i class="fa-solid fa-list-ul text-lg"></i><span class="text-[9px] font-bold">Pool</span></button>
+      <button onclick="switchView('driver-task')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400"><i class="fa-solid fa-truck-fast text-lg"></i><span class="text-[9px] font-bold">Tugas</span></button>
+      <button onclick="switchView('driver-finance')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400"><i class="fa-solid fa-wallet text-lg"></i><span class="text-[9px] font-bold">Keuangan</span></button>
     </div>
   </nav>
 
-  <!-- MODAL: ADD ORDER -->
+  <!-- MODALS ADMIN -->
+  <!-- ADD ORDER -->
   <div id="modal-add-order" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center p-4 hidden">
-    <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
-      <button onclick="closeModal('modal-add-order')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
-      <h3 class="text-base font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Buat Order Baru</h3>
-      
-      <form id="form-add-order" class="space-y-4 text-left">
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Nama Customer</label>
-          <input type="text" id="order-customer" required class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Lokasi Tujuan / Proyek</label>
-          <input type="text" id="order-destination" required class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Pilih Jenis Material</label>
-          <select id="order-material" required class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none bg-white">
-            <!-- Loaded via JS -->
-          </select>
-        </div>
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 relative">
+      <button onclick="closeModal('modal-add-order')" class="absolute top-4 right-4 text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+      <h3 class="text-base font-bold text-slate-900 mb-4 border-b pb-2">Buat Order Baru</h3>
+      <form id="form-add-order" class="space-y-4">
+        <div><label class="block text-xs font-bold mb-1">Customer</label><input type="text" id="order-customer" required class="w-full border p-2 text-xs rounded-lg"></div>
+        <div><label class="block text-xs font-bold mb-1">Tujuan</label><input type="text" id="order-destination" required class="w-full border p-2 text-xs rounded-lg"></div>
+        <div><label class="block text-xs font-bold mb-1">Material</label><select id="order-material" required class="w-full border p-2 text-xs rounded-lg"></select></div>
         <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Total Ritase</label>
-            <input type="number" id="order-rit" required min="1" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Prioritas</label>
-            <select id="order-priority" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
-              <option value="NORMAL">Normal</option>
-              <option value="URGENT">Urgent</option>
-            </select>
-          </div>
+          <div><label class="block text-xs font-bold mb-1">Total Ritase</label><input type="number" id="order-rit" required min="1" class="w-full border p-2 text-xs rounded-lg"></div>
+          <div><label class="block text-xs font-bold mb-1">Prioritas</label><select id="order-priority" class="w-full border p-2 text-xs rounded-lg"><option value="NORMAL">Normal</option><option value="URGENT">Urgent</option></select></div>
         </div>
-        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2 shadow-md hover:bg-blue-700">Simpan Order</button>
+        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2">Simpan Order</button>
       </form>
     </div>
   </div>
-
-  <!-- MODAL: ADD MATERIAL -->
+  
+  <!-- ADD MATERIAL -->
   <div id="modal-add-material" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center p-4 hidden">
-    <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl relative">
-      <button onclick="closeModal('modal-add-material')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
-      <h3 class="text-base font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Tambah Jenis Material</h3>
-      
-      <form id="form-add-material" class="space-y-4 text-left">
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Nama Material</label>
-          <input type="text" id="mat-name" required placeholder="Contoh: Pasir, Batu Split" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Keterangan / Satuan</label>
-          <input type="text" id="mat-desc" placeholder="Contoh: Kubik / Ton" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
-        </div>
-        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2 shadow-md hover:bg-blue-700">Simpan Material</button>
+    <div class="bg-white w-full max-w-sm rounded-2xl p-6 relative">
+      <button onclick="closeModal('modal-add-material')" class="absolute top-4 right-4 text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+      <h3 class="text-base font-bold text-slate-900 mb-4 border-b pb-2">Tambah Material</h3>
+      <form id="form-add-material" class="space-y-4">
+        <div><label class="block text-xs font-bold mb-1">Nama</label><input type="text" id="mat-name" required class="w-full border p-2 text-xs rounded-lg"></div>
+        <div><label class="block text-xs font-bold mb-1">Satuan</label><input type="text" id="mat-desc" class="w-full border p-2 text-xs rounded-lg"></div>
+        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2">Simpan</button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: ADD USER (SUPER ADMIN ONLY) -->
+  <!-- ADD USER -->
   <div id="modal-add-user" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center p-4 hidden">
-    <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
-      <button onclick="closeModal('modal-add-user')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
-      <h3 class="text-base font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Buat Akun Baru (Admin / Driver)</h3>
-      
-      <form id="form-add-user" class="space-y-4 text-left">
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Nama Lengkap</label>
-          <input type="text" id="usr-name" required placeholder="Nama Karyawan/Driver" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Email (Untuk Login)</label>
-          <input type="email" id="usr-email" required placeholder="email@sansamgroup.com" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Password Awal</label>
-          <input type="password" id="usr-pass" required placeholder="Minimal 6 karakter" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Hak Akses (Role)</label>
-          <select id="usr-role" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs focus:border-brand-blue focus:outline-none bg-white">
-            <option value="ADMIN">ADMIN (Pengelola Order)</option>
-            <option value="DRIVER">DRIVER (Armada Lapangan)</option>
-            <option value="SUPER_ADMIN">SUPER_ADMIN (Akses Penuh)</option>
-          </select>
-        </div>
-        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2 shadow-md hover:bg-blue-700">Daftarkan Akun</button>
+    <div class="bg-white w-full max-w-sm rounded-2xl p-6 relative">
+      <button onclick="closeModal('modal-add-user')" class="absolute top-4 right-4 text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+      <h3 class="text-base font-bold text-slate-900 mb-4 border-b pb-2">Buat Akun</h3>
+      <form id="form-add-user" class="space-y-4">
+        <div><label class="block text-xs font-bold mb-1">Nama</label><input type="text" id="usr-name" required class="w-full border p-2 text-xs rounded-lg"></div>
+        <div><label class="block text-xs font-bold mb-1">Email</label><input type="email" id="usr-email" required class="w-full border p-2 text-xs rounded-lg"></div>
+        <div><label class="block text-xs font-bold mb-1">Password</label><input type="password" id="usr-pass" required class="w-full border p-2 text-xs rounded-lg"></div>
+        <div><label class="block text-xs font-bold mb-1">Akses</label><select id="usr-role" class="w-full border p-2 text-xs rounded-lg"><option value="DRIVER">DRIVER</option><option value="ADMIN">ADMIN</option><option value="SUPER_ADMIN">SUPER ADMIN</option></select></div>
+        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2">Simpan Akun</button>
       </form>
     </div>
   </div>
 
-  <!-- SCRIPT UTAMA -->
+  <!-- JAVASCRIPT APP -->
   <script>
     const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let currentRole = null;
-    let currentUser = null; 
-    let activeAssignment = null; 
+    let currentRole = null; let currentUser = null; let activeAssignment = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
-      setTimeout(() => { 
-        const splash = document.getElementById('splash-screen');
-        if(splash) { splash.classList.add('opacity-0', 'pointer-events-none'); setTimeout(() => splash.classList.add('hidden'), 500); }
-      }, 1000);
-      
       try {
         showLoader(true);
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
           const { data: userData } = await supabaseClient.from('master_users').select('*').eq('auth_user_id', session.user.id).single();
-          if (userData && userData.status === 'ACTIVE') {
-            currentUser = userData;
-            currentRole = userData.role;
-            setupUI();
-          } else {
-            await supabaseClient.auth.signOut();
-            document.getElementById('login-modal').classList.remove('hidden');
-          }
-        } else {
-          document.getElementById('login-modal').classList.remove('hidden');
-        }
-      } catch (err) {
-        document.getElementById('login-modal').classList.remove('hidden');
-      } finally {
-        showLoader(false);
-      }
+          if (userData && userData.status === 'ACTIVE') { currentUser = userData; currentRole = userData.role; setupUI(); }
+          else { await supabaseClient.auth.signOut(); document.getElementById('login-modal').classList.remove('hidden'); }
+        } else { document.getElementById('login-modal').classList.remove('hidden'); }
+      } catch (err) { document.getElementById('login-modal').classList.remove('hidden'); } 
+      finally { showLoader(false); }
 
-      // Event Listener Login
-      document.getElementById('login-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const email = document.getElementById('auth-email').value.trim();
-        const password = document.getElementById('auth-password').value;
-        if (!email || !password) return alert('Email dan Password wajib diisi!');
-
-        showLoader(true);
-        try {
-          const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
-          if (authError) throw authError;
-
-          const { data: userData, error: userError } = await supabaseClient.from('master_users').select('*').eq('auth_user_id', authData.user.id).single();
-          if (userError || !userData) throw new Error("Akun belum terdaftar di master database.");
-          if (userData.status !== 'ACTIVE') throw new Error("Akun Anda berstatus Non-aktif.");
-
-          currentUser = userData;
-          currentRole = userData.role;
-          localStorage.setItem('sansam_role', currentRole);
-
-          document.getElementById('login-modal').classList.add('hidden');
-          setupUI();
-          alert('Login Berhasil! Selamat datang, ' + currentUser.name);
-        } catch (err) {
-          alert('GAGAL LOGIN: ' + err.message);
-        }
-        showLoader(false);
-      });
-
-      // Form Submissions
+      document.getElementById('login-form').addEventListener('submit', handleLogin);
       document.getElementById('driver-delivery-form').addEventListener('submit', handleDeliverySubmit);
+      document.getElementById('driver-expense-form').addEventListener('submit', handleExpenseSubmit);
       document.getElementById('form-add-order').addEventListener('submit', handleAddOrder);
       document.getElementById('form-add-material').addEventListener('submit', handleAddMaterial);
       document.getElementById('form-add-user').addEventListener('submit', handleAddUser);
     });
 
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim(), password = document.getElementById('auth-password').value;
+      showLoader(true);
+      try {
+        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (authError) throw authError;
+        const { data: userData, error: userError } = await supabaseClient.from('master_users').select('*').eq('auth_user_id', authData.user.id).single();
+        if (userError || !userData) throw new Error("Akun belum terdaftar di master database.");
+        if (userData.status !== 'ACTIVE') throw new Error("Akun Non-aktif.");
+        currentUser = userData; currentRole = userData.role;
+        document.getElementById('login-modal').classList.add('hidden');
+        setupUI();
+      } catch (err) { alert('GAGAL LOGIN: ' + err.message); }
+      showLoader(false);
+    }
+
     function setupUI() {
-      document.getElementById('login-modal').classList.add('hidden');
       document.getElementById('app-header').classList.remove('hidden');
       document.getElementById('app-content').classList.remove('hidden');
-      
       document.getElementById('header-role-badge').innerText = `${currentUser.name} (${currentRole})`;
-
       if (currentRole === 'SUPER_ADMIN' || currentRole === 'ADMIN') {
         document.getElementById('admin-nav').classList.remove('hidden');
-        switchView('admin-dashboard');
+        setupAdminFilters(); switchView('admin-dashboard');
       } else if (currentRole === 'DRIVER') {
         document.getElementById('driver-nav').classList.remove('hidden');
         checkActiveDriverTask();
@@ -540,408 +435,280 @@
       document.getElementById('view-' + viewId).classList.remove('hidden');
       
       if (currentRole === 'ADMIN' || currentRole === 'SUPER_ADMIN') {
-        document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-          btn.classList.remove('border-brand-blue', 'text-brand-blue');
-          btn.classList.add('border-transparent', 'text-slate-500');
-        });
-        if(event && event.currentTarget) {
-          event.currentTarget.classList.add('border-brand-blue', 'text-brand-blue');
-          event.currentTarget.classList.remove('border-transparent', 'text-slate-500');
-        }
-        if(viewId === 'admin-dashboard') loadAdminDashboard();
-        if(viewId === 'admin-orders') loadAdminOrders();
-        if(viewId === 'admin-materials') loadAdminMaterials();
-        if(viewId === 'admin-users') loadAdminUsers();
+        document.querySelectorAll('.admin-tab-btn').forEach(btn => { btn.classList.remove('border-b-2', 'border-brand-blue', 'text-brand-blue'); btn.classList.add('text-slate-500'); });
+        if(event && event.currentTarget) { event.currentTarget.classList.add('border-b-2', 'border-brand-blue', 'text-brand-blue'); event.currentTarget.classList.remove('text-slate-500'); }
+        if(viewId === 'admin-dashboard') loadAdminDashboard(); if(viewId === 'admin-orders') loadAdminOrders();
+        if(viewId === 'admin-materials') loadAdminMaterials(); if(viewId === 'admin-users') loadAdminUsers();
         if(viewId === 'admin-reports') loadAdminReports();
       }
-      
       if (currentRole === 'DRIVER') {
-        document.querySelectorAll('.driver-tab-btn').forEach(btn => {
-          btn.classList.remove('text-brand-blue'); btn.classList.add('text-slate-400');
-        });
-        if(event && event.currentTarget) {
-          event.currentTarget.classList.add('text-brand-blue');
-          event.currentTarget.classList.remove('text-slate-400');
-        }
-        if(viewId === 'driver-pool') loadDriverPool();
+        document.querySelectorAll('.driver-tab-btn').forEach(btn => { btn.classList.remove('text-brand-blue'); btn.classList.add('text-slate-400'); });
+        if(event && event.currentTarget) { event.currentTarget.classList.add('text-brand-blue'); event.currentTarget.classList.remove('text-slate-400'); }
+        if(viewId === 'driver-pool') loadDriverPool(); if(viewId === 'driver-finance') document.getElementById('driver-expense-form').reset();
       }
     }
 
-    // ==========================================
-    // LOGIKA ADMIN & DASHBOARD
-    // ==========================================
+    // ================== ADMIN ==================
     async function loadAdminDashboard() {
       showLoader(true);
-      const { data: orders } = await supabaseClient.from('orders').select('*');
+      // Kalkulasi riil time sisa slot dari order dikurang assignment aktif
+      const { data: orders } = await supabaseClient.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']);
+      const { data: activeAssigns } = await supabaseClient.from('assignments').select('order_id').eq('status', 'ACTIVE');
+      let totalSisa = 0;
+      let activeMap = {};
+      if(activeAssigns) activeAssigns.forEach(a => activeMap[a.order_id] = (activeMap[a.order_id] || 0) + 1);
+      if(orders) orders.forEach(o => { totalSisa += (o.total_rit - o.completed_rit - (activeMap[o.id] || 0)); });
+      
       const { data: deliveries } = await supabaseClient.from('deliveries').select('*');
-      const { data: drivers } = await supabaseClient.from('master_users').select('*').eq('role', 'DRIVER').eq('status', 'ACTIVE');
+      const { data: expenses } = await supabaseClient.from('driver_expenses').select('*');
       showLoader(false);
 
-      if(orders) document.getElementById('dash-active-order').innerText = orders.filter(o => o.status !== 'COMPLETED').length;
+      document.getElementById('dash-active-order').innerText = totalSisa > 0 ? totalSisa : 0;
       if(deliveries) {
-        let totalRit = deliveries.length;
-        document.getElementById('dash-completed-rit').innerText = totalRit;
-        let cashSum = deliveries.filter(d => d.payment_method === 'CASH').reduce((sum, d) => sum + (parseFloat(d.nominal) || 0), 0);
-        document.getElementById('dash-cash-today').innerText = 'Rp ' + cashSum.toLocaleString('id-ID');
+        document.getElementById('dash-completed-rit').innerText = deliveries.length;
+        let cash = deliveries.filter(d => d.payment_method === 'CASH').reduce((s, d) => s + parseFloat(d.nominal||0), 0);
+        document.getElementById('dash-cash-today').innerText = 'Rp ' + cash.toLocaleString('id-ID');
       }
-      if(drivers) document.getElementById('dash-standby-driver').innerText = drivers.length;
+      if(expenses) {
+        let exp = expenses.reduce((s, d) => s + parseFloat(d.nominal||0), 0);
+        document.getElementById('dash-expenses').innerText = 'Rp ' + exp.toLocaleString('id-ID');
+      }
     }
 
     async function loadAdminOrders() {
       showLoader(true);
-      const { data, error } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
+      const { data } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
       showLoader(false);
-      
-      if (error) return alert("Gagal memuat order.");
-      const tbody = document.getElementById('admin-orders-tbody');
-      tbody.innerHTML = '';
-      
-      data.forEach(o => {
-        let badge = o.status === 'COMPLETED' ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold">Selesai</span>' : '<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-[10px] font-bold">Berjalan</span>';
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50">
-            <td class="p-4 font-mono font-bold text-slate-700">${o.order_number || '-'}</td>
-            <td class="p-4"><p class="font-bold text-slate-800">${o.customer_id}</p><p class="text-[10px] text-slate-500">${o.destination}</p></td>
-            <td class="p-4 font-medium text-slate-700">${o.material_name || '-'}</td>
-            <td class="p-4 text-center font-bold text-brand-blue">${o.completed_rit} / ${o.total_rit}</td>
-            <td class="p-4 text-center">${badge}</td>
-          </tr>
-        `;
+      const tbody = document.getElementById('admin-orders-tbody'); tbody.innerHTML = '';
+      if(data) data.forEach(o => {
+        let badge = o.status === 'COMPLETED' ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px]">Selesai</span>' : '<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-[10px]">Berjalan</span>';
+        tbody.innerHTML += `<tr><td class="p-4 font-bold text-slate-700">${o.order_number||'-'}</td><td class="p-4 font-bold">${o.customer_id}<br><span class="text-[10px] text-slate-500 font-normal">${o.destination}</span></td><td class="p-4">${o.material_name||'-'}</td><td class="p-4 text-center font-bold text-brand-blue">${o.completed_rit} / ${o.total_rit} <br>${badge}</td></tr>`;
       });
     }
 
     async function loadAdminMaterials() {
-      showLoader(true);
-      const { data, error } = await supabaseClient.from('master_materials').select('*');
-      showLoader(false);
-
-      const tbody = document.getElementById('admin-materials-tbody');
-      tbody.innerHTML = '';
-      if(data) {
-        data.forEach(m => {
-          tbody.innerHTML += `
-            <tr class="hover:bg-slate-50">
-              <td class="p-4 font-bold text-slate-800">${m.name}</td>
-              <td class="p-4 text-slate-600">${m.description || '-'}</td>
-              <td class="p-4 text-right"><button onclick="deleteMaterial('${m.id}')" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash"></i></button></td>
-            </tr>
-          `;
-        });
-      }
+      showLoader(true); const { data } = await supabaseClient.from('master_materials').select('*'); showLoader(false);
+      const tbody = document.getElementById('admin-materials-tbody'); tbody.innerHTML = '';
+      if(data) data.forEach(m => { tbody.innerHTML += `<tr><td class="p-4 font-bold">${m.name}</td><td class="p-4">${m.description||'-'}</td><td class="p-4 text-right"><button onclick="deleteMaterial('${m.id}')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`; });
     }
 
-    async function handleAddMaterial(e) {
-      e.preventDefault();
-      const name = document.getElementById('mat-name').value;
-      const desc = document.getElementById('mat-desc').value;
-
-      showLoader(true);
-      const { error } = await supabaseClient.from('master_materials').insert([{ name, description: desc }]);
-      showLoader(false);
-
-      if(error) alert("Gagal tambah material: " + error.message);
-      else {
-        alert("Material berhasil ditambahkan!");
-        closeModal('modal-add-material');
-        document.getElementById('form-add-material').reset();
-        loadAdminMaterials();
-      }
-    }
-
-    async function deleteMaterial(id) {
-      if(confirm("Hapus material ini?")) {
-        await supabaseClient.from('master_materials').delete().eq('id', id);
-        loadAdminMaterials();
-      }
-    }
+    async function deleteMaterial(id) { if(confirm("Hapus material?")) { await supabaseClient.from('master_materials').delete().eq('id', id); loadAdminMaterials(); } }
 
     async function loadAdminUsers() {
-      showLoader(true);
-      const { data } = await supabaseClient.from('master_users').select('*');
-      showLoader(false);
-
-      const tbody = document.getElementById('admin-users-tbody');
-      tbody.innerHTML = '';
-      if(data) {
-        data.forEach(u => {
-          tbody.innerHTML += `
-            <tr class="hover:bg-slate-50">
-              <td class="p-4 font-bold text-slate-800">${u.name}</td>
-              <td class="p-4 text-slate-600">${u.email}</td>
-              <td class="p-4"><span class="px-2 py-1 bg-blue-50 text-brand-blue rounded text-[10px] font-bold">${u.role}</span></td>
-              <td class="p-4 text-center"><span class="px-2 py-1 bg-emerald-50 text-emerald-600 rounded text-[10px] font-bold">${u.status}</span></td>
-            </tr>
-          `;
-        });
-      }
+      showLoader(true); const { data } = await supabaseClient.from('master_users').select('*'); showLoader(false);
+      const tbody = document.getElementById('admin-users-tbody'); tbody.innerHTML = '';
+      if(data) data.forEach(u => { tbody.innerHTML += `<tr><td class="p-4 font-bold">${u.name}</td><td class="p-4">${u.email}</td><td class="p-4">${u.role}</td><td class="p-4">${u.status}</td></tr>`; });
     }
 
-    async function handleAddUser(e) {
-      e.preventDefault();
-      if(currentUser.role !== 'SUPER_ADMIN') return alert("Hanya Super Admin yang dapat membuat akun baru.");
-
-      const name = document.getElementById('usr-name').value;
-      const email = document.getElementById('usr-email').value;
-      const password = document.getElementById('usr-pass').value;
-      const role = document.getElementById('usr-role').value;
-
-      showLoader(true);
-      try {
-        // Buat akun di Supabase Auth
-        const { data: authData, error: authErr } = await supabaseClient.auth.signUp({ email, password });
-        if(authErr) throw authErr;
-
-        if(authData.user) {
-          // Masukkan ke master_users
-          const { error: dbErr } = await supabaseClient.from('master_users').insert([{
-            auth_user_id: authData.user.id,
-            name: name,
-            email: email,
-            role: role,
-            status: 'ACTIVE'
-          }]);
-          if(dbErr) throw dbErr;
-
-          alert("Akun berhasil dibuat!");
-          closeModal('modal-add-user');
-          document.getElementById('form-add-user').reset();
-          loadAdminUsers();
-        }
-      } catch (err) {
-        alert("Gagal membuat akun: " + err.message);
-      }
-      showLoader(false);
+    // --- FITUR FILTER & EXCEL ADMIN REKAPAN ---
+    async function setupAdminFilters() {
+      const { data } = await supabaseClient.from('master_users').select('auth_user_id, name').eq('role', 'DRIVER');
+      const sel = document.getElementById('filter-driver');
+      if(data) data.forEach(d => { sel.innerHTML += `<option value="${d.auth_user_id}">${d.name}</option>`; });
     }
 
     async function loadAdminReports() {
+      const startDate = document.getElementById('filter-start').value;
+      const endDate = document.getElementById('filter-end').value;
+      const drv = document.getElementById('filter-driver').value;
+      
       showLoader(true);
-      const { data } = await supabaseClient.from('deliveries').select('*, master_users(name), delivery_photos(photo_url)').order('created_at', { ascending: false });
+      let dQuery = supabaseClient.from('deliveries').select('*, master_users!driver_id(name), orders(order_number, destination, material_name)').order('created_at', { ascending: false });
+      let eQuery = supabaseClient.from('driver_expenses').select('*, master_users!driver_id(name)').order('created_at', { ascending: false });
+      
+      if(startDate) { dQuery = dQuery.gte('created_at', startDate + 'T00:00:00Z'); eQuery = eQuery.gte('created_at', startDate + 'T00:00:00Z'); }
+      if(endDate) { dQuery = dQuery.lte('created_at', endDate + 'T23:59:59Z'); eQuery = eQuery.lte('created_at', endDate + 'T23:59:59Z'); }
+      if(drv !== 'ALL') { dQuery = dQuery.eq('driver_id', drv); eQuery = eQuery.eq('driver_id', drv); }
+
+      const { data: delivs } = await dQuery;
+      const { data: exps } = await eQuery;
       showLoader(false);
 
-      const tbody = document.getElementById('admin-reports-tbody');
-      tbody.innerHTML = '';
-      if(data) {
-        data.forEach(d => {
-          let photo = d.delivery_photos?.[0]?.photo_url ? `<a href="${d.delivery_photos[0].photo_url}" target="_blank" class="text-brand-blue underline font-bold">Lihat Foto</a>` : 'Tidak ada';
-          let nom = d.payment_method === 'CASH' ? `Rp ${parseInt(d.nominal || 0).toLocaleString('id-ID')}` : '-';
-          tbody.innerHTML += `
-            <tr class="hover:bg-slate-50">
-              <td class="p-4 text-slate-500">${new Date(d.created_at).toLocaleString('id-ID')}</td>
-              <td class="p-4 font-bold text-slate-800">${d.master_users?.name || 'Driver'}</td>
-              <td class="p-4 text-center font-bold text-brand-blue">Ritase #${d.trip_number}</td>
-              <td class="p-4"><span class="font-bold text-slate-700">${d.payment_method}</span> ${nom}</td>
-              <td class="p-4 text-center">${photo}</td>
-            </tr>
-          `;
-        });
-      }
+      const dBody = document.getElementById('admin-reports-tbody'); dBody.innerHTML = '';
+      if(delivs) delivs.forEach(d => {
+        let nominal = d.payment_method === 'CASH' ? parseInt(d.nominal||0).toLocaleString('id-ID') : '-';
+        dBody.innerHTML += `<tr><td class="p-3 text-slate-500">${new Date(d.created_at).toLocaleDateString('id-ID')}</td><td class="p-3 font-bold">${d.orders?.order_number||'-'}</td><td class="p-3">${d.orders?.destination||'-'} / ${d.orders?.material_name||'-'}</td><td class="p-3 font-bold text-brand-blue">${d.master_users?.name||'Driver'}</td><td class="p-3">Rit ke-${d.trip_number}</td><td class="p-3">${d.payment_method}</td><td class="p-3 font-bold text-amber-600">${nominal}</td></tr>`;
+      });
+
+      const eBody = document.getElementById('admin-expenses-tbody'); eBody.innerHTML = '';
+      if(exps) exps.forEach(x => {
+        eBody.innerHTML += `<tr><td class="p-3 text-slate-500">${new Date(x.created_at).toLocaleDateString('id-ID')}</td><td class="p-3 font-bold">${x.master_users?.name||'Driver'}</td><td class="p-3 font-bold text-rose-600">${x.expense_type}</td><td class="p-3">${x.description}</td><td class="p-3 font-bold">Rp ${parseInt(x.nominal||0).toLocaleString('id-ID')}</td></tr>`;
+      });
+    }
+
+    function exportExcel() {
+      const wb = XLSX.utils.book_new();
+      const wsRit = XLSX.utils.table_to_sheet(document.getElementById('table-rekapan-ritase'));
+      XLSX.utils.book_append_sheet(wb, wsRit, "Ritase");
+      const wsExp = XLSX.utils.table_to_sheet(document.getElementById('table-rekapan-expenses'));
+      XLSX.utils.book_append_sheet(wb, wsExp, "Pengeluaran");
+      XLSX.writeFile(wb, `Rekapan_Sansam_Fleet_${new Date().toLocaleDateString('id-ID')}.xlsx`);
     }
 
     async function handleAddOrder(e) {
       e.preventDefault();
-      const customer = document.getElementById('order-customer').value;
-      const destination = document.getElementById('order-destination').value;
-      const material = document.getElementById('order-material').value;
-      const rit = parseInt(document.getElementById('order-rit').value);
-      const priority = document.getElementById('order-priority').value;
-      
       showLoader(true);
       const { error } = await supabaseClient.from('orders').insert([{
         order_number: 'ORD-' + Date.now().toString().slice(-6),
-        customer_id: customer,
-        destination: destination,
-        material_name: material,
-        total_rit: rit,
-        priority: priority,
-        created_by: currentUser.id,
-        status: 'AVAILABLE'
+        customer_id: document.getElementById('order-customer').value,
+        destination: document.getElementById('order-destination').value,
+        material_name: document.getElementById('order-material').value,
+        total_rit: parseInt(document.getElementById('order-rit').value),
+        priority: document.getElementById('order-priority').value,
+        created_by: currentUser.auth_user_id
       }]);
       showLoader(false);
-      
       if(error) alert("Error: " + error.message);
-      else {
-        alert("Order berhasil dibuat!");
-        closeModal('modal-add-order');
-        document.getElementById('form-add-order').reset();
-        loadAdminOrders();
-      }
+      else { alert("Order dibuat!"); closeModal('modal-add-order'); loadAdminOrders(); }
     }
-
+    
     async function openModalAddOrder() {
-      // Ambil daftar material untuk pilihan dropdown
       const { data } = await supabaseClient.from('master_materials').select('*');
-      const select = document.getElementById('order-material');
-      select.innerHTML = '';
-      if(data && data.length > 0) {
-        data.forEach(m => {
-          select.innerHTML += `<option value="${m.name}">${m.name} (${m.description || ''})</option>`;
-        });
-      } else {
-        select.innerHTML = `<option value="Umum">Belum ada material (Tambah di menu Material)</option>`;
-      }
-      
-      // PERBAIKANNYA DI SINI
+      const sel = document.getElementById('order-material'); sel.innerHTML = '';
+      if(data && data.length>0) data.forEach(m => sel.innerHTML += `<option value="${m.name}">${m.name}</option>`);
       document.getElementById('modal-add-order').classList.remove('hidden');
     }
+    async function handleAddMaterial(e) {
+      e.preventDefault(); showLoader(true);
+      const { error } = await supabaseClient.from('master_materials').insert([{ name: document.getElementById('mat-name').value, description: document.getElementById('mat-desc').value }]);
+      showLoader(false);
+      if(error) alert("Error: " + error.message); else { closeModal('modal-add-material'); loadAdminMaterials(); }
+    }
+    async function handleAddUser(e) {
+      e.preventDefault(); showLoader(true);
+      try {
+        const { data: aData, error: aErr } = await supabaseClient.auth.signUp({ email: document.getElementById('usr-email').value, password: document.getElementById('usr-pass').value });
+        if(aErr) throw aErr;
+        await supabaseClient.from('master_users').insert([{ auth_user_id: aData.user.id, name: document.getElementById('usr-name').value, email: document.getElementById('usr-email').value, role: document.getElementById('usr-role').value }]);
+        alert("Akun dibuat!"); closeModal('modal-add-user'); loadAdminUsers();
+      } catch (err) { alert("Error: " + err.message); }
+      showLoader(false);
+    }
 
-    // ==========================================
-    // LOGIKA DRIVER
-    // ==========================================
+    // ================== DRIVER ==================
     async function checkActiveDriverTask() {
       showLoader(true);
-      const { data } = await supabaseClient.from('assignments').select('*, orders(*)').eq('driver_id', currentUser.id).eq('status', 'ACTIVE').single();
+      const { data } = await supabaseClient.from('assignments').select('*, orders(*)').eq('driver_id', currentUser.auth_user_id).eq('status', 'ACTIVE').single();
       showLoader(false);
-      
       if (data && data.orders) {
         activeAssignment = data;
-        document.getElementById('task-customer').innerText = data.orders.order_number + ' - ' + data.orders.customer_id;
+        document.getElementById('task-customer').innerText = data.orders.customer_id;
         document.getElementById('task-destination').innerText = data.orders.destination;
         document.getElementById('task-material').innerText = data.orders.material_name || '-';
-        document.getElementById('task-progress-text').innerText = `${data.orders.completed_rit} / ${data.orders.total_rit} Rit`;
-        
-        let pct = (data.orders.completed_rit / data.orders.total_rit) * 100;
-        document.getElementById('task-progress-bar').style.width = pct + '%';
-        
         document.querySelectorAll('.driver-tab-btn')[1].click(); 
       } else {
-        activeAssignment = null;
-        document.querySelectorAll('.driver-tab-btn')[0].click(); 
+        activeAssignment = null; document.querySelectorAll('.driver-tab-btn')[0].click(); 
       }
     }
 
+    // MENGATASI MASALAH POOL 10 RITASE = 10 PILIHAN SLOT
     async function loadDriverPool() {
       showLoader(true);
-      const { data } = await supabaseClient.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']).eq('locked', false);
+      const { data: orders } = await supabaseClient.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']).eq('locked', false);
+      const { data: activeAssigns } = await supabaseClient.from('assignments').select('order_id').eq('status', 'ACTIVE');
       showLoader(false);
       
-      const container = document.getElementById('driver-pool-container');
-      container.innerHTML = '';
+      let activeMap = {};
+      if(activeAssigns) activeAssigns.forEach(a => activeMap[a.order_id] = (activeMap[a.order_id] || 0) + 1);
+
+      const cont = document.getElementById('driver-pool-container'); cont.innerHTML = '';
+      let hasData = false;
       
-      if(data && data.length > 0) {
-        data.forEach(o => {
-          let urgent = o.priority === 'URGENT' ? '<span class="bg-rose-100 text-rose-600 px-2 py-0.5 rounded text-[9px] font-bold ml-2">URGENT</span>' : '';
-          container.innerHTML += `
-            <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-left flex justify-between items-center">
-              <div>
-                <h4 class="font-bold text-slate-800 text-sm">${o.destination} ${urgent}</h4>
-                <p class="text-[10px] text-slate-500 mt-0.5">Material: <strong class="text-slate-700">${o.material_name || 'Umum'}</strong></p>
-                <p class="text-[10px] text-slate-500 mt-0.5">Sisa Ritase: <strong class="text-brand-blue">${o.total_rit - o.completed_rit} Rit</strong></p>
-              </div>
-              <button onclick="takeOrder('${o.id}')" class="bg-brand-blue hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Ambil</button>
-            </div>
-          `;
+      if(orders) {
+        orders.forEach(o => {
+          let sisaSlot = o.total_rit - o.completed_rit - (activeMap[o.id] || 0);
+          // Loop sebanyak sisa slot agar muncul banyak pilihan untuk armada lain
+          for(let i=0; i<sisaSlot; i++) {
+            hasData = true;
+            cont.innerHTML += `
+              <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-left flex justify-between items-center mb-3">
+                <div>
+                  <h4 class="font-bold text-slate-800 text-sm">${o.destination}</h4>
+                  <p class="text-[10px] text-slate-500 mt-0.5">${o.customer_id} | Mat: <b>${o.material_name}</b></p>
+                  <span class="inline-block mt-1 bg-blue-50 text-brand-blue border border-blue-100 px-2 py-0.5 rounded text-[10px] font-bold">Slot Kuota Tersedia</span>
+                </div>
+                <button onclick="takeOrder('${o.id}')" class="bg-brand-blue hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold active-scale shadow-md">Ambil 1 Rit</button>
+              </div>`;
+          }
         });
-      } else {
-        container.innerHTML = `<div class="text-center p-6 text-slate-400 text-xs border border-slate-200 rounded-xl bg-slate-50">Belum ada order tersedia.</div>`;
       }
+      if(!hasData) cont.innerHTML = `<div class="p-6 text-slate-400 text-xs bg-slate-50 rounded-xl border">Tidak ada slot order tersedia.</div>`;
     }
 
     async function takeOrder(orderId) {
-      if(activeAssignment) return alert("Anda masih memiliki tugas aktif!");
-      if(confirm("Ambil order ini sekarang?")) {
+      if(activeAssignment) return alert("Selesaikan atau Lepas tugas aktif Anda dulu!");
+      if(confirm("Ambil slot 1 Ritase ini?")) {
         showLoader(true);
-        const { error } = await supabaseClient.from('assignments').insert([{ order_id: orderId, driver_id: currentUser.id, status: 'ACTIVE' }]);
+        const { error } = await supabaseClient.from('assignments').insert([{ order_id: orderId, driver_id: currentUser.auth_user_id, status: 'ACTIVE' }]);
         showLoader(false);
-        if(error) alert("Gagal mengambil order: " + error.message);
-        else checkActiveDriverTask();
+        if(error) alert("Gagal: " + error.message); else checkActiveDriverTask();
       }
     }
 
     async function releaseOrder() {
       if(!activeAssignment) return;
-      let reason = prompt("Alasan pelepasan order:");
+      let reason = prompt("Alasan melepas tugas (Misal: Ban Bocor):");
       if(!reason) return;
       showLoader(true);
       await supabaseClient.from('assignments').update({ status: 'RELEASED', release_reason: reason }).eq('id', activeAssignment.id);
       showLoader(false);
-      activeAssignment = null;
-      checkActiveDriverTask();
+      activeAssignment = null; checkActiveDriverTask();
     }
 
     function toggleNominalInput() {
-      const val = document.querySelector('input[name="pay_method"]:checked')?.value;
-      const nomCont = document.getElementById('nominal-container');
-      const nomInput = document.getElementById('pay-nominal');
-      if (val === 'CASH') { nomCont.classList.remove('hidden'); nomInput.required = true; }
-      else { nomCont.classList.add('hidden'); nomInput.required = false; nomInput.value = ''; }
+      let val = document.getElementById('pay_method').value;
+      if (val === 'CASH') { document.getElementById('nominal-container').classList.remove('hidden'); document.getElementById('pay-nominal').required = true; }
+      else { document.getElementById('nominal-container').classList.add('hidden'); document.getElementById('pay-nominal').required = false; }
     }
 
-    function compressAndPreviewImage(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    function compressAndPreviewImage(e) {
+      if (!e.target.files[0]) return;
       const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          let w = img.width, h = img.height; const MAX = 800; 
-          if (w > MAX) { h *= MAX / w; w = MAX; }
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
-          const base64 = canvas.toDataURL('image/jpeg', 0.6); 
-          document.getElementById('photo-base64').value = base64;
+      reader.onload = function(ev) {
+        const img = new Image(); img.onload = function() {
+          const cvs = document.createElement('canvas'); let w = img.width, h = img.height; const MX = 800; 
+          if (w > MX) { h *= MX / w; w = MX; } cvs.width = w; cvs.height = h;
+          cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+          const b64 = cvs.toDataURL('image/jpeg', 0.6); 
+          document.getElementById('photo-base64').value = b64;
           document.getElementById('photo-placeholder').classList.add('hidden');
-          const preview = document.getElementById('photo-preview');
-          preview.src = base64; preview.classList.remove('hidden');
-        }
-        img.src = e.target.result;
-      }
-      reader.readAsDataURL(file);
+          document.getElementById('photo-preview').src = b64; document.getElementById('photo-preview').classList.remove('hidden');
+        }; img.src = ev.target.result;
+      }; reader.readAsDataURL(e.target.files[0]);
     }
 
     async function handleDeliverySubmit(e) {
       e.preventDefault();
       if(!activeAssignment) return alert("Tidak ada order aktif.");
-
-      const payMethod = document.querySelector('input[name="pay_method"]:checked').value;
-      const nominal = document.getElementById('pay-nominal').value || 0;
-      const photo = document.getElementById('photo-base64').value;
-
-      if(!photo) return alert("Foto bukti bongkar wajib dilampirkan!");
+      let method = document.getElementById('pay_method').value, nom = document.getElementById('pay-nominal').value||0, photo = document.getElementById('photo-base64').value;
+      if(!photo) return alert("Foto wajib!");
 
       showLoader(true);
       try {
-        const { data: orderData } = await supabaseClient.from('orders').select('completed_rit, total_rit').eq('id', activeAssignment.order_id).single();
-        const newTrip = orderData.completed_rit + 1;
-
-        const { data: deliv } = await supabaseClient.from('deliveries').insert([{
-          order_id: activeAssignment.order_id,
-          assignment_id: activeAssignment.id,
-          driver_id: currentUser.id,
-          trip_number: newTrip,
-          payment_method: payMethod,
-          nominal: nominal
-        }]).select().single();
-
+        const { data: ord } = await supabaseClient.from('orders').select('completed_rit, total_rit').eq('id', activeAssignment.order_id).single();
+        const newTrip = ord.completed_rit + 1;
+        const { data: deliv } = await supabaseClient.from('deliveries').insert([{ order_id: activeAssignment.order_id, assignment_id: activeAssignment.id, driver_id: currentUser.auth_user_id, trip_number: newTrip, payment_method: method, nominal: nom }]).select().single();
         await supabaseClient.from('delivery_photos').insert([{ delivery_id: deliv.id, photo_url: photo }]);
-
-        let newStatus = (newTrip >= orderData.total_rit) ? 'COMPLETED' : 'PARTIALLY_COMPLETED';
-        await supabaseClient.from('orders').update({ completed_rit: newTrip, status: newStatus }).eq('id', activeAssignment.order_id);
-        
-        if (newStatus === 'COMPLETED') {
-           await supabaseClient.from('assignments').update({ status: 'COMPLETED' }).eq('id', activeAssignment.id);
-           alert("Laporan terkirim! Order telah selesai sepenuhnya.");
-        } else {
-           alert("Laporan ritase ke-" + newTrip + " berhasil dikirim!");
-        }
-
-        document.getElementById('driver-delivery-form').reset();
-        document.getElementById('photo-base64').value = "";
-        document.getElementById('photo-preview').classList.add('hidden');
-        document.getElementById('photo-placeholder').classList.remove('hidden');
+        let st = (newTrip >= ord.total_rit) ? 'COMPLETED' : 'PARTIALLY_COMPLETED';
+        await supabaseClient.from('orders').update({ completed_rit: newTrip, status: st }).eq('id', activeAssignment.order_id);
+        await supabaseClient.from('assignments').update({ status: 'COMPLETED' }).eq('id', activeAssignment.id);
+        alert("Laporan bongkar terkirim!"); 
+        document.getElementById('driver-delivery-form').reset(); document.getElementById('photo-base64').value = ""; document.getElementById('photo-preview').classList.add('hidden'); document.getElementById('photo-placeholder').classList.remove('hidden'); toggleNominalInput();
         checkActiveDriverTask();
-      } catch (err) {
-        alert("Gagal: " + err.message);
-      }
+      } catch (err) { alert("Error: " + err.message); }
       showLoader(false);
     }
 
-    function openModal(id) { 
-      if(id === 'modal-add-order') { openModalAddOrder(); return; }
-      document.getElementById(id).classList.remove('hidden'); 
+    async function handleExpenseSubmit(e) {
+      e.preventDefault(); showLoader(true);
+      const { error } = await supabaseClient.from('driver_expenses').insert([{ driver_id: currentUser.auth_user_id, expense_type: document.getElementById('exp-type').value, nominal: document.getElementById('exp-nom').value, description: document.getElementById('exp-desc').value }]);
+      showLoader(false);
+      if(error) alert("Gagal: " + error.message); else { alert("Laporan Dana berhasil dikirim ke Admin!"); document.getElementById('driver-expense-form').reset(); }
     }
+
+    function openModal(id) { if(id === 'modal-add-order') openModalAddOrder(); else document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-    async function logoutAccount() { showLoader(true); await supabaseClient.auth.signOut(); location.reload(); }
+    async function logoutAccount() { showLoader(true); await supabaseClient.auth.signOut(); localStorage.removeItem('sansam_role'); location.reload(); }
     function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
   </script>
 </body>
