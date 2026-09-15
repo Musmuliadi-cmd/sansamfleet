@@ -4,25 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>CV SANSAM GROUP - Fleet Ultimate</title>
+  
   <meta name="theme-color" content="#ffffff">
   
-  <!-- Tailwind CSS & FontAwesome -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Supabase & XLSX -->
+  <!-- Supabase & SheetJS (Excel) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  
+
   <script>
-    tailwind.config = { 
-      theme: { 
-        extend: { 
-          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] }, 
-          colors: { brand: { blue: '#2563eb', green: '#16a34a', red: '#dc2626' } } 
-        } 
-      } 
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], },
+          colors: { brand: { blue: '#2563eb', green: '#16a34a', red: '#dc2626' } }
+        }
+      }
     }
   </script>
   
@@ -37,7 +40,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- GLOBAL LOADER -->
+  <!-- LOADER -->
   <div id="global-loader" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999999] flex flex-col items-center justify-center hidden">
     <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center">
       <i class="fa-solid fa-truck-fast fa-bounce text-4xl text-brand-blue mb-3"></i>
@@ -57,19 +60,19 @@
       </div>
       <form id="login-form" class="space-y-4 pt-2 text-left">
         <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Email Akses</label>
-          <input type="email" id="auth-email" required placeholder="email@sansamgroup.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-blue focus:outline-none">
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Email</label>
+          <input type="email" id="auth-email" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-blue focus:outline-none">
         </div>
         <div>
           <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Password</label>
-          <input type="password" id="auth-password" required placeholder="********" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-blue focus:outline-none">
+          <input type="password" id="auth-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-blue focus:outline-none">
         </div>
         <button type="submit" class="w-full bg-brand-blue text-white font-extrabold py-3.5 rounded-xl text-xs active-scale shadow-lg">LOGIN SISTEM</button>
       </form>
     </div>
   </div>
 
-  <!-- HEADER -->
+  <!-- HEADER GLOBAL -->
   <header class="border-b border-slate-200 glass-nav sticky top-0 z-50 shadow-sm hidden" id="app-header">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -81,30 +84,29 @@
           <span class="text-[10px] text-brand-blue font-bold uppercase tracking-wider block" id="header-role-badge">Memuat...</span>
         </div>
       </div>
-      <button onclick="logoutAccount()" class="text-rose-500 text-xs font-bold px-3 py-2 bg-rose-50 rounded-lg active-scale">
-        <i class="fa-solid fa-power-off"></i> Keluar
-      </button>
+      <button onclick="logoutAccount()" class="text-rose-500 text-xs font-bold px-3 py-2 bg-rose-50 rounded-lg active-scale"><i class="fa-solid fa-power-off"></i> Keluar</button>
     </div>
     
-    <!-- ADMIN NAVIGATION -->
+    <!-- ADMIN DESKTOP NAV -->
     <nav id="admin-nav" class="hidden bg-white border-t border-slate-200">
       <div class="max-w-7xl mx-auto px-4 flex gap-5 overflow-x-auto custom-scrollbar">
-        <button onclick="switchView('admin-dashboard')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap"><i class="fa-solid fa-chart-pie mr-1"></i>Dashboard</button>
-        <button onclick="switchView('admin-orders')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap"><i class="fa-solid fa-clipboard-list mr-1"></i>Order</button>
-        <button onclick="switchView('admin-finance')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap"><i class="fa-solid fa-wallet mr-1"></i>Kas & Dana</button>
-        <button onclick="switchView('admin-reports')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap"><i class="fa-solid fa-file-lines mr-1"></i>Rekapan</button>
-        <button onclick="switchView('admin-materials')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap"><i class="fa-solid fa-boxes-stacked mr-1"></i>Material</button>
-        <button onclick="switchView('admin-users')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap"><i class="fa-solid fa-users-gear mr-1"></i>Pengguna</button>
+        <button onclick="switchView('admin-dashboard')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap text-brand-blue border-b-2 border-brand-blue"><i class="fa-solid fa-chart-pie mr-1"></i>Dashboard</button>
+        <button onclick="switchView('admin-orders')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap text-slate-500"><i class="fa-solid fa-clipboard-list mr-1"></i>Order</button>
+        <button onclick="switchView('admin-finance')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap text-slate-500"><i class="fa-solid fa-wallet mr-1"></i>Kas & Dana</button>
+        <button onclick="switchView('admin-reports')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap text-slate-500"><i class="fa-solid fa-file-lines mr-1"></i>Rekapan</button>
+        <button onclick="switchView('admin-materials')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap text-slate-500"><i class="fa-solid fa-boxes-stacked mr-1"></i>Material</button>
+        <button onclick="switchView('admin-users')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap text-slate-500"><i class="fa-solid fa-users-gear mr-1"></i>Pengguna</button>
       </div>
     </nav>
   </header>
 
-  <!-- MAIN CONTAINER -->
+  <!-- MAIN CONTENT WRAPPER -->
   <main id="app-content" class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 pb-24 md:pb-6 hidden">
 
-    <!-- ================= ADMIN VIEWS ================= -->
+    <!-- ==========================================
+         ADMIN VIEWS
+         ========================================== -->
     
-    <!-- DASHBOARD ADMIN -->
     <section id="view-admin-dashboard" class="app-view hidden space-y-6">
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="p-4 bg-blue-50 border border-blue-100 rounded-xl">
@@ -126,35 +128,25 @@
       </div>
     </section>
 
-    <!-- MANAJEMEN ORDER -->
     <section id="view-admin-orders" class="app-view hidden space-y-4">
       <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-        <h3 class="text-base font-bold text-slate-800">Daftar Order Proyek</h3>
-        <button onclick="openModal('modal-add-order')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md">
-          <i class="fa-solid fa-plus mr-1"></i> Buat Order
-        </button>
+        <h3 class="text-base font-bold text-slate-800">Daftar Order</h3>
+        <button onclick="openModal('modal-add-order')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md"><i class="fa-solid fa-plus"></i> Order</button>
       </div>
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar">
         <table class="w-full text-left text-xs whitespace-nowrap">
           <thead class="bg-slate-50 text-slate-500 border-b">
-            <tr>
-              <th class="p-4">No. Order</th>
-              <th class="p-4">Customer / Tujuan</th>
-              <th class="p-4">Material</th>
-              <th class="p-4 text-center">Progress Ritase</th>
-            </tr>
+            <tr><th class="p-4">No. Order</th><th class="p-4">Customer/Tujuan</th><th class="p-4">Material</th><th class="p-4 text-center">Progress</th></tr>
           </thead>
           <tbody id="admin-orders-tbody" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
     </section>
 
-    <!-- KAS & DANA ADMIN -->
+    <!-- ADMIN FINANCE (UANG JALAN) -->
     <section id="view-admin-finance" class="app-view hidden space-y-4">
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
-        <h3 class="text-sm font-bold text-slate-800 mb-4 border-b pb-2">
-          <i class="fa-solid fa-hand-holding-dollar text-brand-green mr-2"></i>Beri Uang Jalan / Kasbon ke Driver
-        </h3>
+        <h3 class="text-sm font-bold text-slate-800 mb-4 border-b pb-2"><i class="fa-solid fa-hand-holding-dollar text-brand-green mr-2"></i>Beri Uang Jalan / Kasbon ke Driver</h3>
         <form id="admin-give-cash-form" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -175,85 +167,58 @@
           </button>
         </form>
       </div>
-
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar">
-        <h3 class="p-4 font-bold text-sm bg-slate-50 border-b">Riwayat Uang Jalan / Kasbon Admin</h3>
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar mt-4">
+        <h3 class="p-4 font-bold text-sm bg-slate-50 border-b">Riwayat Dana Keluar (Uang Jalan Admin)</h3>
         <table class="w-full text-left text-xs whitespace-nowrap">
           <thead class="bg-white text-slate-500 border-b">
-            <tr>
-              <th class="p-3">Waktu</th>
-              <th class="p-3">Penerima (Driver)</th>
-              <th class="p-3">Keterangan</th>
-              <th class="p-3 font-bold text-rose-500">Nominal Keluar</th>
-            </tr>
+            <tr><th class="p-3">Waktu</th><th class="p-3">Penerima (Driver)</th><th class="p-3">Keterangan</th><th class="p-3 font-bold text-rose-500">Nominal Keluar</th></tr>
           </thead>
           <tbody id="admin-kas-history-tbody" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
     </section>
 
-    <!-- REKAPAN PRO (WITH EDIT & EXPORT) -->
+    <!-- ADMIN REPORTS (REKAPAN) -->
     <section id="view-admin-reports" class="app-view hidden space-y-4">
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
         <div class="flex flex-col lg:flex-row justify-between gap-4 mb-4">
           <div class="flex-1 flex flex-col md:flex-row gap-2">
-            <input type="date" id="filter-start" class="border rounded-lg p-2 text-xs w-full">
-            <input type="date" id="filter-end" class="border rounded-lg p-2 text-xs w-full">
-            <select id="filter-driver" class="border rounded-lg p-2 text-xs w-full">
-              <option value="ALL">Semua Driver</option>
-            </select>
-            <button onclick="loadAdminReports()" class="bg-brand-blue text-white px-4 rounded-lg text-xs font-bold py-2">Filter</button>
+            <input type="date" id="filter-start" class="border rounded-lg p-2 text-xs w-full md:w-auto">
+            <input type="date" id="filter-end" class="border rounded-lg p-2 text-xs w-full md:w-auto">
+            <select id="filter-driver" class="border rounded-lg p-2 text-xs w-full md:w-auto"><option value="ALL">Semua Driver</option></select>
+            <button onclick="loadAdminReports()" class="bg-brand-blue text-white px-4 rounded-lg text-xs font-bold py-2 active-scale">Filter</button>
           </div>
-          <button onclick="exportExcel()" class="bg-brand-green text-white px-4 rounded-lg text-xs font-bold py-2">
-            <i class="fa-solid fa-file-excel mr-1"></i> Download Excel
-          </button>
+          <button onclick="exportExcel()" class="bg-brand-green text-white px-4 rounded-lg text-xs font-bold py-2 active-scale"><i class="fa-solid fa-file-excel"></i> Download Excel</button>
         </div>
 
+        <!-- Tabel Ritase -->
         <h4 class="font-bold text-sm text-slate-800 mb-2 mt-6 border-b pb-1">Laporan Ritase Selesai</h4>
         <div class="overflow-x-auto custom-scrollbar mb-6">
           <table class="w-full text-left text-xs whitespace-nowrap" id="table-rekapan-ritase">
             <thead class="bg-slate-50 text-slate-500">
-              <tr>
-                <th class="p-3">Tanggal</th>
-                <th class="p-3">No. Order</th>
-                <th class="p-3">Tujuan/Material</th>
-                <th class="p-3">Driver</th>
-                <th class="p-3">Ritase</th>
-                <th class="p-3">Pembayaran</th>
-                <th class="p-3">Nominal (CASH)</th>
-                <th class="p-3 text-center">Aksi</th>
-              </tr>
+              <tr><th class="p-3">Tanggal</th><th class="p-3">No. Order</th><th class="p-3">Tujuan/Mat</th><th class="p-3">Driver</th><th class="p-3">Ritase</th><th class="p-3">Pembayaran</th><th class="p-3">Nominal (CASH)</th><th class="p-3 text-center">Aksi</th></tr>
             </thead>
             <tbody id="admin-reports-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
 
+        <!-- Tabel Absen -->
         <h4 class="font-bold text-sm text-slate-800 mb-2 border-b pb-1">Laporan Absensi Driver</h4>
         <div class="overflow-x-auto custom-scrollbar mb-6">
           <table class="w-full text-left text-xs whitespace-nowrap" id="table-rekapan-absen">
             <thead class="bg-slate-50 text-slate-500">
-              <tr>
-                <th class="p-3">Tanggal</th>
-                <th class="p-3">Driver</th>
-                <th class="p-3">Status</th>
-                <th class="p-3">Keterangan</th>
-              </tr>
+              <tr><th class="p-3">Tanggal</th><th class="p-3">Driver</th><th class="p-3">Status</th><th class="p-3">Keterangan Tambahan</th></tr>
             </thead>
             <tbody id="admin-absen-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
 
-        <h4 class="font-bold text-sm text-slate-800 mb-2 border-b pb-1">Laporan Pengeluaran Driver di Jalan</h4>
+        <!-- Tabel Pengeluaran -->
+        <h4 class="font-bold text-sm text-slate-800 mb-2 border-b pb-1">Laporan Pengeluaran & Kas Driver</h4>
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-left text-xs whitespace-nowrap" id="table-rekapan-expenses">
             <thead class="bg-rose-50 text-rose-600">
-              <tr>
-                <th class="p-3">Tanggal</th>
-                <th class="p-3">Driver</th>
-                <th class="p-3">Jenis/Transfer</th>
-                <th class="p-3">Keterangan</th>
-                <th class="p-3">Nominal Keluar</th>
-              </tr>
+              <tr><th class="p-3">Tanggal</th><th class="p-3">Driver</th><th class="p-3">Jenis Dana / Transfer</th><th class="p-3">Keterangan</th><th class="p-3">Nominal Keluar</th></tr>
             </thead>
             <tbody id="admin-expenses-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
@@ -261,58 +226,47 @@
       </div>
     </section>
 
-    <!-- MATERIAL MANAGEMENT -->
+    <!-- ADMIN MATERIALS -->
     <section id="view-admin-materials" class="app-view hidden space-y-4">
       <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
         <h3 class="text-base font-bold text-slate-800">Jenis Material</h3>
-        <button onclick="openModal('modal-add-material')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md">
-          <i class="fa-solid fa-plus mr-1"></i> Material
-        </button>
+        <button onclick="openModal('modal-add-material')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md"><i class="fa-solid fa-plus"></i> Material</button>
       </div>
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar">
         <table class="w-full text-left text-xs whitespace-nowrap">
           <thead class="bg-slate-50 text-slate-500 border-b">
-            <tr>
-              <th class="p-4">Nama</th>
-              <th class="p-4">Satuan</th>
-              <th class="p-4 text-right">Aksi</th>
-            </tr>
+            <tr><th class="p-4">Nama</th><th class="p-4">Satuan</th><th class="p-4 text-right">Aksi</th></tr>
           </thead>
           <tbody id="admin-materials-tbody" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
     </section>
 
-    <!-- USER MANAGEMENT -->
+    <!-- ADMIN USERS -->
     <section id="view-admin-users" class="app-view hidden space-y-4">
       <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
         <h3 class="text-base font-bold text-slate-800">Kelola Akun</h3>
-        <button onclick="openModal('modal-add-user')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md">
-          <i class="fa-solid fa-user-plus mr-1"></i> Akun
-        </button>
+        <button onclick="openModal('modal-add-user')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md"><i class="fa-solid fa-user-plus"></i> Akun</button>
       </div>
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar">
         <table class="w-full text-left text-xs whitespace-nowrap">
           <thead class="bg-slate-50 text-slate-500 border-b">
-            <tr>
-              <th class="p-4">Nama</th>
-              <th class="p-4">Email</th>
-              <th class="p-4">Role</th>
-              <th class="p-4">Status</th>
-            </tr>
+            <tr><th class="p-4">Nama</th><th class="p-4">Email</th><th class="p-4">Role</th><th class="p-4">Status</th></tr>
           </thead>
           <tbody id="admin-users-tbody" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
     </section>
 
-    <!-- ================= DRIVER VIEWS ================= -->
+    <!-- ==========================================
+         DRIVER VIEWS
+         ========================================== -->
     
-    <!-- DRIVER POOL (MULTI-SLOT) -->
+    <!-- DRIVER POOL -->
     <section id="view-driver-pool" class="app-view hidden space-y-4">
       <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
         <h3 class="text-sm font-bold text-slate-800">Order Pool Aktif</h3>
-        <p class="text-[11px] text-slate-500">Ketuk <b>"Ambil 1 Ritase"</b> untuk mengambil tugas.</p>
+        <p class="text-[11px] text-slate-500">Ketuk <b>"Ambil 1 Rit"</b> untuk menjalankan tugas.</p>
       </div>
       <div id="driver-pool-container" class="space-y-3"></div>
     </section>
@@ -327,28 +281,21 @@
           <p class="text-xs text-blue-100 mb-1"><i class="fa-solid fa-location-dot mr-1"></i> <span id="task-destination">...</span></p>
           <p class="text-xs text-blue-200 mb-4"><i class="fa-solid fa-boxes-stacked mr-1"></i> Material: <span id="task-material" class="font-bold text-white">-</span></p>
           <button onclick="releaseOrder()" class="w-full bg-rose-500 hover:bg-rose-600 font-bold py-2.5 rounded-xl text-xs active-scale">
-            <i class="fa-solid fa-triangle-exclamation mr-1"></i> Lepas Order (Kendala)
+            <i class="fa-solid fa-triangle-exclamation mr-1"></i> Lepas Order (Ada Kendala)
           </button>
         </div>
       </div>
-
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
-        <h3 class="text-sm font-bold text-slate-800 border-b pb-3 mb-4">
-          <i class="fa-solid fa-camera text-brand-blue mr-2"></i> Laporan Selesai Bongkar
-        </h3>
+        <h3 class="text-sm font-bold text-slate-800 border-b pb-3 mb-4"><i class="fa-solid fa-camera text-brand-blue mr-2"></i> Laporan Selesai Bongkar</h3>
         <form id="driver-delivery-form" class="space-y-4 text-left">
           <div class="relative flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-6 bg-slate-50">
             <input type="file" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer" onchange="compressAndPreviewImage(event)">
-            <div id="photo-placeholder" class="text-center">
-              <i class="fa-solid fa-image text-3xl text-slate-400 mb-2"></i>
-              <p class="text-[11px] font-bold">Buka Kamera</p>
-            </div>
+            <div id="photo-placeholder" class="text-center"><i class="fa-solid fa-image text-3xl text-slate-400 mb-2"></i><p class="text-[11px] font-bold text-slate-500">Buka Kamera / Galeri</p></div>
             <img id="photo-preview" class="hidden w-full max-h-48 object-contain rounded-lg" src="">
           </div>
           <input type="hidden" id="photo-base64">
-          
           <div>
-            <label class="block text-xs font-bold mb-2">Sistem Pembayaran</label>
+            <label class="block text-xs font-bold mb-2 text-slate-600">Sistem Pembayaran</label>
             <select id="pay_method" required class="w-full border rounded-xl p-3 text-xs bg-slate-50" onchange="toggleNominalInput()">
               <option value="TF">Transfer (TF)</option>
               <option value="BB">Bayar Belakang (BB)</option>
@@ -356,12 +303,10 @@
               <option value="NONE">Tidak Ada</option>
             </select>
           </div>
-          
           <div id="nominal-container" class="hidden">
-            <label class="block text-xs font-bold mb-2">Nominal Cash (Rp)</label>
+            <label class="block text-xs font-bold mb-2 text-slate-600">Nominal Cash (Rp)</label>
             <input type="number" id="pay-nominal" class="w-full border rounded-xl p-3 text-sm font-bold bg-slate-50">
           </div>
-          
           <button type="submit" class="w-full bg-brand-green text-white font-bold py-3.5 rounded-xl text-xs shadow-md active-scale">Kirim Laporan Ritase</button>
         </form>
       </div>
@@ -370,9 +315,7 @@
     <!-- DRIVER ABSEN -->
     <section id="view-driver-absen" class="app-view hidden space-y-4">
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
-        <h3 class="text-sm font-bold text-slate-800 mb-4 border-b pb-2">
-          <i class="fa-solid fa-calendar-check text-brand-blue mr-2"></i>Absen Harian Karyawan
-        </h3>
+        <h3 class="text-sm font-bold text-slate-800 mb-4 border-b pb-2"><i class="fa-solid fa-calendar-check text-brand-blue mr-2"></i>Absen Harian Karyawan</h3>
         <form id="driver-absen-form" class="space-y-4">
           <div>
             <label class="block text-xs font-bold mb-2 text-slate-600">Status Kehadiran Hari Ini</label>
@@ -384,18 +327,18 @@
           </div>
           <div>
             <label class="block text-xs font-bold mb-2 text-slate-600">Keterangan Tambahan</label>
-            <input type="text" id="absen-notes" placeholder="Opsional..." class="w-full border rounded-xl p-3 text-xs bg-slate-50">
+            <input type="text" id="absen-notes" placeholder="Tulis alasan jika sakit/izin..." class="w-full border rounded-xl p-3 text-xs bg-slate-50">
           </div>
-          <button type="submit" class="w-full bg-brand-blue text-white font-bold py-3.5 rounded-xl text-xs active-scale">Kirim Absen Sekarang</button>
+          <button type="submit" class="w-full bg-brand-blue text-white font-bold py-3.5 rounded-xl text-xs active-scale shadow-md">Kirim Absen Sekarang</button>
         </form>
       </div>
     </section>
 
-    <!-- DRIVER KEUANGAN & TRANSFER -->
+    <!-- DRIVER FINANCE (PENGELUARAN & TRANSFER) -->
     <section id="view-driver-finance" class="app-view hidden space-y-4">
       <div class="bg-amber-500 text-white p-5 rounded-2xl shadow-sm text-center">
         <h3 class="text-base font-bold">Laporan Kasbon & Pengeluaran</h3>
-        <p class="text-[11px] text-amber-100 mt-1">Catat pengeluaran atau Transfer Kas ke Driver Lain.</p>
+        <p class="text-[11px] text-amber-100 mt-1">Catat pengeluaran operasional atau Transfer Kas ke Driver Lain.</p>
       </div>
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
         <form id="driver-expense-form" class="space-y-4">
@@ -409,53 +352,43 @@
               <option value="TRANSFER_KAS">TRANSFER KAS KE DRIVER LAIN</option>
             </select>
           </div>
-          
           <div id="transfer-target-box" class="hidden">
-            <label class="block text-xs font-bold mb-2 text-slate-600">Pilih Driver Penerima Kas</label>
-            <select id="exp-target-driver" class="w-full border rounded-xl p-3 text-xs bg-slate-50"></select>
+            <label class="block text-xs font-bold mb-2 text-brand-blue">Pilih Driver Penerima Kas</label>
+            <select id="exp-target-driver" class="w-full border border-brand-blue rounded-xl p-3 text-xs bg-blue-50"></select>
           </div>
-          
           <div>
             <label class="block text-xs font-bold mb-2 text-slate-600">Nominal (Rp)</label>
-            <input type="number" id="exp-nom" required class="w-full border rounded-xl p-3 text-sm font-bold bg-slate-50">
+            <input type="number" id="exp-nom" required placeholder="Contoh: 150000" class="w-full border rounded-xl p-3 text-sm font-bold bg-slate-50">
           </div>
           <div>
             <label class="block text-xs font-bold mb-2 text-slate-600">Keterangan Detail</label>
-            <input type="text" id="exp-desc" required placeholder="Contoh: Beli solar, atau Titip kas ke Budi..." class="w-full border rounded-xl p-3 text-xs bg-slate-50">
+            <input type="text" id="exp-desc" required placeholder="Tulis rincian..." class="w-full border rounded-xl p-3 text-xs bg-slate-50">
           </div>
-          <button type="submit" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-xl text-xs active-scale">Kirim Laporan Dana</button>
+          <button type="submit" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-xl text-xs active-scale shadow-md">Kirim Laporan Dana</button>
         </form>
       </div>
     </section>
+
   </main>
 
-  <!-- DRIVER BOTTOM NAVIGATION -->
+  <!-- DRIVER BOTTOM NAV -->
   <nav id="driver-nav" class="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 pb-safe z-40">
     <div class="flex justify-around items-center p-2">
-      <button onclick="switchView('driver-pool')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400">
-        <i class="fa-solid fa-list-ul text-lg"></i>
-        <span class="text-[9px] font-bold">Pool</span>
-      </button>
-      <button onclick="switchView('driver-task')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400">
-        <i class="fa-solid fa-truck-fast text-lg"></i>
-        <span class="text-[9px] font-bold">Tugas</span>
-      </button>
-      <button onclick="switchView('driver-absen')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400">
-        <i class="fa-solid fa-calendar-check text-lg"></i>
-        <span class="text-[9px] font-bold">Absen</span>
-      </button>
-      <button onclick="switchView('driver-finance')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400">
-        <i class="fa-solid fa-wallet text-lg"></i>
-        <span class="text-[9px] font-bold">Kas</span>
-      </button>
+      <button onclick="switchView('driver-pool')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-brand-blue"><i class="fa-solid fa-list-ul text-lg"></i><span class="text-[9px] font-bold">Pool</span></button>
+      <button onclick="switchView('driver-task')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400"><i class="fa-solid fa-truck-fast text-lg"></i><span class="text-[9px] font-bold">Tugas</span></button>
+      <button onclick="switchView('driver-absen')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400"><i class="fa-solid fa-calendar-check text-lg"></i><span class="text-[9px] font-bold">Absen</span></button>
+      <button onclick="switchView('driver-finance')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400"><i class="fa-solid fa-wallet text-lg"></i><span class="text-[9px] font-bold">Kas</span></button>
     </div>
   </nav>
 
-  <!-- MODALS -->
+  <!-- ==========================================
+       MODALS KUMPULAN (ADMIN)
+       ========================================== -->
+  
   <div id="modal-add-order" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center p-4 hidden">
     <div class="bg-white w-full max-w-md rounded-2xl p-6 relative">
-      <button onclick="closeModal('modal-add-order')" class="absolute top-4 right-4 text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button>
-      <h3 class="text-base font-bold mb-4 border-b pb-2">Buat Order</h3>
+      <button onclick="closeModal('modal-add-order')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
+      <h3 class="text-base font-bold mb-4 border-b pb-2">Buat Order Baru</h3>
       <form id="form-add-order" class="space-y-4">
         <div><label class="block text-xs font-bold mb-1">Customer</label><input type="text" id="order-customer" required class="w-full border p-2 text-xs rounded-lg"></div>
         <div><label class="block text-xs font-bold mb-1">Tujuan</label><input type="text" id="order-destination" required class="w-full border p-2 text-xs rounded-lg"></div>
@@ -475,8 +408,8 @@
       <h3 class="text-base font-bold mb-4 border-b pb-2">Tambah Material</h3>
       <form id="form-add-material" class="space-y-4">
         <div><label class="block text-xs font-bold mb-1">Nama</label><input type="text" id="mat-name" required class="w-full border p-2 text-xs rounded-lg"></div>
-        <div><label class="block text-xs font-bold mb-1">Satuan</label><input type="text" id="mat-desc" class="w-full border p-2 text-xs rounded-lg"></div>
-        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2">Simpan</button>
+        <div><label class="block text-xs font-bold mb-1">Keterangan / Satuan</label><input type="text" id="mat-desc" class="w-full border p-2 text-xs rounded-lg"></div>
+        <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2">Simpan Material</button>
       </form>
     </div>
   </div>
@@ -489,7 +422,14 @@
         <div><label class="block text-xs font-bold mb-1">Nama</label><input type="text" id="usr-name" required class="w-full border p-2 text-xs rounded-lg"></div>
         <div><label class="block text-xs font-bold mb-1">Email</label><input type="email" id="usr-email" required class="w-full border p-2 text-xs rounded-lg"></div>
         <div><label class="block text-xs font-bold mb-1">Password</label><input type="password" id="usr-pass" required class="w-full border p-2 text-xs rounded-lg"></div>
-        <div><label class="block text-xs font-bold mb-1">Akses</label><select id="usr-role" class="w-full border p-2 text-xs rounded-lg"><option value="DRIVER">DRIVER</option><option value="ADMIN">ADMIN</option><option value="SUPER_ADMIN">SUPER ADMIN</option></select></div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Hak Akses</label>
+          <select id="usr-role" class="w-full border p-2 text-xs rounded-lg">
+            <option value="DRIVER">DRIVER</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="SUPER_ADMIN">SUPER ADMIN</option>
+          </select>
+        </div>
         <button type="submit" class="w-full bg-brand-blue text-white py-3 rounded-xl text-xs font-bold mt-2">Simpan Akun</button>
       </form>
     </div>
@@ -499,28 +439,30 @@
   <div id="modal-edit-rekapan" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center p-4 hidden">
     <div class="bg-white w-full max-w-sm rounded-2xl p-6 relative">
       <button onclick="closeModal('modal-edit-rekapan')" class="absolute top-4 right-4 text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button>
-      <h3 class="text-base font-bold mb-4 border-b pb-2">Koreksi Data Ritase</h3>
+      <h3 class="text-base font-bold mb-4 border-b pb-2 text-amber-600"><i class="fa-solid fa-pen-to-square mr-2"></i>Koreksi Data Ritase</h3>
       <form id="form-edit-rekapan" class="space-y-4">
         <input type="hidden" id="edit-deliv-id">
         <div>
           <label class="block text-xs font-bold mb-1">Metode Bayar (Koreksi)</label>
           <select id="edit-pay-method" class="w-full border p-2 text-xs rounded-lg">
-            <option value="TF">TF</option>
-            <option value="BB">BB</option>
-            <option value="CASH">CASH</option>
-            <option value="NONE">NONE</option>
+            <option value="TF">Transfer (TF)</option>
+            <option value="BB">Bayar Belakang (BB)</option>
+            <option value="CASH">Tunai (CASH)</option>
+            <option value="NONE">Tidak Ada (0)</option>
           </select>
         </div>
         <div>
           <label class="block text-xs font-bold mb-1">Nominal CASH (Koreksi)</label>
           <input type="number" id="edit-pay-nominal" class="w-full border p-2 text-xs rounded-lg">
         </div>
-        <button type="submit" class="w-full bg-amber-500 text-white py-3 rounded-xl text-xs font-bold mt-2 shadow-md">Update Data</button>
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-xl text-xs font-bold mt-2 shadow-md">Simpan Pembaruan</button>
       </form>
     </div>
   </div>
 
-  <!-- JAVASCRIPT APP LOGIC -->
+  <!-- ==========================================
+       JAVASCRIPT APP LOGIC
+       ========================================== -->
   <script>
     const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
@@ -534,7 +476,6 @@
       try {
         showLoader(true); 
         const { data: { session } } = await supabase.auth.getSession();
-        
         if (session) {
           const { data: userData } = await supabase.from('master_users').select('*').eq('auth_user_id', session.user.id).single();
           if (userData && userData.status === 'ACTIVE') { 
@@ -554,7 +495,6 @@
         showLoader(false); 
       }
 
-      // Handlers Form
       document.getElementById('login-form').addEventListener('submit', handleLogin);
       document.getElementById('driver-delivery-form').addEventListener('submit', handleDeliverySubmit);
       document.getElementById('driver-expense-form').addEventListener('submit', handleExpenseSubmit);
@@ -577,15 +517,15 @@
         if (authError) throw authError; 
         
         const { data: userData, error: userError } = await supabase.from('master_users').select('*').eq('auth_user_id', authData.user.id).single(); 
-        if (userError || !userData) throw new Error("Akun belum terdaftar di database."); 
-        if (userData.status !== 'ACTIVE') throw new Error("Akun status Non-aktif."); 
+        if (userError || !userData) throw new Error("Akun belum terdaftar."); 
+        if (userData.status !== 'ACTIVE') throw new Error("Akun Non-aktif."); 
         
         currentUser = userData; 
         currentRole = userData.role; 
         document.getElementById('login-modal').classList.add('hidden'); 
         setupUI(); 
       } catch (err) { 
-        alert('GAGAL: ' + err.message); 
+        alert('GAGAL LOGIN: ' + err.message); 
       } 
       showLoader(false); 
     }
@@ -641,7 +581,9 @@
       }
     }
 
-    // ================= ADMIN DASHBOARD & ORDERS =================
+    // ==========================================
+    // ADMIN FUNCTIONS
+    // ==========================================
     async function loadAdminDashboard() {
       showLoader(true);
       const { data: orders } = await supabase.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']);
@@ -657,6 +599,7 @@
       showLoader(false);
       
       document.getElementById('dash-active-order').innerText = totalSisa > 0 ? totalSisa : 0;
+      
       if(deliveries) { 
         document.getElementById('dash-completed-rit').innerText = deliveries.length; 
         document.getElementById('dash-cash-today').innerText = 'Rp ' + deliveries.filter(d=>d.payment_method==='CASH').reduce((s,d)=>s+parseFloat(d.nominal||0),0).toLocaleString('id-ID'); 
@@ -675,7 +618,7 @@
       tbody.innerHTML = ''; 
       
       if(data) data.forEach(o => { 
-        let badge = o.status === 'COMPLETED' ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px]">Selesai</span>' : '<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-[10px]">Berjalan</span>'; 
+        let badge = o.status === 'COMPLETED' ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold">Selesai</span>' : '<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-[10px] font-bold">Berjalan</span>'; 
         tbody.innerHTML += `
           <tr>
             <td class="p-4 font-bold text-slate-700">${o.order_number||'-'}</td>
@@ -690,42 +633,47 @@
       showLoader(true); 
       const { data } = await supabase.from('master_materials').select('*'); 
       showLoader(false); 
+      
       const tbody = document.getElementById('admin-materials-tbody'); 
       tbody.innerHTML = ''; 
+      
       if(data) data.forEach(m => { 
         tbody.innerHTML += `
           <tr>
             <td class="p-4 font-bold">${m.name}</td>
             <td class="p-4">${m.description||'-'}</td>
-            <td class="p-4 text-right"><button onclick="deleteMaterial('${m.id}')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td>
+            <td class="p-4 text-right"><button onclick="deleteMaterial('${m.id}')" class="text-rose-500 bg-rose-50 px-3 py-2 rounded-lg hover:bg-rose-100"><i class="fa-solid fa-trash"></i></button></td>
           </tr>`; 
       }); 
     }
-    
+
     async function deleteMaterial(id) { 
-      if(confirm("Hapus material ini?")) { 
+      if(confirm("Yakin ingin menghapus material ini?")) { 
         await supabase.from('master_materials').delete().eq('id', id); 
         loadAdminMaterials(); 
       } 
     }
-    
+
     async function loadAdminUsers() { 
       showLoader(true); 
       const { data } = await supabase.from('master_users').select('*'); 
       showLoader(false); 
+      
       const tbody = document.getElementById('admin-users-tbody'); 
       tbody.innerHTML = ''; 
+      
       if(data) data.forEach(u => { 
         tbody.innerHTML += `
           <tr>
             <td class="p-4 font-bold">${u.name}</td>
             <td class="p-4">${u.email}</td>
-            <td class="p-4">${u.role}</td>
-            <td class="p-4">${u.status}</td>
+            <td class="p-4"><span class="bg-blue-50 text-brand-blue px-2 py-1 rounded text-xs font-bold">${u.role}</span></td>
+            <td class="p-4"><span class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded text-xs font-bold">${u.status}</span></td>
           </tr>`; 
       }); 
     }
 
+    // --- FORM ACTIONS ADMIN ---
     async function handleAddOrder(e) { 
       e.preventDefault(); 
       showLoader(true); 
@@ -739,18 +687,28 @@
         created_by: currentUser.id 
       }]); 
       showLoader(false); 
+      
       if(error) alert("Error: " + error.message); 
-      else { alert("Order berhasil dibuat!"); closeModal('modal-add-order'); loadAdminOrders(); } 
+      else { 
+        alert("Order berhasil dibuat!"); 
+        closeModal('modal-add-order'); 
+        loadAdminOrders(); 
+      } 
     }
-    
+
     async function openModalAddOrder() { 
       const { data } = await supabase.from('master_materials').select('*'); 
       const sel = document.getElementById('order-material'); 
       sel.innerHTML = ''; 
-      if(data) data.forEach(m => sel.innerHTML += `<option value="${m.name}">${m.name}</option>`); 
+      
+      if(data && data.length > 0) {
+        data.forEach(m => sel.innerHTML += `<option value="${m.name}">${m.name}</option>`); 
+      } else {
+        sel.innerHTML = `<option value="">Belum ada material</option>`; 
+      }
       document.getElementById('modal-add-order').classList.remove('hidden'); 
     }
-    
+
     async function handleAddMaterial(e) { 
       e.preventDefault(); 
       showLoader(true); 
@@ -759,10 +717,14 @@
         description: document.getElementById('mat-desc').value 
       }]); 
       showLoader(false); 
+      
       if(error) alert("Error: " + error.message); 
-      else { closeModal('modal-add-material'); loadAdminMaterials(); } 
+      else { 
+        closeModal('modal-add-material'); 
+        loadAdminMaterials(); 
+      } 
     }
-    
+
     async function handleAddUser(e) { 
       e.preventDefault(); 
       showLoader(true); 
@@ -789,15 +751,12 @@
       showLoader(false); 
     }
 
-    // ================= ADMIN FINANCE & REKAPAN =================
+    // --- UANG JALAN ADMIN ---
     async function loadAdminKas() {
-      const { data } = await supabase.from('driver_expenses')
-        .select('*, master_users!driver_id(name)')
-        .eq('expense_type', 'UANG_JALAN_ADMIN')
-        .order('created_at', { ascending: false });
-      
+      const { data } = await supabase.from('driver_expenses').select('*, master_users!driver_id(name)').eq('expense_type', 'UANG_JALAN_ADMIN').order('created_at', { ascending: false });
       const tbody = document.getElementById('admin-kas-history-tbody'); 
       tbody.innerHTML = '';
+      
       if(data) data.forEach(x => { 
         tbody.innerHTML += `
           <tr>
@@ -808,7 +767,7 @@
           </tr>`; 
       });
     }
-    
+
     async function handleAdminKas(e) { 
       e.preventDefault(); 
       showLoader(true); 
@@ -819,24 +778,27 @@
         description: document.getElementById('admin-kas-desc').value 
       }]); 
       showLoader(false); 
+      
       if(error) alert("Gagal: " + error.message); 
       else { 
-        alert("Uang Jalan Tercatat!"); 
+        alert("Uang Jalan Berhasil Dicatat!"); 
         document.getElementById('admin-give-cash-form').reset(); 
         loadAdminKas(); 
       } 
     }
 
+    // --- REKAPAN ADMIN (FILTER & EDIT) ---
     async function setupAdminFilters() {
       const { data } = await supabase.from('master_users').select('id, name').eq('role', 'DRIVER');
       const selF = document.getElementById('filter-driver'); 
       const selK = document.getElementById('admin-kas-driver');
+      
       if(data) data.forEach(d => { 
         selF.innerHTML += `<option value="${d.id}">${d.name}</option>`; 
         selK.innerHTML += `<option value="${d.id}">${d.name}</option>`; 
       });
     }
-    
+
     async function loadAdminReports() {
       const startDate = document.getElementById('filter-start').value;
       const endDate = document.getElementById('filter-end').value;
@@ -866,6 +828,7 @@
       const [dRes, eRes, aRes] = await Promise.all([dQuery, eQuery, aQuery]); 
       showLoader(false);
       
+      // Load Deliveries
       const dBody = document.getElementById('admin-reports-tbody'); 
       dBody.innerHTML = '';
       if(dRes.data) dRes.data.forEach(d => {
@@ -880,13 +843,14 @@
             <td class="p-3 font-bold">${d.payment_method}</td>
             <td class="p-3 font-bold text-amber-600">${nominal}</td>
             <td class="p-3 text-center">
-              <button onclick="openEditRekapan('${d.id}', '${d.payment_method}', '${d.nominal}')" class="text-amber-500 hover:text-amber-700 bg-amber-50 px-2 py-1 rounded">
+              <button onclick="openEditRekapan('${d.id}', '${d.payment_method}', '${d.nominal}')" class="text-amber-500 hover:text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200">
                 <i class="fa-solid fa-pen-to-square"></i> Edit
               </button>
             </td>
           </tr>`;
       });
-      
+
+      // Load Expenses
       const eBody = document.getElementById('admin-expenses-tbody'); 
       eBody.innerHTML = '';
       if(eRes.data) eRes.data.forEach(x => { 
@@ -899,11 +863,12 @@
             <td class="p-3 font-bold">Rp ${parseInt(x.nominal||0).toLocaleString('id-ID')}</td>
           </tr>`; 
       });
-      
+
+      // Load Absen
       const aBody = document.getElementById('admin-absen-tbody'); 
       aBody.innerHTML = '';
       if(aRes.data) aRes.data.forEach(a => { 
-        let c = a.status==='HADIR'?'text-brand-green':(a.status==='SAKIT'?'text-rose-500':'text-amber-500'); 
+        let c = a.status==='HADIR' ? 'text-brand-green' : (a.status==='SAKIT' ? 'text-rose-500' : 'text-amber-500'); 
         aBody.innerHTML += `
           <tr>
             <td class="p-3 text-slate-500">${new Date(a.created_at).toLocaleDateString('id-ID')}</td>
@@ -920,7 +885,7 @@
       document.getElementById('edit-pay-nominal').value = nominal || 0; 
       document.getElementById('modal-edit-rekapan').classList.remove('hidden'); 
     }
-    
+
     async function submitEditRekapan(e) { 
       e.preventDefault(); 
       showLoader(true); 
@@ -932,12 +897,12 @@
       showLoader(false); 
       if(error) alert("Gagal Edit: "+error.message); 
       else { 
-        alert("Data Ritase Diperbarui!"); 
+        alert("Data Rekapan Berhasil Diperbarui!"); 
         closeModal('modal-edit-rekapan'); 
         loadAdminReports(); 
       } 
     }
-    
+
     function exportExcel() { 
       const wb = XLSX.utils.book_new(); 
       XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById('table-rekapan-ritase')), "Ritase"); 
@@ -946,13 +911,17 @@
       XLSX.writeFile(wb, `Rekapan_Sansam_${new Date().toLocaleDateString('id-ID')}.xlsx`); 
     }
 
-    // ================= DRIVER FUNCTIONS =================
+
+    // ==========================================
+    // DRIVER FUNCTIONS
+    // ==========================================
+
     async function populateDriverDropdowns() { 
       const { data } = await supabase.from('master_users').select('id, name').eq('role', 'DRIVER').neq('id', currentUser.id); 
       const sel = document.getElementById('exp-target-driver'); 
       if(data) data.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.name}</option>`); 
     }
-    
+
     function toggleTransferDriver() { 
       if(document.getElementById('exp-type').value === 'TRANSFER_KAS') {
         document.getElementById('transfer-target-box').classList.remove('hidden'); 
@@ -970,9 +939,10 @@
         notes: document.getElementById('absen-notes').value 
       }]); 
       showLoader(false); 
+      
       if(error) alert("Gagal: "+error.message); 
       else { 
-        alert("Absen Berhasil Dikirim!"); 
+        alert("Absen Hari Ini Berhasil Dikirim!"); 
         document.getElementById('driver-absen-form').reset(); 
       } 
     }
@@ -985,7 +955,7 @@
       
       if(type === 'TRANSFER_KAS') {
         const targetSel = document.getElementById('exp-target-driver'); 
-        targetStr = " (Transfer ke: " + targetSel.options[targetSel.selectedIndex].text + ") ";
+        targetStr = " (Transfer Kas ke: " + targetSel.options[targetSel.selectedIndex].text + ") ";
       }
       
       const { error } = await supabase.from('driver_expenses').insert([{ 
@@ -995,9 +965,10 @@
         description: document.getElementById('exp-desc').value + targetStr 
       }]);
       showLoader(false); 
+      
       if(error) alert("Gagal: " + error.message); 
       else { 
-        alert("Laporan Dana Terkirim!"); 
+        alert("Laporan Dana/Kas Terkirim ke Sistem Admin!"); 
         document.getElementById('driver-expense-form').reset(); 
         toggleTransferDriver(); 
       }
@@ -1020,7 +991,7 @@
       } 
     }
 
-    // MULTI SLOT GENERATION PER RITASE
+    // MENGATASI MASALAH POOL (Multi Slot Tampil Sekaligus)
     async function loadDriverPool() {
       showLoader(true); 
       const { data: orders } = await supabase.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']).eq('locked', false); 
@@ -1037,7 +1008,10 @@
       if(orders) {
         let htmlBuild = '';
         orders.forEach(o => {
+          // Hitung sisa ritase dikurangi yang sedang aktif dijalankan driver lain
           let sisaSlot = o.total_rit - o.completed_rit - (activeMap[o.id] || 0);
+          
+          // Render tombol sebanyak sisa slot agar bisa dikeroyok
           for(let i=0; i<sisaSlot; i++) {
             hasData = true; 
             htmlBuild += `
@@ -1053,24 +1027,29 @@
         });
         cont.innerHTML = htmlBuild;
       }
-      if(!hasData) cont.innerHTML = `<div class="p-6 text-slate-400 text-xs text-center border rounded-xl bg-slate-50">Tidak ada order / slot tersedia.</div>`;
+      
+      if(!hasData) {
+        cont.innerHTML = `<div class="p-6 text-slate-400 text-xs text-center border rounded-xl bg-slate-50">Tidak ada order / slot tersedia saat ini.</div>`;
+      }
     }
 
+    // MENGATASI ERROR "assignments_driver_id_fkey"
     async function takeOrder(orderId) { 
       if(activeAssignment) return alert("Selesaikan tugas aktif Anda dulu!"); 
-      if(confirm("Ambil 1 Ritase ini?")) { 
+      if(confirm("Ambil 1 Slot Ritase ini?")) { 
         showLoader(true); 
         const { error } = await supabase.from('assignments').insert([{ 
           order_id: orderId, 
-          driver_id: currentUser.id, 
+          driver_id: currentUser.id,  // <-- Ini perbaikan kuncinya, harus pakai ID master_users
           status: 'ACTIVE' 
         }]); 
         showLoader(false); 
-        if(error) alert("Gagal: " + error.message); 
+        
+        if(error) alert("Gagal mengambil order: " + error.message); 
         else checkActiveDriverTask(); 
       } 
     }
-    
+
     async function releaseOrder() { 
       if(!activeAssignment) return; 
       let r = prompt("Alasan melepas tugas (Misal: Ban Bocor):"); 
@@ -1091,7 +1070,7 @@
         document.getElementById('pay-nominal').required = false; 
       } 
     }
-    
+
     function compressAndPreviewImage(e) { 
       if (!e.target.files[0]) return; 
       const r = new FileReader(); 
@@ -1105,7 +1084,6 @@
           cvs.width = w; cvs.height = h; 
           cvs.getContext('2d').drawImage(img, 0, 0, w, h); 
           const b64 = cvs.toDataURL('image/jpeg', 0.6); 
-          
           document.getElementById('photo-base64').value = b64; 
           document.getElementById('photo-placeholder').classList.add('hidden'); 
           document.getElementById('photo-preview').src = b64; 
@@ -1115,12 +1093,12 @@
       }; 
       r.readAsDataURL(e.target.files[0]); 
     }
-    
+
     async function handleDeliverySubmit(e) { 
       e.preventDefault(); 
       if(!activeAssignment) return alert("Tidak ada order aktif."); 
       let photo = document.getElementById('photo-base64').value; 
-      if(!photo) return alert("Foto wajib!"); 
+      if(!photo) return alert("Foto wajib dilampirkan!"); 
       
       showLoader(true); 
       try { 
@@ -1145,7 +1123,7 @@
         
         await supabase.from('assignments').update({ status: 'COMPLETED' }).eq('id', activeAssignment.id); 
         
-        alert("Laporan bongkar terkirim!"); 
+        alert("Laporan bongkar ritase terkirim!"); 
         document.getElementById('driver-delivery-form').reset(); 
         document.getElementById('photo-base64').value = ""; 
         document.getElementById('photo-preview').classList.add('hidden'); 
@@ -1158,24 +1136,20 @@
       showLoader(false); 
     }
 
+    // ==========================================
+    // UTILS
+    // ==========================================
     function openModal(id) { 
       if(id === 'modal-add-order') openModalAddOrder(); 
       else document.getElementById(id).classList.remove('hidden'); 
     }
-    
-    function closeModal(id) { 
-      document.getElementById(id).classList.add('hidden'); 
-    }
-    
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
     async function logoutAccount() { 
       showLoader(true); 
       await supabase.auth.signOut(); 
       location.reload(); 
     }
-    
-    function showLoader(show) { 
-      document.getElementById('global-loader').classList.toggle('hidden', !show); 
-    }
+    function showLoader(show) { document.getElementById('global-loader').classList.toggle('hidden', !show); }
   </script>
 </body>
 </html>
