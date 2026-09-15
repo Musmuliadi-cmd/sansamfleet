@@ -6,10 +6,12 @@
   <title>CV SANSAM GROUP - Fleet Ultimate</title>
   <meta name="theme-color" content="#ffffff">
   
+  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- Supabase & XLSX -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   
@@ -35,7 +37,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- LOADER -->
+  <!-- GLOBAL LOADER -->
   <div id="global-loader" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999999] flex flex-col items-center justify-center hidden">
     <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center">
       <i class="fa-solid fa-truck-fast fa-bounce text-4xl text-brand-blue mb-3"></i>
@@ -43,7 +45,7 @@
     </div>
   </div>
 
-  <!-- LOGIN -->
+  <!-- LOGIN MODAL -->
   <div id="login-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-[99999] flex flex-col items-center justify-center p-4 hidden">
     <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-5">
       <div class="w-16 h-16 bg-blue-50 rounded-2xl mx-auto flex items-center justify-center">
@@ -55,12 +57,12 @@
       </div>
       <form id="login-form" class="space-y-4 pt-2 text-left">
         <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Email</label>
-          <input type="email" id="auth-email" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-blue focus:outline-none">
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Email Akses</label>
+          <input type="email" id="auth-email" required placeholder="email@sansamgroup.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-blue focus:outline-none">
         </div>
         <div>
           <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Password</label>
-          <input type="password" id="auth-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-blue focus:outline-none">
+          <input type="password" id="auth-password" required placeholder="********" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:border-brand-blue focus:outline-none">
         </div>
         <button type="submit" class="w-full bg-brand-blue text-white font-extrabold py-3.5 rounded-xl text-xs active-scale shadow-lg">LOGIN SISTEM</button>
       </form>
@@ -84,7 +86,7 @@
       </button>
     </div>
     
-    <!-- ADMIN NAV -->
+    <!-- ADMIN NAVIGATION -->
     <nav id="admin-nav" class="hidden bg-white border-t border-slate-200">
       <div class="max-w-7xl mx-auto px-4 flex gap-5 overflow-x-auto custom-scrollbar">
         <button onclick="switchView('admin-dashboard')" class="admin-tab-btn py-3 text-[11px] font-bold whitespace-nowrap"><i class="fa-solid fa-chart-pie mr-1"></i>Dashboard</button>
@@ -97,9 +99,12 @@
     </nav>
   </header>
 
+  <!-- MAIN CONTAINER -->
   <main id="app-content" class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 pb-24 md:pb-6 hidden">
 
     <!-- ================= ADMIN VIEWS ================= -->
+    
+    <!-- DASHBOARD ADMIN -->
     <section id="view-admin-dashboard" class="app-view hidden space-y-6">
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="p-4 bg-blue-50 border border-blue-100 rounded-xl">
@@ -111,7 +116,7 @@
           <h3 class="text-2xl font-black text-emerald-700 mt-1" id="dash-completed-rit">0</h3>
         </div>
         <div class="p-4 bg-rose-50 border border-rose-100 rounded-xl">
-          <p class="text-[10px] text-rose-500 font-bold uppercase">Dana Keluar</p>
+          <p class="text-[10px] text-rose-500 font-bold uppercase">Dana Keluar (Kasbon)</p>
           <h3 class="text-base font-black text-rose-600 mt-1" id="dash-expenses">Rp 0</h3>
         </div>
         <div class="p-4 bg-amber-50 border border-amber-100 rounded-xl">
@@ -121,22 +126,30 @@
       </div>
     </section>
 
+    <!-- MANAJEMEN ORDER -->
     <section id="view-admin-orders" class="app-view hidden space-y-4">
       <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-        <h3 class="text-base font-bold text-slate-800">Daftar Order</h3>
-        <button onclick="openModal('modal-add-order')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md"><i class="fa-solid fa-plus"></i> Order</button>
+        <h3 class="text-base font-bold text-slate-800">Daftar Order Proyek</h3>
+        <button onclick="openModal('modal-add-order')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md">
+          <i class="fa-solid fa-plus mr-1"></i> Buat Order
+        </button>
       </div>
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar">
         <table class="w-full text-left text-xs whitespace-nowrap">
           <thead class="bg-slate-50 text-slate-500 border-b">
-            <tr><th class="p-4">No. Order</th><th class="p-4">Customer/Tujuan</th><th class="p-4">Material</th><th class="p-4 text-center">Progress</th></tr>
+            <tr>
+              <th class="p-4">No. Order</th>
+              <th class="p-4">Customer / Tujuan</th>
+              <th class="p-4">Material</th>
+              <th class="p-4 text-center">Progress Ritase</th>
+            </tr>
           </thead>
           <tbody id="admin-orders-tbody" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
     </section>
 
-    <!-- TAB KAS & DANA ADMIN -->
+    <!-- KAS & DANA ADMIN -->
     <section id="view-admin-finance" class="app-view hidden space-y-4">
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
         <h3 class="text-sm font-bold text-slate-800 mb-4 border-b pb-2">
@@ -162,18 +175,24 @@
           </button>
         </form>
       </div>
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar mt-4">
-        <h3 class="p-4 font-bold text-sm bg-slate-50 border-b">Riwayat Dana Keluar (Uang Jalan Admin)</h3>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar">
+        <h3 class="p-4 font-bold text-sm bg-slate-50 border-b">Riwayat Uang Jalan / Kasbon Admin</h3>
         <table class="w-full text-left text-xs whitespace-nowrap">
           <thead class="bg-white text-slate-500 border-b">
-            <tr><th class="p-3">Waktu</th><th class="p-3">Penerima (Driver)</th><th class="p-3">Keterangan</th><th class="p-3 font-bold text-rose-500">Nominal Keluar</th></tr>
+            <tr>
+              <th class="p-3">Waktu</th>
+              <th class="p-3">Penerima (Driver)</th>
+              <th class="p-3">Keterangan</th>
+              <th class="p-3 font-bold text-rose-500">Nominal Keluar</th>
+            </tr>
           </thead>
           <tbody id="admin-kas-history-tbody" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
     </section>
 
-    <!-- REKAPAN PRO (WITH EDIT BUTTON & FILTERS) -->
+    <!-- REKAPAN PRO (WITH EDIT & EXPORT) -->
     <section id="view-admin-reports" class="app-view hidden space-y-4">
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
         <div class="flex flex-col lg:flex-row justify-between gap-4 mb-4">
@@ -186,7 +205,7 @@
             <button onclick="loadAdminReports()" class="bg-brand-blue text-white px-4 rounded-lg text-xs font-bold py-2">Filter</button>
           </div>
           <button onclick="exportExcel()" class="bg-brand-green text-white px-4 rounded-lg text-xs font-bold py-2">
-            <i class="fa-solid fa-file-excel"></i> Excel
+            <i class="fa-solid fa-file-excel mr-1"></i> Download Excel
           </button>
         </div>
 
@@ -195,9 +214,14 @@
           <table class="w-full text-left text-xs whitespace-nowrap" id="table-rekapan-ritase">
             <thead class="bg-slate-50 text-slate-500">
               <tr>
-                <th class="p-3">Tanggal</th><th class="p-3">No. Order</th><th class="p-3">Tujuan/Mat</th>
-                <th class="p-3">Driver</th><th class="p-3">Ritase</th><th class="p-3">Pembayaran</th>
-                <th class="p-3">Nominal (CASH)</th><th class="p-3 text-center">Aksi</th>
+                <th class="p-3">Tanggal</th>
+                <th class="p-3">No. Order</th>
+                <th class="p-3">Tujuan/Material</th>
+                <th class="p-3">Driver</th>
+                <th class="p-3">Ritase</th>
+                <th class="p-3">Pembayaran</th>
+                <th class="p-3">Nominal (CASH)</th>
+                <th class="p-3 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody id="admin-reports-tbody" class="divide-y divide-slate-100"></tbody>
@@ -208,7 +232,12 @@
         <div class="overflow-x-auto custom-scrollbar mb-6">
           <table class="w-full text-left text-xs whitespace-nowrap" id="table-rekapan-absen">
             <thead class="bg-slate-50 text-slate-500">
-              <tr><th class="p-3">Tanggal</th><th class="p-3">Driver</th><th class="p-3">Status</th><th class="p-3">Keterangan</th></tr>
+              <tr>
+                <th class="p-3">Tanggal</th>
+                <th class="p-3">Driver</th>
+                <th class="p-3">Status</th>
+                <th class="p-3">Keterangan</th>
+              </tr>
             </thead>
             <tbody id="admin-absen-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
@@ -218,7 +247,13 @@
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-left text-xs whitespace-nowrap" id="table-rekapan-expenses">
             <thead class="bg-rose-50 text-rose-600">
-              <tr><th class="p-3">Tanggal</th><th class="p-3">Driver</th><th class="p-3">Jenis/Transfer</th><th class="p-3">Keterangan</th><th class="p-3">Nominal Keluar</th></tr>
+              <tr>
+                <th class="p-3">Tanggal</th>
+                <th class="p-3">Driver</th>
+                <th class="p-3">Jenis/Transfer</th>
+                <th class="p-3">Keterangan</th>
+                <th class="p-3">Nominal Keluar</th>
+              </tr>
             </thead>
             <tbody id="admin-expenses-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
@@ -226,30 +261,45 @@
       </div>
     </section>
 
+    <!-- MATERIAL MANAGEMENT -->
     <section id="view-admin-materials" class="app-view hidden space-y-4">
       <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
         <h3 class="text-base font-bold text-slate-800">Jenis Material</h3>
-        <button onclick="openModal('modal-add-material')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md"><i class="fa-solid fa-plus"></i> Material</button>
+        <button onclick="openModal('modal-add-material')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md">
+          <i class="fa-solid fa-plus mr-1"></i> Material
+        </button>
       </div>
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar">
         <table class="w-full text-left text-xs whitespace-nowrap">
           <thead class="bg-slate-50 text-slate-500 border-b">
-            <tr><th class="p-4">Nama</th><th class="p-4">Satuan</th><th class="p-4 text-right">Aksi</th></tr>
+            <tr>
+              <th class="p-4">Nama</th>
+              <th class="p-4">Satuan</th>
+              <th class="p-4 text-right">Aksi</th>
+            </tr>
           </thead>
           <tbody id="admin-materials-tbody" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
     </section>
 
+    <!-- USER MANAGEMENT -->
     <section id="view-admin-users" class="app-view hidden space-y-4">
       <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
         <h3 class="text-base font-bold text-slate-800">Kelola Akun</h3>
-        <button onclick="openModal('modal-add-user')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md"><i class="fa-solid fa-user-plus"></i> Akun</button>
+        <button onclick="openModal('modal-add-user')" class="bg-brand-blue text-white px-4 py-2 rounded-xl text-xs font-bold active-scale shadow-md">
+          <i class="fa-solid fa-user-plus mr-1"></i> Akun
+        </button>
       </div>
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar">
         <table class="w-full text-left text-xs whitespace-nowrap">
           <thead class="bg-slate-50 text-slate-500 border-b">
-            <tr><th class="p-4">Nama</th><th class="p-4">Email</th><th class="p-4">Role</th><th class="p-4">Status</th></tr>
+            <tr>
+              <th class="p-4">Nama</th>
+              <th class="p-4">Email</th>
+              <th class="p-4">Role</th>
+              <th class="p-4">Status</th>
+            </tr>
           </thead>
           <tbody id="admin-users-tbody" class="divide-y divide-slate-100"></tbody>
         </table>
@@ -258,7 +308,7 @@
 
     <!-- ================= DRIVER VIEWS ================= -->
     
-    <!-- DRIVER: POOL (MULTI SLOT) -->
+    <!-- DRIVER POOL (MULTI-SLOT) -->
     <section id="view-driver-pool" class="app-view hidden space-y-4">
       <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
         <h3 class="text-sm font-bold text-slate-800">Order Pool Aktif</h3>
@@ -267,6 +317,7 @@
       <div id="driver-pool-container" class="space-y-3"></div>
     </section>
 
+    <!-- DRIVER TASK -->
     <section id="view-driver-task" class="app-view hidden space-y-4">
       <div class="bg-brand-blue text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
         <div class="absolute -right-4 -top-4 opacity-10"><i class="fa-solid fa-truck-fast text-9xl"></i></div>
@@ -280,6 +331,7 @@
           </button>
         </div>
       </div>
+
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
         <h3 class="text-sm font-bold text-slate-800 border-b pb-3 mb-4">
           <i class="fa-solid fa-camera text-brand-blue mr-2"></i> Laporan Selesai Bongkar
@@ -304,16 +356,18 @@
               <option value="NONE">Tidak Ada</option>
             </select>
           </div>
+          
           <div id="nominal-container" class="hidden">
             <label class="block text-xs font-bold mb-2">Nominal Cash (Rp)</label>
             <input type="number" id="pay-nominal" class="w-full border rounded-xl p-3 text-sm font-bold bg-slate-50">
           </div>
+          
           <button type="submit" class="w-full bg-brand-green text-white font-bold py-3.5 rounded-xl text-xs shadow-md active-scale">Kirim Laporan Ritase</button>
         </form>
       </div>
     </section>
 
-    <!-- DRIVER: ABSEN -->
+    <!-- DRIVER ABSEN -->
     <section id="view-driver-absen" class="app-view hidden space-y-4">
       <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
         <h3 class="text-sm font-bold text-slate-800 mb-4 border-b pb-2">
@@ -337,7 +391,7 @@
       </div>
     </section>
 
-    <!-- DRIVER: KEUANGAN (Termasuk Transfer Kas) -->
+    <!-- DRIVER KEUANGAN & TRANSFER -->
     <section id="view-driver-finance" class="app-view hidden space-y-4">
       <div class="bg-amber-500 text-white p-5 rounded-2xl shadow-sm text-center">
         <h3 class="text-base font-bold">Laporan Kasbon & Pengeluaran</h3>
@@ -355,10 +409,12 @@
               <option value="TRANSFER_KAS">TRANSFER KAS KE DRIVER LAIN</option>
             </select>
           </div>
+          
           <div id="transfer-target-box" class="hidden">
             <label class="block text-xs font-bold mb-2 text-slate-600">Pilih Driver Penerima Kas</label>
             <select id="exp-target-driver" class="w-full border rounded-xl p-3 text-xs bg-slate-50"></select>
           </div>
+          
           <div>
             <label class="block text-xs font-bold mb-2 text-slate-600">Nominal (Rp)</label>
             <input type="number" id="exp-nom" required class="w-full border rounded-xl p-3 text-sm font-bold bg-slate-50">
@@ -373,19 +429,24 @@
     </section>
   </main>
 
+  <!-- DRIVER BOTTOM NAVIGATION -->
   <nav id="driver-nav" class="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 pb-safe z-40">
     <div class="flex justify-around items-center p-2">
       <button onclick="switchView('driver-pool')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400">
-        <i class="fa-solid fa-list-ul text-lg"></i><span class="text-[9px] font-bold">Pool</span>
+        <i class="fa-solid fa-list-ul text-lg"></i>
+        <span class="text-[9px] font-bold">Pool</span>
       </button>
       <button onclick="switchView('driver-task')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400">
-        <i class="fa-solid fa-truck-fast text-lg"></i><span class="text-[9px] font-bold">Tugas</span>
+        <i class="fa-solid fa-truck-fast text-lg"></i>
+        <span class="text-[9px] font-bold">Tugas</span>
       </button>
       <button onclick="switchView('driver-absen')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400">
-        <i class="fa-solid fa-calendar-check text-lg"></i><span class="text-[9px] font-bold">Absen</span>
+        <i class="fa-solid fa-calendar-check text-lg"></i>
+        <span class="text-[9px] font-bold">Absen</span>
       </button>
       <button onclick="switchView('driver-finance')" class="driver-tab-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400">
-        <i class="fa-solid fa-wallet text-lg"></i><span class="text-[9px] font-bold">Kas</span>
+        <i class="fa-solid fa-wallet text-lg"></i>
+        <span class="text-[9px] font-bold">Kas</span>
       </button>
     </div>
   </nav>
@@ -407,7 +468,7 @@
       </form>
     </div>
   </div>
-  
+
   <div id="modal-add-material" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center p-4 hidden">
     <div class="bg-white w-full max-w-sm rounded-2xl p-6 relative">
       <button onclick="closeModal('modal-add-material')" class="absolute top-4 right-4 text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -459,6 +520,7 @@
     </div>
   </div>
 
+  <!-- JAVASCRIPT APP LOGIC -->
   <script>
     const SUPABASE_URL = 'https://eijaasstpgxukifpqtsh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpamFhc3N0cGd4dWtpZnBxdHNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTUxNDIsImV4cCI6MjA5NzA5MTE0Mn0.d_FNrf5TQ-gLV8x_3rwMk_q9Go4yNEabisstSpToDLw';
@@ -492,7 +554,7 @@
         showLoader(false); 
       }
 
-      // Event Listeners Form
+      // Handlers Form
       document.getElementById('login-form').addEventListener('submit', handleLogin);
       document.getElementById('driver-delivery-form').addEventListener('submit', handleDeliverySubmit);
       document.getElementById('driver-expense-form').addEventListener('submit', handleExpenseSubmit);
@@ -508,12 +570,15 @@
       e.preventDefault(); 
       showLoader(true); 
       try { 
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email: document.getElementById('auth-email').value.trim(), password: document.getElementById('auth-password').value }); 
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ 
+          email: document.getElementById('auth-email').value.trim(), 
+          password: document.getElementById('auth-password').value 
+        }); 
         if (authError) throw authError; 
         
         const { data: userData, error: userError } = await supabase.from('master_users').select('*').eq('auth_user_id', authData.user.id).single(); 
-        if (userError || !userData) throw new Error("Akun belum terdaftar."); 
-        if (userData.status !== 'ACTIVE') throw new Error("Akun Non-aktif."); 
+        if (userError || !userData) throw new Error("Akun belum terdaftar di database."); 
+        if (userData.status !== 'ACTIVE') throw new Error("Akun status Non-aktif."); 
         
         currentUser = userData; 
         currentRole = userData.role; 
@@ -546,8 +611,14 @@
       document.getElementById('view-' + viewId).classList.remove('hidden');
       
       if (currentRole === 'ADMIN' || currentRole === 'SUPER_ADMIN') {
-        document.querySelectorAll('.admin-tab-btn').forEach(btn => { btn.classList.remove('border-b-2', 'border-brand-blue', 'text-brand-blue'); btn.classList.add('text-slate-500'); });
-        if(event && event.currentTarget) { event.currentTarget.classList.add('border-b-2', 'border-brand-blue', 'text-brand-blue'); event.currentTarget.classList.remove('text-slate-500'); }
+        document.querySelectorAll('.admin-tab-btn').forEach(btn => { 
+          btn.classList.remove('border-b-2', 'border-brand-blue', 'text-brand-blue'); 
+          btn.classList.add('text-slate-500'); 
+        });
+        if(event && event.currentTarget) { 
+          event.currentTarget.classList.add('border-b-2', 'border-brand-blue', 'text-brand-blue'); 
+          event.currentTarget.classList.remove('text-slate-500'); 
+        }
         
         if(viewId==='admin-dashboard') loadAdminDashboard(); 
         if(viewId==='admin-orders') loadAdminOrders(); 
@@ -556,15 +627,21 @@
         if(viewId==='admin-reports') loadAdminReports(); 
         if(viewId==='admin-finance') loadAdminKas();
       } else if (currentRole === 'DRIVER') {
-        document.querySelectorAll('.driver-tab-btn').forEach(btn => { btn.classList.remove('text-brand-blue'); btn.classList.add('text-slate-400'); });
-        if(event && event.currentTarget) { event.currentTarget.classList.add('text-brand-blue'); event.currentTarget.classList.remove('text-slate-400'); }
+        document.querySelectorAll('.driver-tab-btn').forEach(btn => { 
+          btn.classList.remove('text-brand-blue'); 
+          btn.classList.add('text-slate-400'); 
+        });
+        if(event && event.currentTarget) { 
+          event.currentTarget.classList.add('text-brand-blue'); 
+          event.currentTarget.classList.remove('text-slate-400'); 
+        }
         
         if(viewId==='driver-pool') loadDriverPool(); 
         if(viewId==='driver-finance') document.getElementById('driver-expense-form').reset();
       }
     }
 
-    // ================== ADMIN DASHBOARD ==================
+    // ================= ADMIN DASHBOARD & ORDERS =================
     async function loadAdminDashboard() {
       showLoader(true);
       const { data: orders } = await supabase.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']);
@@ -589,7 +666,6 @@
       }
     }
 
-    // ================== ADMIN ORDERS ==================
     async function loadAdminOrders() { 
       showLoader(true); 
       const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false }); 
@@ -600,22 +676,34 @@
       
       if(data) data.forEach(o => { 
         let badge = o.status === 'COMPLETED' ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px]">Selesai</span>' : '<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-[10px]">Berjalan</span>'; 
-        tbody.innerHTML += `<tr><td class="p-4 font-bold text-slate-700">${o.order_number||'-'}</td><td class="p-4 font-bold">${o.customer_id}<br><span class="text-[10px] text-slate-500 font-normal">${o.destination}</span></td><td class="p-4">${o.material_name||'-'}</td><td class="p-4 text-center font-bold text-brand-blue">${o.completed_rit} / ${o.total_rit} <br>${badge}</td></tr>`; 
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-4 font-bold text-slate-700">${o.order_number||'-'}</td>
+            <td class="p-4 font-bold">${o.customer_id}<br><span class="text-[10px] text-slate-500 font-normal">${o.destination}</span></td>
+            <td class="p-4">${o.material_name||'-'}</td>
+            <td class="p-4 text-center font-bold text-brand-blue">${o.completed_rit} / ${o.total_rit} <br>${badge}</td>
+          </tr>`; 
       }); 
     }
 
-    // ================== ADMIN MATERIALS & USERS ==================
     async function loadAdminMaterials() { 
       showLoader(true); 
       const { data } = await supabase.from('master_materials').select('*'); 
       showLoader(false); 
       const tbody = document.getElementById('admin-materials-tbody'); 
       tbody.innerHTML = ''; 
-      if(data) data.forEach(m => { tbody.innerHTML += `<tr><td class="p-4 font-bold">${m.name}</td><td class="p-4">${m.description||'-'}</td><td class="p-4 text-right"><button onclick="deleteMaterial('${m.id}')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`; }); 
+      if(data) data.forEach(m => { 
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-4 font-bold">${m.name}</td>
+            <td class="p-4">${m.description||'-'}</td>
+            <td class="p-4 text-right"><button onclick="deleteMaterial('${m.id}')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td>
+          </tr>`; 
+      }); 
     }
     
     async function deleteMaterial(id) { 
-      if(confirm("Hapus material?")) { 
+      if(confirm("Hapus material ini?")) { 
         await supabase.from('master_materials').delete().eq('id', id); 
         loadAdminMaterials(); 
       } 
@@ -627,10 +715,17 @@
       showLoader(false); 
       const tbody = document.getElementById('admin-users-tbody'); 
       tbody.innerHTML = ''; 
-      if(data) data.forEach(u => { tbody.innerHTML += `<tr><td class="p-4 font-bold">${u.name}</td><td class="p-4">${u.email}</td><td class="p-4">${u.role}</td><td class="p-4">${u.status}</td></tr>`; }); 
+      if(data) data.forEach(u => { 
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-4 font-bold">${u.name}</td>
+            <td class="p-4">${u.email}</td>
+            <td class="p-4">${u.role}</td>
+            <td class="p-4">${u.status}</td>
+          </tr>`; 
+      }); 
     }
 
-    // ================== ADMIN ADD FUNCTIONS ==================
     async function handleAddOrder(e) { 
       e.preventDefault(); 
       showLoader(true); 
@@ -645,7 +740,7 @@
       }]); 
       showLoader(false); 
       if(error) alert("Error: " + error.message); 
-      else { alert("Order dibuat!"); closeModal('modal-add-order'); loadAdminOrders(); } 
+      else { alert("Order berhasil dibuat!"); closeModal('modal-add-order'); loadAdminOrders(); } 
     }
     
     async function openModalAddOrder() { 
@@ -677,26 +772,40 @@
           password: document.getElementById('usr-pass').value 
         }); 
         if(aErr) throw aErr; 
+        
         await supabase.from('master_users').insert([{ 
           auth_user_id: aData.user.id, 
           name: document.getElementById('usr-name').value, 
           email: document.getElementById('usr-email').value, 
           role: document.getElementById('usr-role').value 
         }]); 
-        alert("Akun dibuat!"); 
+        
+        alert("Akun berhasil dibuat!"); 
         closeModal('modal-add-user'); 
         loadAdminUsers(); 
-      } catch (err) { alert("Error: " + err.message); } 
+      } catch (err) { 
+        alert("Error: " + err.message); 
+      } 
       showLoader(false); 
     }
 
-    // ================== ADMIN FINANCE (UANG JALAN) ==================
+    // ================= ADMIN FINANCE & REKAPAN =================
     async function loadAdminKas() {
-      const { data } = await supabase.from('driver_expenses').select('*, master_users!driver_id(name)').eq('expense_type', 'UANG_JALAN_ADMIN').order('created_at', { ascending: false });
+      const { data } = await supabase.from('driver_expenses')
+        .select('*, master_users!driver_id(name)')
+        .eq('expense_type', 'UANG_JALAN_ADMIN')
+        .order('created_at', { ascending: false });
+      
       const tbody = document.getElementById('admin-kas-history-tbody'); 
       tbody.innerHTML = '';
       if(data) data.forEach(x => { 
-        tbody.innerHTML += `<tr><td class="p-3 text-slate-500">${new Date(x.created_at).toLocaleString('id-ID')}</td><td class="p-3 font-bold">${x.master_users?.name||'Driver'}</td><td class="p-3">${x.description}</td><td class="p-3 font-bold text-rose-500">Rp ${parseInt(x.nominal||0).toLocaleString('id-ID')}</td></tr>`; 
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-3 text-slate-500">${new Date(x.created_at).toLocaleString('id-ID')}</td>
+            <td class="p-3 font-bold">${x.master_users?.name||'Driver'}</td>
+            <td class="p-3">${x.description}</td>
+            <td class="p-3 font-bold text-rose-500">Rp ${parseInt(x.nominal||0).toLocaleString('id-ID')}</td>
+          </tr>`; 
       });
     }
     
@@ -711,10 +820,13 @@
       }]); 
       showLoader(false); 
       if(error) alert("Gagal: " + error.message); 
-      else { alert("Uang Jalan Tercatat!"); document.getElementById('admin-give-cash-form').reset(); loadAdminKas(); } 
+      else { 
+        alert("Uang Jalan Tercatat!"); 
+        document.getElementById('admin-give-cash-form').reset(); 
+        loadAdminKas(); 
+      } 
     }
 
-    // ================== REKAPAN PRO (WITH EDIT & ABSEN) ==================
     async function setupAdminFilters() {
       const { data } = await supabase.from('master_users').select('id, name').eq('role', 'DRIVER');
       const selF = document.getElementById('filter-driver'); 
@@ -758,20 +870,47 @@
       dBody.innerHTML = '';
       if(dRes.data) dRes.data.forEach(d => {
         let nominal = d.payment_method === 'CASH' ? parseInt(d.nominal||0).toLocaleString('id-ID') : '-';
-        dBody.innerHTML += `<tr><td class="p-3 text-slate-500">${new Date(d.created_at).toLocaleDateString('id-ID')}</td><td class="p-3 font-bold">${d.orders?.order_number||'-'}</td><td class="p-3">${d.orders?.destination||'-'}/${d.orders?.material_name||'-'}</td><td class="p-3 font-bold text-brand-blue">${d.master_users?.name||'Driver'}</td><td class="p-3">Rit ke-${d.trip_number}</td><td class="p-3 font-bold">${d.payment_method}</td><td class="p-3 font-bold text-amber-600">${nominal}</td><td class="p-3 text-center"><button onclick="openEditRekapan('${d.id}', '${d.payment_method}', '${d.nominal}')" class="text-amber-500 hover:text-amber-700 bg-amber-50 px-2 py-1 rounded"><i class="fa-solid fa-pen-to-square"></i> Edit</button></td></tr>`;
+        dBody.innerHTML += `
+          <tr>
+            <td class="p-3 text-slate-500">${new Date(d.created_at).toLocaleDateString('id-ID')}</td>
+            <td class="p-3 font-bold">${d.orders?.order_number||'-'}</td>
+            <td class="p-3">${d.orders?.destination||'-'}/${d.orders?.material_name||'-'}</td>
+            <td class="p-3 font-bold text-brand-blue">${d.master_users?.name||'Driver'}</td>
+            <td class="p-3">Rit ke-${d.trip_number}</td>
+            <td class="p-3 font-bold">${d.payment_method}</td>
+            <td class="p-3 font-bold text-amber-600">${nominal}</td>
+            <td class="p-3 text-center">
+              <button onclick="openEditRekapan('${d.id}', '${d.payment_method}', '${d.nominal}')" class="text-amber-500 hover:text-amber-700 bg-amber-50 px-2 py-1 rounded">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+            </td>
+          </tr>`;
       });
       
       const eBody = document.getElementById('admin-expenses-tbody'); 
       eBody.innerHTML = '';
       if(eRes.data) eRes.data.forEach(x => { 
-        eBody.innerHTML += `<tr><td class="p-3 text-slate-500">${new Date(x.created_at).toLocaleDateString('id-ID')}</td><td class="p-3 font-bold">${x.master_users?.name||'Driver'}</td><td class="p-3 font-bold text-rose-600">${x.expense_type}</td><td class="p-3">${x.description}</td><td class="p-3 font-bold">Rp ${parseInt(x.nominal||0).toLocaleString('id-ID')}</td></tr>`; 
+        eBody.innerHTML += `
+          <tr>
+            <td class="p-3 text-slate-500">${new Date(x.created_at).toLocaleDateString('id-ID')}</td>
+            <td class="p-3 font-bold">${x.master_users?.name||'Driver'}</td>
+            <td class="p-3 font-bold text-rose-600">${x.expense_type}</td>
+            <td class="p-3">${x.description}</td>
+            <td class="p-3 font-bold">Rp ${parseInt(x.nominal||0).toLocaleString('id-ID')}</td>
+          </tr>`; 
       });
       
       const aBody = document.getElementById('admin-absen-tbody'); 
       aBody.innerHTML = '';
       if(aRes.data) aRes.data.forEach(a => { 
         let c = a.status==='HADIR'?'text-brand-green':(a.status==='SAKIT'?'text-rose-500':'text-amber-500'); 
-        aBody.innerHTML += `<tr><td class="p-3 text-slate-500">${new Date(a.created_at).toLocaleDateString('id-ID')}</td><td class="p-3 font-bold">${a.master_users?.name||'Driver'}</td><td class="p-3 font-bold ${c}">${a.status}</td><td class="p-3">${a.notes||'-'}</td></tr>`; 
+        aBody.innerHTML += `
+          <tr>
+            <td class="p-3 text-slate-500">${new Date(a.created_at).toLocaleDateString('id-ID')}</td>
+            <td class="p-3 font-bold">${a.master_users?.name||'Driver'}</td>
+            <td class="p-3 font-bold ${c}">${a.status}</td>
+            <td class="p-3">${a.notes||'-'}</td>
+          </tr>`; 
       });
     }
     
@@ -792,7 +931,11 @@
       
       showLoader(false); 
       if(error) alert("Gagal Edit: "+error.message); 
-      else { alert("Data Ritase Diperbarui!"); closeModal('modal-edit-rekapan'); loadAdminReports(); } 
+      else { 
+        alert("Data Ritase Diperbarui!"); 
+        closeModal('modal-edit-rekapan'); 
+        loadAdminReports(); 
+      } 
     }
     
     function exportExcel() { 
@@ -803,7 +946,7 @@
       XLSX.writeFile(wb, `Rekapan_Sansam_${new Date().toLocaleDateString('id-ID')}.xlsx`); 
     }
 
-    // ================== DRIVER ==================
+    // ================= DRIVER FUNCTIONS =================
     async function populateDriverDropdowns() { 
       const { data } = await supabase.from('master_users').select('id, name').eq('role', 'DRIVER').neq('id', currentUser.id); 
       const sel = document.getElementById('exp-target-driver'); 
@@ -811,8 +954,11 @@
     }
     
     function toggleTransferDriver() { 
-      if(document.getElementById('exp-type').value === 'TRANSFER_KAS') document.getElementById('transfer-target-box').classList.remove('hidden'); 
-      else document.getElementById('transfer-target-box').classList.add('hidden'); 
+      if(document.getElementById('exp-type').value === 'TRANSFER_KAS') {
+        document.getElementById('transfer-target-box').classList.remove('hidden'); 
+      } else {
+        document.getElementById('transfer-target-box').classList.add('hidden'); 
+      }
     }
     
     async function handleAbsenSubmit(e) { 
@@ -825,7 +971,10 @@
       }]); 
       showLoader(false); 
       if(error) alert("Gagal: "+error.message); 
-      else { alert("Absen Berhasil Dikirim!"); document.getElementById('driver-absen-form').reset(); } 
+      else { 
+        alert("Absen Berhasil Dikirim!"); 
+        document.getElementById('driver-absen-form').reset(); 
+      } 
     }
     
     async function handleExpenseSubmit(e) {
@@ -847,7 +996,11 @@
       }]);
       showLoader(false); 
       if(error) alert("Gagal: " + error.message); 
-      else { alert("Laporan Dana Terkirim!"); document.getElementById('driver-expense-form').reset(); toggleTransferDriver(); }
+      else { 
+        alert("Laporan Dana Terkirim!"); 
+        document.getElementById('driver-expense-form').reset(); 
+        toggleTransferDriver(); 
+      }
     }
 
     async function checkActiveDriverTask() { 
@@ -867,7 +1020,7 @@
       } 
     }
 
-    // MENGATASI MASALAH POOL 10 RITASE = 10 PILIHAN SLOT
+    // MULTI SLOT GENERATION PER RITASE
     async function loadDriverPool() {
       showLoader(true); 
       const { data: orders } = await supabase.from('orders').select('*').in('status', ['AVAILABLE', 'PARTIALLY_COMPLETED']).eq('locked', false); 
@@ -885,7 +1038,6 @@
         let htmlBuild = '';
         orders.forEach(o => {
           let sisaSlot = o.total_rit - o.completed_rit - (activeMap[o.id] || 0);
-          // Loop sebanyak sisa slot agar muncul banyak pilihan untuk armada lain
           for(let i=0; i<sisaSlot; i++) {
             hasData = true; 
             htmlBuild += `
@@ -904,7 +1056,6 @@
       if(!hasData) cont.innerHTML = `<div class="p-6 text-slate-400 text-xs text-center border rounded-xl bg-slate-50">Tidak ada order / slot tersedia.</div>`;
     }
 
-    // PERBAIKAN: Menggunakan currentUser.id agar tidak error assignments_driver_id_fkey
     async function takeOrder(orderId) { 
       if(activeAssignment) return alert("Selesaikan tugas aktif Anda dulu!"); 
       if(confirm("Ambil 1 Ritase ini?")) { 
@@ -1028,6 +1179,3 @@
   </script>
 </body>
 </html>
-```
-
-Silakan salin *(copy)* kembali dan simpan di GitHub Bapak. Jika driver Bapak sekarang mencoba menekan tombol **"Ambil 1 Rit"**, prosesnya akan langsung sukses tanpa *error* lagi!
